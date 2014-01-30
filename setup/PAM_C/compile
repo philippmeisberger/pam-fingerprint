@@ -1,0 +1,8 @@
+#!/bin/sh
+gcc -fPIC -DPIC -shared -rdynamic -o ../src/pam_fingerprint.so ../src/pam_fingerprint.c
+
+# Compile for 64bit
+#gcc -m64 -fPIC -DPIC -shared -rdynamic -o ../src/pam_fingerprint64.so ../src/pam_fingerprint.c
+
+# Compile for 32bit
+#gcc -m32 -fPIC -DPIC -shared -rdynamic -o ../src/pam_fingerprint32.so ../src/pam_fingerprint.c

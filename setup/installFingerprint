@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Install PAM module
+cp ../src/pam_fingerprint.py /lib/security/pam_fingerprint.py
+chown root:root /lib/security/pam_fingerprint.py
+chmod 644 /lib/security/pam_fingerprint.py
+
+# Allocate PAM module to system
+cp common-auth /etc/pam.d/
+chmod 644 /etc/pam.d/common-auth

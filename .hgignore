@@ -1,0 +1,5 @@
+## Uses glob syntax, regex sucks ;)
+syntax: glob
+
+**.pyc
+**.out
