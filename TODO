@@ -1,1 +1,4 @@
 - Write owner of pam_fingerprint.log
+- Exception message print
+- Main-program pam_fingerprint-conf --> /usr/bin/
+- Add unimplemented method headers 

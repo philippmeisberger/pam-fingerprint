@@ -4,7 +4,11 @@
 cp ../src/lib/security/pam_fingerprint.py /lib/security/
 
 cp ../src/etc/pam_fingerprint.conf /etc/
+# TODO: lower perms
 #chmod 600 /etc/pam_fingerprint.conf
+
+cp ../src/usr/bin/pam_fingerprint-conf /usr/bin/
+chmod 744 /usr/bin/pam_fingerprint-conf
 
 cp ../src/var/log/pam_fingerprint.log /var/log/
 chown phil: /var/log/pam_fingerprint.log
