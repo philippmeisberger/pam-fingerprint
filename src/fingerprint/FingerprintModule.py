@@ -29,13 +29,13 @@ class FingerprintModule(object):
     """
     def __init__(self):
 
-        # Get connection values
+        ## Gets connection values
         port = Config.getInstance().readString('FingerprintModule', 'port')
         baudRate = Config.getInstance().readInteger('FingerprintModule', 'baudRate')
         address = Config.getInstance().readHex('FingerprintModule', 'address')
         password = Config.getInstance().readHex('FingerprintModule', 'password')
 
-        # Try to establish connection
+        ## Tries to establish connection
         self.__fingerprint = Fingerprint(port, baudRate, address, password)
 
         p = self.__fingerprint.verifyPassword()
@@ -48,7 +48,7 @@ class FingerprintModule(object):
             raise Exception('Password is wrong')
         else:
             raise Exception('Unknown error')
-            
+
     """
     "" Authenticates a user with a fingerprint.
     ""
@@ -56,11 +56,17 @@ class FingerprintModule(object):
     """
     def authenticate(self):
 
+        ## Checks if this module is installed
+        if ( Module.isInstalled(self.MODULENAME) == False ):
+            Logger.getInstance().log(Logger.NOTICE, __name__, 'Module "' + self.MODULENAME + '" is not installed!')
+            return False
+
         p = [-1]
+        Logger.getInstance().log(Logger.DEBUG, __name__, 'Waiting for finger...')
 
         while ( p[0] != FINGERPRINT_OK ):
 
-            # Get fingerprint image
+            ## Gets fingerprint image
             p = self.__fingerprint.getImage()
 
             if ( p[0] == FINGERPRINT_OK ):
@@ -74,12 +80,10 @@ class FingerprintModule(object):
                 Logger.getInstance().log(Logger.ERROR, __name__, 'Imaging error')
             else:
                 Logger.getInstance().log(Logger.ERROR, __name__, 'Unknown error')
-                
-            time.sleep(0.05)
-        
-        # First step is done
+
+        ## First step is done
         p = self.__fingerprint.image2Tz(0x01);
-        
+
         if ( p[0] == FINGERPRINT_OK ):
             Logger.getInstance().log(Logger.DEBUG, __name__, 'Image converted.')
         elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
@@ -98,7 +102,7 @@ class FingerprintModule(object):
             Logger.getInstance().log(Logger.ERROR, __name__, 'Unknown error')
             return False
 
-        # Search fingerprint in database
+        ## Searches fingerprint in database
         p = self.__fingerprint.searchTemplate();
 
         if ( p[0] == FINGERPRINT_OK ):
@@ -117,6 +121,21 @@ class FingerprintModule(object):
         positionNumber = utilities.leftShift(positionNumber, 8)
         positionNumber = positionNumber | p[2]
 
-        # TODO: Check if user exists in a file
+        ## Gets user ID from database
+        Database.getInstance().cursor.execute('SELECT user_id FROM ' + self.DATABASE_TABLENAME + ' WHERE template_id=?',
+            [positionNumber]
+        )
+        rows = Database.getInstance().cursor.fetchall()        
 
+        if ( len(rows) > 0 ):
+            userId = rows[0][0]
+        else:
+            userId = -1
+            AuthLogger.getInstance().log(userId, __name__, 'Access denied (template not assigned).')
+            return False
+
+        # TODO: Check if user exists in a file
         return True
+
+        ## General false for sure
+        #return False
