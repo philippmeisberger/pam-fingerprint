@@ -25,7 +25,7 @@ class Config(object):
     "" Path to configuration file
     "" @var string __configFile
     """
-    __configFile = os.environ['PYTHONPATH'] + '/var/pamfingerprint.cfg'
+    __configFile = os.environ['PYTHONPATH'] + '/etc/pam_fingerprint.conf'
 
     """
     "" The ConfigParser object

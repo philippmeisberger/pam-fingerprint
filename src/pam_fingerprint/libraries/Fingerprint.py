@@ -18,8 +18,8 @@
 ""
 """
 
-from fingerprint.lib.constants import *
-import fingerprint.lib.utilities as utilities
+from pam_fingerprint.libraries.constants import *
+import pam_fingerprint.libraries.utilities as utilities
 
 import serial
 import struct

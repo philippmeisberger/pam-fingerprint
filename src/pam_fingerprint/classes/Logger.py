@@ -8,7 +8,7 @@
 "" All rights reserved.
 """
 
-from utils.Config import *
+from pam_fingerprint.classes.Config import *
 import sys
 import time
 import os
