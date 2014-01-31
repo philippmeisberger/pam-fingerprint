@@ -9,18 +9,11 @@
 """
 
 from pam_fingerprint.classes.Config import *
-import sys
 import time
 import os
 
 
 class Logger(object):
-
-    """
-    "" Singleton instance
-    "" @var object __instance
-    """
-    __instance = None
 
     """
     "" Log level constants
@@ -38,17 +31,11 @@ class Logger(object):
     __file = None
 
     """
-    "" Singleton method
-    ""
-    "" @return Logger
+    "" The config instance
+    "" @var Config __config
     """
-    @classmethod
-    def getInstance(self):
-
-        if not self.__instance:
-            self.__instance = Logger()
-        return self.__instance
-
+    __config = None
+    
     """
     "" Constructor
     ""    
@@ -57,11 +44,9 @@ class Logger(object):
     def __init__(self):
 
         # Get path to log file
-        logFile = Config.getInstance().readString('Log', 'file')
-
-        # Absolute path to log file
-        logFile = os.environ['PYTHONPATH'] + logFile
-
+        self.__config = Config('/etc/pam_fingerprint.conf')
+        logFile = self.__config.readString('Log', 'file')
+        
         # Checks if path/file is writable
         if ( os.access(logFile, os.W_OK) == False ):
             raise Exception('The log file "' + logFile + '" is not writable!')
@@ -90,11 +75,11 @@ class Logger(object):
     "" 
     "" @return void
     """
-    def log(self, level, caller, message, printMessage = True):
+    def log(self, level, message):
 
         ## Gets logging level from configuration file
-        loggingLevel = Config.getInstance().readInteger('Log', 'level')
-
+        loggingLevel = self.__config.readInteger('Log', 'level')
+        
         if ( loggingLevel < 0 or loggingLevel > 3 ):
             raise Exception('Invalid configuration file (line "level" must be [0-3])!')
 
@@ -114,8 +99,8 @@ class Logger(object):
                 levelLabel = '[Unknown level]'
 
             ## Appends message to log
-            self.__file.write(time.strftime('%Y-%m-%d %H:%M:%S: ') + levelLabel + ' ' + caller + ': ' + message + '\n')
+            self.__file.write(time.strftime('%Y-%m-%d %H:%M:%S: ') + levelLabel + ' ' + message + '\n')
 
             ## Prints all log messages which log level is greater than DEBUG
-            if ( level >= Logger.DEBUG or printMessage == True ):
-                print levelLabel + ' ' + caller + ': ' + message
+            if ( level >= Logger.DEBUG ):
+                print levelLabel + ' pam_fingerprint: ' + message

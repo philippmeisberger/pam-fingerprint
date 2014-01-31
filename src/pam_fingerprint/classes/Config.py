@@ -16,34 +16,10 @@ import os
 class Config(object):
 
     """
-    "" Singleton instance
-    "" @var object __instance
-    """
-    __instance = None
-
-    """
-    "" Path to configuration file
-    "" @var string __configFile
-    """
-    __configFile = os.environ['PYTHONPATH'] + '/etc/pam_fingerprint.conf'
-
-    """
     "" The ConfigParser object
     "" @var ConfigParser __configParser
     """
     __configParser = None
-
-    """
-    "" Singleton method
-    ""
-    "" @return Config
-    """
-    @classmethod
-    def getInstance(self):
-
-        if (not self.__instance):
-            self.__instance = Config(self.__configFile)
-        return self.__instance
 
     """
     "" Constructor
