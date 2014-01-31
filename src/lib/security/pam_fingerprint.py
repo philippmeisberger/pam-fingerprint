@@ -10,7 +10,10 @@
 
 from pam_fingerprint.classes.Logger import *
 from pam_fingerprint.classes.Config import *
+
+from pam_fingerprint.libraries.constants import *
 from pam_fingerprint.libraries.Fingerprint import *
+import pam_fingerprint.libraries.utilities as utilities
 
 import os
 
@@ -37,7 +40,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     ## Tries to init logger instance
     try:
-        logger = Logger()
+        logger = Logger('/var/log/pam_fingerprint.log', Logger.NOTICE)
 
     except Exception:
         print 'TODO: Logger Exception message'

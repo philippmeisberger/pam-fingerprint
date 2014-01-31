@@ -1,7 +1,5 @@
 """
-"" PAM Fingerprint
 "" A python written library for Adafruit optical fingerprint sensor.
-""
 "" @author Bastian Raschke
 ""
 "" Inspired by Adafruit Industries
