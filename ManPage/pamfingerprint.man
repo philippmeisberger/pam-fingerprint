@@ -1,0 +1,30 @@
+.TH PAMFINGERPRINT 1 "" "" "PAM Fingerprint"
+
+.SH NAME
+pamfingerprint - PAM module for fingerprint authentification
+.SH SYNOPSIS
+.B pamfingerprint
+.RI [ options ]
+.br
+
+.SH DESCRIPTION
+\fBPAM Fingerprint\fP is a open-source Unix PAM module that allows users biometric fingerprint
+authentification.
+
+It is totally written in python and uses a python framework called
+pam_python as adapter to implement the PAM interface that is written in C.
+PAM Fingerprint uses the Adafruit optical fingerprint sensor for biometric 
+authentification. Pyserial, a python written library for serial connections, is used 
+for the connection between the sensor and a computer. The sensor is connected
+with a USB TTL converter.
+.PP
+
+.SH OPTIONS
+.B
+.IP -OPTION
+This option...
+
+.SH "SEE ALSO"
+Used fingerprint sensor from Adafruit:
+.br
+http://www.adafruit.com/products/751
