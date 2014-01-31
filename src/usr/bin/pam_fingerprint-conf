@@ -1,2 +1,76 @@
-#!/usr/bin/python
-print '1'
+#!/usr/bin/env python
+"""
+"" PAM Fingerprint
+"" Main program
+""
+"" @author Philipp Meisberger
+""
+"" Copyright 2014 Bastian Raschke, Philipp Meisberger.
+"" All rights reserved.
+"""
+
+import argparse
+
+
+class PamFingerprint(object):
+
+    """
+    "" Argument parser instance
+    "" @var argparse __parser
+    """
+    __parser = None
+
+    """
+    "" Constructor
+    ""
+    "" @return void
+    """
+    def __init__(self):
+
+        self.__parser = argparse.ArgumentParser(description='PAM_Fingerprint main configuration program.')
+        self.__parser.add_argument('--add-user', help='Adds a new user and enrolls new fingerprint image.')
+        self.__parser.add_argument('--remove-user', help='Removes an user from the fingerprint database.')
+        self.__parser.add_argument('--check', help='Enrolls fingerprint and checks if user was found.', nargs='?', const=True)
+
+        args = vars(self.__parser.parse_args())
+
+        if ( args['add_user'] ):
+            self.addUser(args['add_user'])
+        elif ( args['remove_user'] ):
+            self.removeUser(args['remove_user'])
+        elif ( args['check'] ):
+            self.check()
+        else:
+            self.__parser.print_help()
+
+    """
+    "" Adds new user and enrolls new fingerprint image.
+    ""
+    "" @param string name
+    "" @return boolean
+    """
+    def addUser(self, name):
+
+        print 'Called addUser: '+ name
+ 
+    """
+    "" Removes an user from the fingerprint database.
+    ""
+    "" @param string name
+    "" @return boolean
+    """
+    def removeUser(self, name):
+
+        print 'Called removeUser: '+ name
+
+    """
+    "" Enrolls fingerprint and checks if user was found.
+    ""
+    "" @return boolean
+    """
+    def check(self):
+
+        print 'Called check'
+
+
+conf = PamFingerprint()

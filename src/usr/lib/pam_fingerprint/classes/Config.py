@@ -100,3 +100,12 @@ class Config(object):
     def getSections(self):
     
         return self.__configParser.sections()
+
+    """
+    "" Returns all items of a sections as an array.
+    ""
+    "" @return array
+    """
+    def getItems(self, section):
+
+        return self.__configParser.items()
