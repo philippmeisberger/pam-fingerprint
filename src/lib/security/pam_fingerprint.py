@@ -16,7 +16,7 @@ import os
 
 
 """
-"" Is called when a user tries to authenticate.
+"" PAM service function for user authentication.
 ""
 "" @param pamh
 "" @param flags
@@ -142,7 +142,7 @@ def pam_sm_authenticate(pamh, flags, argv):
     return pamh.IGNORE
 
 """
-""
+"" PAM service function to alter credentials.
 ""
 "" @param pamh
 "" @param flags
@@ -154,7 +154,7 @@ def pam_sm_setcred(pamh, flags, argv):
     return pamh.PAM_SUCCESS
 
 """
-""
+"" PAM service function for account management.
 ""
 "" @param pamh
 "" @param flags
@@ -166,7 +166,7 @@ def pam_sm_acct_mgmt(pamh, flags, argv):
     return pamh.PAM_SUCCESS
 
 """
-""
+"" PAM service function to open session management.
 ""
 "" @param pamh
 "" @param flags
@@ -178,7 +178,7 @@ def pam_sm_open_session(pamh, flags, argv):
     return pamh.PAM_SUCCESS
 
 """
-""
+"" PAM service function to terminate session management.
 ""
 "" @param pamh
 "" @param flags
@@ -190,7 +190,7 @@ def pam_sm_close_session(pamh, flags, argv):
     return pamh.PAM_SUCCESS
 
 """
-""
+"" PAM service function for authentication token management.
 ""
 "" @param pamh
 "" @param flags
