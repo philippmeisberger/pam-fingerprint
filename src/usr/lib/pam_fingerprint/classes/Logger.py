@@ -8,14 +8,18 @@
 "" All rights reserved.
 """
 
-from pam_fingerprint.classes.Config import *
-
 import time
 import os
 
 
 class Logger(object):
 
+    """
+    "" Singleton instance
+    "" @var object __instance
+    """
+    __instance = None
+    
     """
     "" Log level constants
     "" @var integer
@@ -38,25 +42,38 @@ class Logger(object):
     __logLevel = None
 
     """
+    "" Singleton method
+    ""
+    "" @return Logger
+    """
+    @classmethod
+    def getInstance(self):
+
+        if not self.__instance:
+            self.__instance = Logger()
+        return self.__instance
+    
+    """
     "" Constructor
     ""
     "" @param string logFile
     "" @param integer logLevel
     "" @return void
     """
-    def __init__(self, logFile, logLevel = self.NOTICE):
+    def __init__(self, logFile):
 
         # Checks if path/file is writable
         if ( os.access(logFile, os.W_OK) == False ):
             raise Exception('The log file "' + logFile + '" is not writable!')
 
-        if ( logLevel < 0 or logLevel > 3 ):
-            raise Exception('The log level must between 0 and 3!')
+        #if ( logLevel < 0 or logLevel > 3 ):
+        #    raise Exception('The log level must between 0 and 3!')
 
         # Opens log file for appending text 
         self.__file = open(logFile, 'a')
 
-        self.__logLevel = logLevel
+        # Default log level: NOTICE
+        self.__logLevel = self.NOTICE
 
     """
     "" Destructor

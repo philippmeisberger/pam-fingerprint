@@ -11,16 +11,35 @@
 
 import ConfigParser
 import os
+import sys
 
 
 class Config(object):
 
+    """
+    "" Singleton instance
+    "" @var object __instance
+    """
+    __instance = None
+    
     """
     "" The ConfigParser object
     "" @var ConfigParser __configParser
     """
     __configParser = None
 
+    """
+    "" Singleton method
+    ""
+    "" @return Config
+    """
+    @classmethod
+    def getInstance(self):
+
+        if (not self.__instance):
+            self.__instance = Config(self.__configFile)
+        return self.__instance
+        
     """
     "" Constructor
     ""
@@ -29,6 +48,8 @@ class Config(object):
     """
     def __init__(self, configFile):
 
+        self.__configFile = configFile
+        
         # Checks if path/file is readable
         if ( os.access(configFile, os.R_OK) == False ):
             raise Exception('The configuration file \"' + configFile + '\" is not readable!')
@@ -36,6 +57,39 @@ class Config(object):
         self.__configParser = ConfigParser.ConfigParser()
         self.__configParser.read(configFile)
 
+    """
+    "" Destructor
+    ""
+    "" @return void
+    """
+    def __del__(self):
+
+        # Saves config file
+        self.__configParser.write(open(self.__configFile, 'w'))
+
+    """
+    "" Removes data from config file.
+    ""
+    "" @param string section
+    "" @param string name
+    "" @return boolean
+    """
+    def remove(self, section, name):
+
+        return self.__configParser.remove_option(section, name)
+
+    """
+    "" Writes data into config file.
+    ""
+    "" @param string section
+    "" @param string name
+    "" @parama string value
+    "" @return void
+    """
+    def writeString(self, section, name, value):
+
+        self.__configParser.set(section, name, value)
+        
     """
     "" Reads a string value from config file.
     ""
@@ -108,4 +162,4 @@ class Config(object):
     """
     def getItems(self, section):
 
-        return self.__configParser.items()
+        return self.__configParser.items(section)

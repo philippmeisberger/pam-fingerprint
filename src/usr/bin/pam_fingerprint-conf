@@ -34,6 +34,12 @@ class PamFingerprint(object):
     "" @var Logger __logger
     """
     __logger = None
+
+    """
+    "" Config instance
+    "" @var Config __config
+    """
+    __config = None
     
     """
     "" Constructor
@@ -44,25 +50,25 @@ class PamFingerprint(object):
 
         ## Tries to init config instance
         try:
-            config = Config('/etc/pam_fingerprint.conf')
+            self.__config = Config('/etc/pam_fingerprint.conf')
 
         except Exception:
             print 'TODO: Config Exception message'
             exit(1)
 
         ## Tries to init logger instance
-        try:
-            self.__logger = Logger()
+        #try:
+        self.__logger = Logger(self.__config.readString('Log', 'file'))
 
-        except Exception:
-            print 'TODO: Logger Exception message'
-            exit(1)
+        #except Exception:
+        #    print 'TODO: Logger Exception message'
+        #    exit(1)
 
         ## Gets connection values
-        port = config.readString('FingerprintModule', 'port')
-        baudRate = config.readInteger('FingerprintModule', 'baudRate')
-        address = config.readHex('FingerprintModule', 'address')
-        password = config.readHex('FingerprintModule', 'password')
+        port = self.__config.readString('FingerprintModule', 'port')
+        baudRate = self.__config.readInteger('FingerprintModule', 'baudRate')
+        address = self.__config.readHex('FingerprintModule', 'address')
+        password = self.__config.readHex('FingerprintModule', 'password')
 
         ## Tries to establish connection
         try:
@@ -96,7 +102,12 @@ class PamFingerprint(object):
     """
     def __getIdForName(self, userName):
 
+        users = self.__config.getItems('Users')
         
+        for user in users:
+            if ( user[0] == userName ):
+                return self.__config.readInteger('Users', userName)
+
         return -1
         
     """
@@ -105,7 +116,7 @@ class PamFingerprint(object):
     "" @param string name
     "" @return boolean
     """
-    def addUser(self, name):
+    def addUser(self, userName):
 
         p = [-1]
         self.__logger.log(Logger.DEBUG, 'Waiting for finger...')
@@ -248,7 +259,15 @@ class PamFingerprint(object):
             self.__logger.log(Logger.ERROR, 'Unknown error')
             return False        
 
-        # TODO: Store tuple <userName> = <template ID> to .conf
+        ## Tries to store tuple <userName> = <template ID> to config
+        try:
+            self.__config.writeString('Users', userName, positionNumber)
+            self.__logger.log(Logger.NOTICE, 'User '+ userName +' added successfully!')
+            return True
+
+        except Exception:
+            self.__logger.log(Logger.ERROR, 'Error while adding user '+ userName +'!')
+            return False 
         
     """
     "" Removes an user from the fingerprint database.
@@ -256,30 +275,37 @@ class PamFingerprint(object):
     "" @param string name
     "" @return boolean
     """
-    def removeUser(self, name):
+    def removeUser(self, userName):
         
         ## Confirmation dialog 
-        r = raw_input('Remove user ' + name + ')? (y/n)')
+        answer = raw_input('Remove user ' + userName + '? (Y/n)')
 
-        if ( not answer in ['y', 'Y'] ):
-            print 'Canceled.'
+        if ( answer in ['n', 'N'] ):
+            print 'Abort!'
             return False
 
-        userId = self.__getIdForName(name)
-
-        if ( userName < 0 ):
+        userId = self.__getIdForName(userName)
+        
+        if ( userId < 0 ):
             self.__logger.log(Logger.ERROR, 'User not found!')
             return False
-            
+        """
         p = [-1]
         p = self.__fingerprint.deleteTemplate(userId)
 
         if ( p[0] == FINGERPRINT_OK ):
             self.__logger.log(Logger.DEBUG, 'Template removed.')
-            return True
         else:
             self.__logger.log(Logger.ERROR, 'Unknown error')
             return False
+        """
+        ## Removes user from config
+        if ( self.__config.remove('Users', userName) == True ):
+            self.__logger.log(Logger.NOTICE, 'User '+ userName +' removed successfully!')
+            return True
+        else:
+            self.__logger.log(Logger.ERROR, 'Error while removing user '+ userName +'!')
+            return False        
 
     """
     "" Enrolls fingerprint and checks if user was found.
@@ -288,7 +314,6 @@ class PamFingerprint(object):
     """
     def check(self):
 
-        print 'Called check'
         p = [-1]
         self.__logger.log(Logger.DEBUG, 'Waiting for finger...')
 
@@ -348,7 +373,16 @@ class PamFingerprint(object):
         positionNumber = p[1]
         positionNumber = utilities.leftShift(positionNumber, 8)
         positionNumber = positionNumber | p[2]
+        
+        ## Checks in config if <userName> matches <template ID>
+        users = self.__config.getItems('Users')
 
-        # TODO: Check in .conf if <userName> matches <template ID>
+        for user in users:
+            if ( self.__config.readInteger(user) == positionNumber ):
+                self.__logger.log(Logger.NOTICE, 'Check for user '+ user +' was successful!')
+                return True
 
-conf = PamFingerprint()
+        self.__logger.log(Logger.ERROR, 'Error while checking user '+ user +'!')
+        return False
+        
+PamFingerprint()
