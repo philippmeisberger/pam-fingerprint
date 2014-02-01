@@ -29,6 +29,7 @@ import os
 def pam_sm_authenticate(pamh, flags, argv):
 
     print 'pamfingerprint: loading module...'
+    #print pamh.get_user()
 
     ## Tries to init config instance
     try:
@@ -138,9 +139,15 @@ def pam_sm_authenticate(pamh, flags, argv):
     positionNumber = utilities.leftShift(positionNumber, 8)
     positionNumber = positionNumber | p[2]
 
-    # TODO: Check if user exists in a file
-    if ( positionNumber > 0 ):
-        return pamh.PAM_SUCCESS
+    ## Checks in config if <userName> matches <template ID>
+    users = config.getItems('Users')
+
+    for user in users:
+        if ( config.readInteger(user) == positionNumber ):
+            print 'Access granted for '+ user +'!'
+            return pamh.PAM_SUCCESS
+
+    print 'Access denied!'
     
     ## Denies for default 
     return pamh.IGNORE

@@ -294,7 +294,7 @@ class PamFingerprint(object):
         if ( userId < 0 ):
             self.__logger.log(Logger.ERROR, 'User not found!')
             return False
-        """
+
         p = [-1]
         p = self.__fingerprint.deleteTemplate(userId)
 
@@ -303,7 +303,7 @@ class PamFingerprint(object):
         else:
             self.__logger.log(Logger.ERROR, 'Unknown error')
             return False
-        """
+
         ## Removes user from config
         if ( self.__config.remove('Users', userName) == True ):
             self.__logger.log(Logger.NOTICE, 'User '+ userName +' removed successfully!')
@@ -389,7 +389,5 @@ class PamFingerprint(object):
 
         self.__logger.log(Logger.ERROR, 'Error while checking user '+ user +'!')
         return False
-
-
 
 PamFingerprint()

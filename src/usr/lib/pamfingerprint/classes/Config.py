@@ -47,7 +47,6 @@ class Config(object):
 
         # Saves config file
         self.__configParser.write(open(self.__configFile, 'w'))
-        self.__configParser.close()
 
     """
     "" Removes data from config file.
