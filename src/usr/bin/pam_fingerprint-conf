@@ -13,8 +13,6 @@
 from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
 
-import PyFingerprint.includes.utilities as utilities
-from PyFingerprint.includes.constants import *
 from PyFingerprint.PyFingerprint import *
 
 import argparse
@@ -63,17 +61,17 @@ class PamFingerprint(object):
 
         ## Tries to init logger instance
         #try:
-        self.__logger = Logger(self.__config.readString('Log', 'file'))
+        self.__logger = Logger(self.__config.readString('Logger', 'file'))
 
         #except Exception:
         #    print 'TODO: Logger Exception message'
         #    exit(1)
 
         ## Gets connection values
-        port = self.__config.readString('FingerprintModule', 'port')
-        baudRate = self.__config.readInteger('FingerprintModule', 'baudRate')
-        address = self.__config.readHex('FingerprintModule', 'address')
-        password = self.__config.readHex('FingerprintModule', 'password')
+        port = self.__config.readString('PyFingerprint', 'port')
+        baudRate = self.__config.readInteger('PyFingerprint', 'baudRate')
+        address = self.__config.readHex('PyFingerprint', 'address')
+        password = self.__config.readHex('PyFingerprint', 'password')
 
         ## Tries to establish connection
         try:

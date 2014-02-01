@@ -1,0 +1,16 @@
+~# apt-get install libpam-python
+
+~# apt-get install python-pip
+~# pip install pyserial
+
+~# echo -e '\nexport PYTHONPATH=$PYTHONPATH:/usr/lib/' >> /home/username/.bashrc
+
+## Serial connection permission:
+~# usermod -a -G dialout username
+~# reboot
+
+## Add line after comments in /etc/pam.d/common-auth
+auth	sufficient                      pam_python.so pam_fingerprint.py
+
+## Quick install for DEVELOPEMENT:
+~# ./src/install.sh

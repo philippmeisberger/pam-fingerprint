@@ -1,5 +1,5 @@
 - Write owner of pam_fingerprint.log
-- Exception message print
 - Main-program pam_fingerprint-conf
 
 - COPYRIGHT datei steuerzeichen
+- CTRL+C while getImage()

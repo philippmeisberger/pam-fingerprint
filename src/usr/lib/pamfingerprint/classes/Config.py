@@ -45,9 +45,11 @@ class Config(object):
     """
     def __del__(self):
 
-        # Saves config file
-        self.__configParser.write(open(self.__configFile, 'w'))
-        self.__configParser.close()
+        f = open(self.__configFile, 'w')
+
+        ## Saves config file
+        self.__configParser.write(f)
+        f.close()
 
     """
     "" Removes data from config file.

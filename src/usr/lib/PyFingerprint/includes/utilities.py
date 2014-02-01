@@ -6,8 +6,21 @@
 "" All rights reserved.
 """
 
+from includes.constants import *
+
 import struct
 
+
+"""
+"" Prints debug message if bebugging is enabled.
+""
+"" @param string message
+"" @return void
+"""
+def printDebug(message):
+
+    if ( DEBUG == True ):
+        print 'PyFingerprint: ' + message
 
 """
 "" Shifts a byte.
@@ -17,7 +30,8 @@ import struct
 "" @return byte
 """
 def rightShift(byte, x):
-  return (byte >> x & 0xFF)
+
+    return (byte >> x & 0xFF)
 
 """
 "" Shifts a byte.
@@ -27,7 +41,8 @@ def rightShift(byte, x):
 "" @return byte
 """
 def leftShift(byte, x):
-  return (byte << x)
+
+    return (byte << x)
 
 """
 "" Converts a byte to string.
@@ -36,7 +51,8 @@ def leftShift(byte, x):
 "" @return string
 """
 def byteToString(byte):
-  return struct.pack('@B', byte)
+
+    return struct.pack('@B', byte)
 
 """
 "" Converts one "string" byte (like '0xFF') to real byte (0xFF).
@@ -45,5 +61,6 @@ def byteToString(byte):
 "" @return byte
 """
 def stringToByte(string):
-  tupel = struct.unpack('@B', string)
-  return tupel[0]
+
+    tupel = struct.unpack('@B', string)
+    return tupel[0]

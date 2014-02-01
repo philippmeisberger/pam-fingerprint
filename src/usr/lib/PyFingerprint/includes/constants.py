@@ -6,6 +6,10 @@
 "" All rights reserved.
 """
 
+## Enabled debugging
+DEBUG = True
+
+
 ## Baotou start byte
 FINGERPRINT_STARTCODE = 0xEF01
 

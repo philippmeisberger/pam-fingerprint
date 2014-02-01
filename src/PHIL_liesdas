@@ -1,0 +1,12 @@
+Hey jo phil,
+
+ich musste bei usr/lib/pamfingerprint den Unterstrich entfernen, da Python das beim Import nicht akzeptiert.
+Zudem habe ich die fingerprint lib weiter verbessert und wrappe die jetzt.
+
+zu dem plane ich die als "eigene lib", bzw eig debian package zu veröffentlichen.
+bitte verändere nichts an der lib, da ich am besten weiß was da geht.
+
+du kannst dich an lib/security/pam_fingerprint.py orientieren für die neusten änderungen.
+die conf habe ich noch nicht aktuealisiert.
+
+es wäre wegen der pamfingerprint umbenennung zu überlegen, alle dateien etc zu pamfingerprint zu benennen.

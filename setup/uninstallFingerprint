@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# Delete PAM module
-rm /lib/security/pam_fingerprint.py
-
-# Deallocate PAM module
-cp common-auth.orig /etc/pam.d/common-auth
-chmod 644 /etc/pam.d/common-auth
