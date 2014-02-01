@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 """
 "" PAM Fingerprint
 "" Main program
@@ -8,9 +9,13 @@
 "" Copyright 2014 Bastian Raschke, Philipp Meisberger.
 "" All rights reserved.
 """
-from pam_fingerprint.classes.Logger import *
-from pam_fingerprint.classes.Config import *
-from pam_fingerprint.libraries.Fingerprint import *
+
+from pamfingerprint.classes.Logger import *
+from pamfingerprint.classes.Config import *
+
+import PyFingerprint.includes.utilities as utilities
+from PyFingerprint.includes.constants import *
+from PyFingerprint.PyFingerprint import *
 
 import argparse
 
@@ -119,7 +124,7 @@ class PamFingerprint(object):
     def addUser(self, userName):
 
         p = [-1]
-        self.__logger.log(Logger.DEBUG, 'Waiting for finger...')
+        self.__logger.log(Logger.NOTICE, 'Waiting for finger...')
 
         while ( p[0] != FINGERPRINT_OK ):
 
@@ -127,7 +132,7 @@ class PamFingerprint(object):
             p = self.__fingerprint.getImage()
 
             if ( p[0] == FINGERPRINT_OK ):
-                self.__logger.log(Logger.DEBUG, 'Image taken.')
+                self.__logger.log(Logger.NOTICE, 'Image taken.')
             elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
                 self.__logger.log(Logger.ERROR, 'Communication error')
             elif ( p[0] == FINGERPRINT_NOFINGER ):
@@ -159,7 +164,7 @@ class PamFingerprint(object):
             self.__logger.log(Logger.ERROR, 'Unknown error')
             return False
 
-        self.__logger.log(Logger.DEBUG, 'Remove finger...')
+        self.__logger.log(Logger.NOTICE, 'Remove finger...')
         time.sleep(2)
 
         p = [-1]
@@ -169,7 +174,7 @@ class PamFingerprint(object):
             p = self.__fingerprint.getImage()
 
         p = [-1]
-        self.__logger.log(Logger.DEBUG, 'Waiting for same finger again...')
+        self.__logger.log(Logger.NOTICE, 'Waiting for same finger again...')
 
         while ( p[0] != FINGERPRINT_OK ):
 
@@ -177,7 +182,7 @@ class PamFingerprint(object):
             p = self.__fingerprint.getImage()
 
             if ( p[0] == FINGERPRINT_OK ):
-                self.__logger.log(Logger.DEBUG, 'Image taken.')
+                self.__logger.log(Logger.NOTICE, 'Image taken.')
             elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
                 self.__logger.log(Logger.ERROR, 'Communication error')
             elif ( p[0] == FINGERPRINT_NOFINGER ):
@@ -384,5 +389,7 @@ class PamFingerprint(object):
 
         self.__logger.log(Logger.ERROR, 'Error while checking user '+ user +'!')
         return False
-        
+
+
+
 PamFingerprint()

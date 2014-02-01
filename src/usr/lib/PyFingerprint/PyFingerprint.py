@@ -1,23 +1,24 @@
 """
-"" A python written library for Adafruit optical fingerprint sensor.
-"" @author Bastian Raschke
-""
-"" Inspired by Adafruit Industries
-"" @see https://github.com/adafruit/Adafruit-Fingerprint-Sensor-Library
+"" PyFingerprint
+"" A python written library for an UART optical fingerprint sensor.
 ""
 "" Requirements:
 "" ~# apt-get install python-pip
 "" ~# pip install pyserial
 ""
-"" Additionally see: http://pyserial.sourceforge.net/
+"" Inspired by Adafruit Industries
+"" @see https://github.com/adafruit/Adafruit-Fingerprint-Sensor-Library
+""
+"" Additionally:
+"" @see http://pyserial.sourceforge.net
 ""
 "" Copyright 2014 Bastian Raschke, Philipp Meisberger.
 "" All rights reserved.
 ""
 """
 
-from pam_fingerprint.libraries.constants import *
-import pam_fingerprint.libraries.utilities as utilities
+from includes.constants import *
+import includes.utilities
 
 import serial
 import struct

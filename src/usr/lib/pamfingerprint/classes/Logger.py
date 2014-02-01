@@ -15,12 +15,6 @@ import os
 class Logger(object):
 
     """
-    "" Singleton instance
-    "" @var object __instance
-    """
-    __instance = None
-    
-    """
     "" Log level constants
     "" @var integer
     """
@@ -30,7 +24,7 @@ class Logger(object):
     ERROR = 3
 
     """
-    "" The opened log file
+    "" The file instance
     "" @var FileObject __file
     """
     __file = None
@@ -40,18 +34,6 @@ class Logger(object):
     "" @var integer __logLevel
     """
     __logLevel = None
-
-    """
-    "" Singleton method
-    ""
-    "" @return Logger
-    """
-    @classmethod
-    def getInstance(self):
-
-        if not self.__instance:
-            self.__instance = Logger()
-        return self.__instance
     
     """
     "" Constructor
@@ -60,20 +42,20 @@ class Logger(object):
     "" @param integer logLevel
     "" @return void
     """
-    def __init__(self, logFile):
+    def __init__(self, logFile, logLevel = 1):
 
-        # Checks if path/file is writable
+        ## Checks if path/file is writable
         if ( os.access(logFile, os.W_OK) == False ):
             raise Exception('The log file "' + logFile + '" is not writable!')
 
-        #if ( logLevel < 0 or logLevel > 3 ):
-        #    raise Exception('The log level must between 0 and 3!')
+        if ( logLevel < 0 or logLevel > 3 ):
+            raise Exception('The log level must between 0 and 3!')
 
-        # Opens log file for appending text 
+        ## Opens log file for appending text 
         self.__file = open(logFile, 'a')
 
-        # Default log level: NOTICE
-        self.__logLevel = self.NOTICE
+        ## Default log level
+        self.__logLevel = logLevel
 
     """
     "" Destructor
@@ -82,7 +64,7 @@ class Logger(object):
     """
     def __del__(self):
 
-        # Closes file if is open
+        ## Closes file if is open
         if (self.__file):
             self.__file.close()
 

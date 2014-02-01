@@ -1,8 +1,6 @@
 """
-"" PAM Fingerprint
-"" A python written library for Adafruit optical fingerprint sensor.
-""
-"" @author Bastian Raschke
+"" PyFingerprint
+"" A python written library for an UART optical fingerprint sensor.
 ""
 "" Copyright 2014 Bastian Raschke, Philipp Meisberger.
 "" All rights reserved.

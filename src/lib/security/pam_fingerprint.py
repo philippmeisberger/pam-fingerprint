@@ -8,12 +8,12 @@
 "" All rights reserved. 
 """
 
-from pam_fingerprint.classes.Logger import *
-from pam_fingerprint.classes.Config import *
+from pamfingerprint.classes.Logger import *
+from pamfingerprint.classes.Config import *
 
-from pam_fingerprint.libraries.constants import *
-from pam_fingerprint.libraries.Fingerprint import *
-import pam_fingerprint.libraries.utilities as utilities
+import PyFingerprint.includes.utilities as utilities
+from PyFingerprint.includes.constants import *
+from PyFingerprint.PyFingerprint import *
 
 import os
 
@@ -28,7 +28,7 @@ import os
 """
 def pam_sm_authenticate(pamh, flags, argv):
 
-    print 'PAM_Fingerprint loading module...'
+    print 'pamfingerprint: loading module...'
 
     ## Tries to init config instance
     try:
@@ -40,7 +40,8 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     ## Tries to init logger instance
     try:
-        logger = Logger('/var/log/pam_fingerprint.log', Logger.NOTICE)
+        logLevel = config.readInteger('Log', 'level')
+        logger = Logger('/var/log/pam_fingerprint.log', logLevel)
 
     except Exception:
         print 'TODO: Logger Exception message'
@@ -52,7 +53,7 @@ def pam_sm_authenticate(pamh, flags, argv):
     address = config.readHex('FingerprintModule', 'address')
     password = config.readHex('FingerprintModule', 'password')
 
-    ## Tries to establish connection
+    ## Tries to establish connection to sensor
     try:
         fingerprint = Fingerprint(port, baudRate, address, password)
 

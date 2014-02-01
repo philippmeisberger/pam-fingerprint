@@ -11,34 +11,15 @@
 
 import ConfigParser
 import os
-import sys
 
 
 class Config(object):
 
     """
-    "" Singleton instance
-    "" @var object __instance
-    """
-    __instance = None
-    
-    """
     "" The ConfigParser object
     "" @var ConfigParser __configParser
     """
     __configParser = None
-
-    """
-    "" Singleton method
-    ""
-    "" @return Config
-    """
-    @classmethod
-    def getInstance(self):
-
-        if (not self.__instance):
-            self.__instance = Config(self.__configFile)
-        return self.__instance
         
     """
     "" Constructor
@@ -48,11 +29,11 @@ class Config(object):
     """
     def __init__(self, configFile):
 
-        self.__configFile = configFile
-        
         # Checks if path/file is readable
         if ( os.access(configFile, os.R_OK) == False ):
             raise Exception('The configuration file \"' + configFile + '\" is not readable!')
+
+        self.__configFile = configFile
 
         self.__configParser = ConfigParser.ConfigParser()
         self.__configParser.read(configFile)
@@ -66,6 +47,7 @@ class Config(object):
 
         # Saves config file
         self.__configParser.write(open(self.__configFile, 'w'))
+        self.__configParser.close()
 
     """
     "" Removes data from config file.
