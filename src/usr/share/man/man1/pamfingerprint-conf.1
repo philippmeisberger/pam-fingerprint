@@ -15,14 +15,14 @@ It is totally written in python and uses a python framework called pam_python as
 
 .SH ACTIONS
 
-.IP --add-user
+.IP --add-user <user>
 Adds a new user and enrolls new fingerprint image.
 
-.IP --remove-user
+.IP --remove-user <user>
 Removes an user from fingerprint database.
 
 .IP --check
-Enrolls fingerprint and checks if user is valid.
+Enrolls fingerprint and checks if user exist.
 
 .SH "SEE ALSO"
 \fBUsed fingerprint sensor\fP: http://www.adafruit.com/products/751
@@ -30,6 +30,11 @@ Enrolls fingerprint and checks if user is valid.
 \fBPyserial\fP: http://pyserial.sourceforge.net/
 .br 
 \fBpam_python\fP: http://ace-host.stuart.id.au/russell/files/pam_python/
+
+.SH FILES
+/etc/pam_fingerprint.conf
+.br
+/var/log/pam_fingerprint.log
 
 .SH AUTHOR
 This manual page was written by Philipp Meisberger <team@pm-codeworks.de>. Visit www.pm-codeworks.de for more interesting projects.
