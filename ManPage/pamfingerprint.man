@@ -1,9 +1,9 @@
-.TH pam_fingerprint-conf 1 "" "" "PAM Fingerprint"
+.TH pamfingerprint-conf 1 "" "" "PAM Fingerprint"
 
 .SH NAME
-pam_fingerprint-conf - PAM_Fingerprint configuration tool
+pamfingerprint-conf - PAM Fingerprint configuration tool
 .SH SYNOPSIS
-.B pam_fingerprint-conf
+.B pamfingerprint-conf
 .RI [ actions ]
 .br
 

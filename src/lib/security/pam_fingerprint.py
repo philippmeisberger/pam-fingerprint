@@ -10,7 +10,6 @@
 
 from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
-
 from PyFingerprint.PyFingerprint import *
 
 import os
@@ -82,9 +81,8 @@ def pam_sm_authenticate(pamh, flags, argv):
             print 'Access granted for '+ user +'!'
             return pamh.PAM_SUCCESS
 
+    ## Denies for default
     print 'Access denied!'
-    
-    ## Denies for default 
     return pamh.IGNORE
 
 """
