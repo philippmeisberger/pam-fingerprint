@@ -129,5 +129,8 @@ class PyFingerprint(object):
 
         return (True, positionNumber)
 
-
-
+    # TODO: maybe we need a fingerprint storing method
+    """
+    def addFingerprint(self):
+        
+    """

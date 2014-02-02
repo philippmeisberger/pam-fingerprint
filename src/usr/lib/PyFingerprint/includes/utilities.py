@@ -6,13 +6,13 @@
 "" All rights reserved.
 """
 
-from includes.constants import *
+from constants import *
 
 import struct
 
 
 """
-"" Prints debug message if bebugging is enabled.
+"" Prints debug message if debugging is enabled.
 ""
 "" @param string message
 "" @return void

@@ -95,6 +95,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 """
 def pam_sm_setcred(pamh, flags, argv):
 
+    print 'pam_sm_setcred: '+ pamh.get_user()
     return pamh.PAM_SUCCESS
 
 """
@@ -107,6 +108,7 @@ def pam_sm_setcred(pamh, flags, argv):
 """
 def pam_sm_acct_mgmt(pamh, flags, argv):
 
+    print 'pam_sm_acct_mgmt: '+ pamh.get_user()
     return pamh.PAM_SUCCESS
 
 """
@@ -119,6 +121,7 @@ def pam_sm_acct_mgmt(pamh, flags, argv):
 """
 def pam_sm_open_session(pamh, flags, argv):
 
+    print 'pam_sm_open_session: '+ pamh.get_user()
     return pamh.PAM_SUCCESS
 
 """
@@ -131,6 +134,7 @@ def pam_sm_open_session(pamh, flags, argv):
 """
 def pam_sm_close_session(pamh, flags, argv):
 
+    print 'pam_sm_close_session: '+ pamh.get_user()
     return pamh.PAM_SUCCESS
 
 """
@@ -143,4 +147,5 @@ def pam_sm_close_session(pamh, flags, argv):
 """
 def pam_sm_chauthtok(pamh, flags, argv):
 
+    print 'pam_sm_chauthtok: '+ pamh.get_user()
     return pamh.PAM_SUCCESS

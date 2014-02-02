@@ -1,4 +1,4 @@
-﻿﻿"""
+﻿"""
 "" PAM Fingerprint
 "" Configuration file class.
 "" @see http://docs.python.org/3/library/configparser.html
