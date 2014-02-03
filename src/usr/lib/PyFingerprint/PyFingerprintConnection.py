@@ -12,7 +12,7 @@
 "" Additionally:
 "" @see http://pyserial.sourceforge.net
 ""
-"" Copyright 2014 Bastian Raschke, Philipp Meisberger.
+"" Copyright 2014 Bastian Raschke.
 "" All rights reserved.
 ""
 """
@@ -141,7 +141,8 @@ class PyFingerprintConnection(object):
 
             if ( len(read) != 0 ):
 
-                utilities.printDebug('Received packet fragment ' + str(index) + ' = '+ str(struct.unpack('@c', read)[0]))
+                ## Deep DEBUG
+                ## utilities.printDebug('Received packet fragment ' + str(index) + ' = '+ str(struct.unpack('@c', read)[0]))
                 read = utilities.stringToByte(read)
 
             ## Skips loop if first byte is not valid
@@ -158,7 +159,8 @@ class PyFingerprintConnection(object):
                 ## Give up if first and second byte are not the startcode
                 if ( received[0] != utilities.rightShift(FINGERPRINT_STARTCODE, 8) or received[1] != utilities.rightShift(FINGERPRINT_STARTCODE, 0) ):
 
-                    utilities.printDebug('Packet is corrupted (FINGERPRINT_STARTCODE not found)!')
+                    ## Deep DEBUG
+                    ## utilities.printDebug('Packet is corrupted (FINGERPRINT_STARTCODE not found)!')
                     return False
 
                 ## Calculates length of the 2 length bytes
@@ -173,7 +175,8 @@ class PyFingerprintConnection(object):
                 if ( index <= length + 10 ):
                     continue
 
-                utilities.printDebug('Packet length: ' + str(length))
+                ## Deep DEBUG
+                ## utilities.printDebug('Packet length: ' + str(length))
 
                 packetType = received[6]
 
@@ -188,18 +191,21 @@ class PyFingerprintConnection(object):
                     packetData.append(received[i])
                     checksum += received[i]
 
-                utilities.printDebug('Packet calculated checksum: ' + str(checksum))
+                ## Deep DEBUG
+                ## utilities.printDebug('Packet calculated checksum: ' + str(checksum))
 
                 ## Calculates full checksum of the 2 separate checksum bytes
                 receivedChecksum = received[index - 2]
                 receivedChecksum = utilities.leftShift(receivedChecksum, 8)
                 receivedChecksum = receivedChecksum | received[index - 1]
 
-                utilities.printDebug('Packet received checksum: ' + str(receivedChecksum))
+                ## Deep DEBUG
+                ## utilities.printDebug('Packet received checksum: ' + str(receivedChecksum))
 
                 if ( receivedChecksum != checksum ):
 
-                    utilities.printDebug('Packet checksum is not correct!')
+                    ## Deep DEBUG
+                    ## utilities.printDebug('Packet checksum is not correct!')
                     return False
 
                 result = (packetType, packetData)
