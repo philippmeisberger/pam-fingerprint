@@ -1,12 +1,12 @@
 """
 "" PyFingerprint
-"" A python written library for an UART optical fingerprint sensor.
 ""
 "" Copyright 2014 Bastian Raschke, Philipp Meisberger.
 "" All rights reserved.
 """
 
-## Enabled debugging
+## Enables debug mode
+##
 DEBUG = True
 
 
@@ -20,7 +20,6 @@ FINGERPRINT_COMMANDPACKET = 0x01
 FINGERPRINT_DATAPACKET = 0x02
 FINGERPRINT_ACKPACKET = 0x07
 FINGERPRINT_ENDDATAPACKET = 0x08
-
 
 ## Instruction codes
 ##
@@ -40,7 +39,6 @@ FINGERPRINT_DELETECHAR = 0x0C
 FINGERPRINT_EMPTY = 0x0D
 
 FINGERPRINT_SEARCH = 0x04
-
 
 ## Packet reply confirmations
 ##
@@ -79,7 +77,6 @@ FINGERPRINT_DBCLEARFAIL = 0x11
 FINGERPRINT_NOMATCH = 0x08
 
 FINGERPRINT_NOTFOUND = 0x09
-
 
 ## General error codes
 ##

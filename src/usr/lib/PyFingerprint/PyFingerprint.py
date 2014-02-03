@@ -9,8 +9,9 @@
 
 import includes.utilities as utilities
 from includes.constants import *
-
 from PyFingerprintConnection import *
+
+import time
 
 
 class PyFingerprint(object):
@@ -196,8 +197,6 @@ class PyFingerprint(object):
             raise Exception('Unknown error')
 
         time.sleep(2)
-
-        print 'Waiting for finger...'
         p = [-1]
 
         ## Waiting the user removes finger
@@ -338,4 +337,5 @@ class PyFingerprint(object):
 f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 print 'Currently stored templates: ' + str(f.getTemplateCount())
 
-## print f.searchTemplate()
+##f.createTemplate()
+print f.searchTemplate()

@@ -1,6 +1,5 @@
 """
 "" PyFingerprint
-"" A python written library for an UART optical fingerprint sensor.
 ""
 "" Copyright 2014 Bastian Raschke, Philipp Meisberger.
 "" All rights reserved.
