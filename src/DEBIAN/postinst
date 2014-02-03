@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if ( test "$1" == remove ); then
+    pam-auth-update --package --remove pamfingerprint
+else
+    pam-auth-update --package pamfingerprint
+fi
