@@ -21,7 +21,7 @@ class PamFingerprint(object):
 
     """
     "" The fingerprint library object
-    "" @var Fingerprint __fingerprint
+    "" @var PyFingerprint __fingerprint
     """
     __fingerprint = None
     
@@ -74,7 +74,7 @@ class PamFingerprint(object):
 
         ## Tries to establish connection
         try:
-            self.__fingerprint = Fingerprint(port, baudRate, address, password)
+            self.__fingerprint = PyFingerprint(port, baudRate, address, password)
 
         except Exception as e:
             print e
@@ -83,6 +83,7 @@ class PamFingerprint(object):
         self.__parser = argparse.ArgumentParser(description='PAM_Fingerprint main configuration program.')
         self.__parser.add_argument('--add-user', help='Adds a new user and enrolls new fingerprint image.')
         self.__parser.add_argument('--remove-user', help='Removes an user from the fingerprint database.')
+        self.__parser.add_argument('--update', help='Enrolls new fingerprint image for an existing user.')
         self.__parser.add_argument('--check', help='Enrolls fingerprint and checks if user was found.', nargs='?', const=True)
 
         args = vars(self.__parser.parse_args())
@@ -91,6 +92,8 @@ class PamFingerprint(object):
             self.addUser(args['add_user'])
         elif ( args['remove_user'] ):
             self.removeUser(args['remove_user'])
+        elif ( args['update'] ):
+            self.update(args['update'])
         elif ( args['check'] ):
             self.check()
         else:
@@ -310,6 +313,16 @@ class PamFingerprint(object):
             return False        
 
     """
+    "" Enrolls new fingerprint for existing user.
+    ""
+    "" @param string userName
+    "" @return boolean
+    """
+    def update(self, userName):
+        
+        pass
+        
+    """
     "" Enrolls fingerprint and checks if user was found.
     ""
     "" @return boolean
@@ -318,7 +331,7 @@ class PamFingerprint(object):
 
         ## Tries to check fingerprint
         try:
-            result = self.__fingerprint.checkFinger()
+            result = self.__fingerprint.checkFingerprint()
 
         except Exception as e:
             print e

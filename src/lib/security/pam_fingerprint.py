@@ -61,7 +61,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     ## Tries to check fingerprint
     try:
-        result = fingerprint.checkFinger()
+        result = fingerprint.checkFingerprint()
 
     except Exception as e:
         print e
@@ -92,12 +92,12 @@ def pam_sm_authenticate(pamh, flags, argv):
 "" @param flags
 "" @param argv
 "" @return integer
-"""
+""
 def pam_sm_setcred(pamh, flags, argv):
 
     print 'pam_sm_setcred: '+ pamh.get_user()
     return pamh.PAM_SUCCESS
-
+"""
 """
 "" PAM service function for account management.
 ""
@@ -105,12 +105,12 @@ def pam_sm_setcred(pamh, flags, argv):
 "" @param flags
 "" @param argv
 "" @return integer
-"""
+""
 def pam_sm_acct_mgmt(pamh, flags, argv):
 
     print 'pam_sm_acct_mgmt: '+ pamh.get_user()
     return pamh.PAM_SUCCESS
-
+"""
 """
 "" PAM service function to open session management.
 ""
@@ -118,12 +118,12 @@ def pam_sm_acct_mgmt(pamh, flags, argv):
 "" @param flags
 "" @param argv
 "" @return integer
-"""
+""
 def pam_sm_open_session(pamh, flags, argv):
 
     print 'pam_sm_open_session: '+ pamh.get_user()
     return pamh.PAM_SUCCESS
-
+"""
 """
 "" PAM service function to terminate session management.
 ""
@@ -131,12 +131,12 @@ def pam_sm_open_session(pamh, flags, argv):
 "" @param flags
 "" @param argv
 "" @return integer
-"""
+""
 def pam_sm_close_session(pamh, flags, argv):
 
     print 'pam_sm_close_session: '+ pamh.get_user()
     return pamh.PAM_SUCCESS
-
+"""
 """
 "" PAM service function for authentication token management.
 ""
@@ -144,8 +144,9 @@ def pam_sm_close_session(pamh, flags, argv):
 "" @param flags
 "" @param argv
 "" @return integer
-"""
+""
 def pam_sm_chauthtok(pamh, flags, argv):
 
     print 'pam_sm_chauthtok: '+ pamh.get_user()
     return pamh.PAM_SUCCESS
+"""

@@ -69,7 +69,7 @@ class PyFingerprint(object):
         while ( p[0] != FINGERPRINT_OK ):
 
             ## Gets fingerprint image
-            p = fingerprint.getImage()
+            p = self.__connection.getImage()
 
             if ( p[0] == FINGERPRINT_OK ):
                 utilities.printDebug('Image taken')
@@ -87,7 +87,7 @@ class PyFingerprint(object):
                 raise Exception('Unknown error')
 
         ## First step is done
-        p = fingerprint.image2Tz(0x01);
+        p = self.__connection.image2Tz(0x01);
 
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Image converted')
@@ -108,7 +108,7 @@ class PyFingerprint(object):
             raise Exception('Unknown error')
 
         ## Searches fingerprint in database
-        p = fingerprint.searchTemplate();
+        p = self.__connection.searchTemplate();
 
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Found a match')
