@@ -1,7 +1,5 @@
 ~# apt-get install libpam-python
-
-~# apt-get install python-pip
-~# pip install pyserial
+~# apt-get install python-serial
 
 ~# echo -e '\nexport PYTHONPATH=$PYTHONPATH:/usr/lib/' >> /home/username/.bashrc
 

@@ -5,3 +5,6 @@
 
 Basti:
 - in createTemplate(): check first if template already exists! If so: return tuple (True, <template id>)
+
+PA_AUTH_ERR statt PAM_IGNORE
+pamfingerprint.py statt pam_fingerprint.py

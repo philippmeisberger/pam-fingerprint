@@ -3,14 +3,10 @@
 "" A python written library for an UART optical fingerprint sensor.
 ""
 "" Requirements:
-"" ~# apt-get install python-pip
-"" ~# pip install pyserial
+"" ~# apt-get install python-serial
 ""
 "" Inspired by Adafruit Industries
 "" @see https://github.com/adafruit/Adafruit-Fingerprint-Sensor-Library
-""
-"" Additionally:
-"" @see http://pyserial.sourceforge.net
 ""
 "" Copyright 2014 Bastian Raschke.
 "" All rights reserved.
@@ -232,7 +228,7 @@ class PyFingerprintConnection(object):
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return False
+            return -1
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
@@ -262,7 +258,7 @@ class PyFingerprintConnection(object):
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return False
+            return -1
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
@@ -292,7 +288,7 @@ class PyFingerprintConnection(object):
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return False
+            return -1
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
@@ -353,7 +349,7 @@ class PyFingerprintConnection(object):
         return receivedPacketData
 
     """
-    "" Generates fingerprint characteristics of readed image and stores temporaryly in ImageBuffer1 or ImageBuffer2.
+    "" Generates fingerprint characteristics of readed image and stores temporarily in ImageBuffer1 or ImageBuffer2.
     ""
     "" @param integer bufferNumber (1 byte)
     "" @return integer (1 byte)
