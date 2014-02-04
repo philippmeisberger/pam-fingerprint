@@ -80,11 +80,11 @@ class PamFingerprint(object):
             print e
             exit(1)
             
-        self.__parser = argparse.ArgumentParser(description='PAM_Fingerprint main configuration program.')
-        self.__parser.add_argument('--add-user', help='Adds a new user and enrolls new fingerprint image.')
-        self.__parser.add_argument('--remove-user', help='Removes an user from the fingerprint database.')
-        self.__parser.add_argument('--update', help='Enrolls new fingerprint image for an existing user.')
-        self.__parser.add_argument('--check', help='Enrolls fingerprint and checks if user was found.', nargs='?', const=True)
+        self.__parser = argparse.ArgumentParser(description='pamfingerprint configuration program.')
+        self.__parser.add_argument('--add-user', metavar='name', help='Adds a new user and enrolls new fingerprint image.')
+        self.__parser.add_argument('--remove-user', metavar='name', help='Removes an user from the fingerprint database.')
+        self.__parser.add_argument('--update', metavar='name', help='Enrolls new fingerprint image for an existing user.')
+        self.__parser.add_argument('--check', metavar='', help='Enrolls fingerprint and checks if user was found.')
 
         args = vars(self.__parser.parse_args())
 
@@ -107,6 +107,7 @@ class PamFingerprint(object):
     """
     def __getIdForName(self, userName):
 
+        ## Gets all tuples <userName> = <template ID> from config
         users = self.__config.getItems('Users')
         
         for user in users:
@@ -211,10 +212,11 @@ class PamFingerprint(object):
         
         positionNumber = result[1]
         
+        ## Gets all tuples <userName> = <template ID> from config
+        users = self.__config.getItems('Users')
+
         ## Checks in config if <userName> matches <template ID>
-        items = self.__config.getItems('Users')
-        
-        for user in items:
+        for user in users:
             if ( self.__config.readInteger('Users', user[0]) == positionNumber ):
                 self.__logger.log(Logger.NOTICE, 'Check for user '+ user[0] +' was successful!')
                 return True

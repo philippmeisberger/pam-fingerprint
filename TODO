@@ -1,7 +1,7 @@
 - Write owner of pam_fingerprint.log
 - Main-program pamfingerprint-conf
-- Add method addFingerprint() to wrapper
-- if fingerprint already exists add tuple <username>=<template id> to conf
-
 - COPYRIGHT datei steuerzeichen
 - CTRL+C while getImage()
+
+Basti:
+- in createTemplate(): check first if template already exists! If so: return tuple (True, <template id>)

@@ -26,7 +26,6 @@ import os
 def pam_sm_authenticate(pamh, flags, argv):
 
     print 'pamfingerprint: loading module...'
-    #print pamh.get_user()
     
     ## Tries to init Config
     try:
@@ -62,7 +61,6 @@ def pam_sm_authenticate(pamh, flags, argv):
     ## Tries to check fingerprint
     try:
         result = fingerprint.searchTemplate()
-        print result
 
     except Exception as e:
         print e
@@ -74,12 +72,13 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     positionNumber = result[1]
 
-    ## Checks in config if <userName> matches <template ID>
+    ## Gets all tuples <userName> = <template ID> from config
     users = config.getItems('Users')
 
+    ## Checks in config if <userName> matches <template ID>
     for user in users:
-        if ( config.readInteger(user) == positionNumber ):
-            print 'Access granted for '+ user +'!'
+        if ( config.readInteger('Users', user[0]) == positionNumber ):
+            print 'Access granted for user '+ user[0] +'!'
             return pamh.PAM_SUCCESS
 
     ## Denies for default
@@ -93,12 +92,12 @@ def pam_sm_authenticate(pamh, flags, argv):
 "" @param flags
 "" @param argv
 "" @return integer
-""
+"""
 def pam_sm_setcred(pamh, flags, argv):
 
-    print 'pam_sm_setcred: '+ pamh.get_user()
+    ## Needed for getting root access rights!
     return pamh.PAM_SUCCESS
-"""
+
 """
 "" PAM service function for account management.
 ""
