@@ -1,10 +1,10 @@
 Package: pamfingerprint
-Version: 0.0.1-0
+Version: 0.1
 Section: admin
 Priority: extra
-Depends: python (>= 2.5), pam_python, python-serial
+Depends: python (>= 2.5), python-pam, python-serial
 Architecture: all
-Installed-Size: 100
+Installed-Size: 200
 Maintainer: PM Codeworks <team@pm-codeworks.de>
 Homepage: www.pm-codeworks.de/pamfingerprint.html
 Description: PAM module for authentication with fingerprint.
