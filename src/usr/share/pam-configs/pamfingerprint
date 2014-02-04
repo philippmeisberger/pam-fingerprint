@@ -3,4 +3,4 @@ Default: yes
 Priority: 257
 Auth-Type: Primary
 Auth:
-    sufficient      pam_python.so     pam_fingerprint.py
+    sufficient      pam_python.so pam_fingerprint.py

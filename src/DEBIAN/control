@@ -1,13 +1,11 @@
 Package: pamfingerprint
 Version: 0.0.1-0
-Section: main
+Section: admin
 Priority: extra
-Depends: python pam_python python-serial
-Replaces: none
-Conflicts: none
+Depends: python (>= 2.5), pam_python, python-serial
 Architecture: all
-Installed-Size: 500
+Installed-Size: 100
 Maintainer: PM Codeworks <team@pm-codeworks.de>
 Homepage: www.pm-codeworks.de/pamfingerprint.html
-Description: A Unix PAM module for biometric fingerprint authentification.
- It is totally written in python and uses a python framework called pam_python as adapter to implement the PAM interface that is written in C. PAM Fingerprint uses the Adafruit optical fingerprint sensor (http://www.adafruit.com/products/751) for biometric authentification. Pyserial, a python written library for serial connections, is used for the connection between the sensor and a computer. The sensor is connected with a USB TTL converter.
+Description: PAM module for authentication with fingerprint.
+ pamfingerprint provides biometric authentication for Linux using a UART fingerprint sensor. It is totally written in python and uses a python framework called pam_python to allow writing PAM modules in python instead in C. Pyserial, a python written library for serial connections, is used for the connection between the sensor and a computer. The sensor is connected with a USB TTL converter. pamfingerprint works with any application supporting PAM, for example su, sudo, etc.
