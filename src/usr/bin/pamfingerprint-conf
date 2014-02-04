@@ -52,7 +52,7 @@ class PamFingerprint(object):
 
         ## Tries to init config instance
         try:
-            self.__config = Config('/etc/pam_fingerprint.conf')
+            self.__config = Config('/etc/pamfingerprint.conf')
 
         except Exception:
             print 'TODO: Config Exception message'
@@ -60,7 +60,7 @@ class PamFingerprint(object):
 
         ## Tries to init logger instance
         try:
-            self.__logger = Logger('/var/log/pam_fingerprint.log')
+            self.__logger = Logger('/var/log/pamfingerprint.log')
 
         except Exception as e:
             print e

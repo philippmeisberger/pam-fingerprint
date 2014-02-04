@@ -29,7 +29,7 @@ def pam_sm_authenticate(pamh, flags, argv):
     
     ## Tries to init Config
     try:
-        config = Config('/etc/pam_fingerprint.conf')
+        config = Config('/etc/pamfingerprint.conf')
 
     except Exception as e:
         print e
@@ -38,7 +38,7 @@ def pam_sm_authenticate(pamh, flags, argv):
     ## Tries to init Logger
     try:
         logLevel = config.readInteger('Logger', 'level')
-        logger = Logger('/var/log/pam_fingerprint.log', logLevel)
+        logger = Logger('/var/log/pamfingerprint.log', logLevel)
 
     except Exception as e:
         print e
