@@ -27,7 +27,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     print 'pamfingerprint: loading module...'
     #print pamh.get_user()
-
+    
     ## Tries to init Config
     try:
         config = Config('/etc/pam_fingerprint.conf')
@@ -61,7 +61,8 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     ## Tries to check fingerprint
     try:
-        result = fingerprint.checkFingerprint()
+        result = fingerprint.searchTemplate()
+        print result
 
     except Exception as e:
         print e

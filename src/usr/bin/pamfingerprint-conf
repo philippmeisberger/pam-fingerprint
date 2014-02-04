@@ -78,7 +78,7 @@ class PamFingerprint(object):
 
         except Exception as e:
             print e
-            #exit(1)
+            exit(1)
             
         self.__parser = argparse.ArgumentParser(description='PAM_Fingerprint main configuration program.')
         self.__parser.add_argument('--add-user', help='Adds a new user and enrolls new fingerprint image.')
@@ -123,154 +123,22 @@ class PamFingerprint(object):
     """
     def addUser(self, userName):
 
-        p = [-1]
-        self.__logger.log(Logger.NOTICE, 'Waiting for finger...')
-
-        while ( p[0] != FINGERPRINT_OK ):
-
-            ## Gets fingerprint image
-            p = self.__fingerprint.getImage()
-
-            if ( p[0] == FINGERPRINT_OK ):
-                self.__logger.log(Logger.NOTICE, 'Image taken.')
-            elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
-                self.__logger.log(Logger.ERROR, 'Communication error')
-            elif ( p[0] == FINGERPRINT_NOFINGER ):
-                ## Will be logged many times
-                self.__logger.log(Logger.DEBUG, 'No finger found')
-            elif ( p[0] == FINGERPRINT_IMAGEFAIL ):
-                self.__logger.log(Logger.ERROR, 'Imaging error')
-            else:
-                self.__logger.log(Logger.ERROR, 'Unknown error')
-
-        ## First step is done
-        p = self.__fingerprint.image2Tz(0x01);
-
-        if ( p[0] == FINGERPRINT_OK ):
-            self.__logger.log(Logger.DEBUG, 'Image converted.')
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
-            self.__logger.log(Logger.ERROR, 'Communication error')
-            return False
-        elif ( p[0] == FINGERPRINT_IMAGEMESS ):
-            self.__logger.log(Logger.ERROR, 'Image too messy!')
-            return False
-        elif ( p[0] == FINGERPRINT_FEATUREFAIL ):
-            self.__logger.log(Logger.ERROR, 'Could not find fingerprint features')
-            return False
-        elif ( p[0] == FINGERPRINT_INVALIDIMAGE ):
-            self.__logger.log(Logger.ERROR, 'Could not find fingerprint features')
-            return False
-        else:
-            self.__logger.log(Logger.ERROR, 'Unknown error')
-            return False
-
-        self.__logger.log(Logger.NOTICE, 'Remove finger...')
-        time.sleep(2)
-
-        p = [-1]
-
-        ## Waiting the user removes finger
-        while ( p[0] != FINGERPRINT_NOFINGER ):
-            p = self.__fingerprint.getImage()
-
-        p = [-1]
-        self.__logger.log(Logger.NOTICE, 'Waiting for same finger again...')
-
-        while ( p[0] != FINGERPRINT_OK ):
-
-            ## Gets fingerprint image
-            p = self.__fingerprint.getImage()
-
-            if ( p[0] == FINGERPRINT_OK ):
-                self.__logger.log(Logger.NOTICE, 'Image taken.')
-            elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
-                self.__logger.log(Logger.ERROR, 'Communication error')
-            elif ( p[0] == FINGERPRINT_NOFINGER ):
-                ## Will be logged many times
-                self.__logger.log(Logger.DEBUG, 'No finger found')
-            elif ( p[0] == FINGERPRINT_IMAGEFAIL ):
-                self.__logger.log(Logger.ERROR, 'Imaging error')
-            else:
-                self.__logger.log(Logger.ERROR, 'Unknown error')
-
-        ## Second step is done
-        p = self.__fingerprint.image2Tz(0x02);
-
-        if ( p[0] == FINGERPRINT_OK ):
-            self.__logger.log(Logger.DEBUG, 'Image converted.')
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
-            self.__logger.log(Logger.ERROR, 'Communication error')
-            return False
-        elif ( p[0] == FINGERPRINT_IMAGEMESS ):
-            self.__logger.log(Logger.ERROR, 'Image too messy!')
-            return False
-        elif ( p[0] == FINGERPRINT_FEATUREFAIL ):
-            self.__logger.log(Logger.ERROR, 'Could not find fingerprint features')
-            return False
-        elif ( p[0] == FINGERPRINT_INVALIDIMAGE ):
-            self.__logger.log(Logger.ERROR, 'Could not find fingerprint features')
-            return False
-        else:
-            self.__logger.log(Logger.ERROR, 'Unknown error')
-            return False
-
-        ## Creates template
-        p = self.__fingerprint.createTemplate()
-
-        if ( p[0] == FINGERPRINT_OK ):
-            self.__logger.log(Logger.DEBUG, 'Images matching.')
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
-            self.__logger.log(Logger.ERROR, 'Communication error')
-            return False
-        elif ( p[0] == FINGERPRINT_ENROLLMISMATCH ):
-            self.__logger.log(Logger.DEBUG, 'Images not matching')
-            return False
-        else:
-            self.__logger.log(Logger.ERROR, 'Unknown error')
-            return False
-
-        ## Gets current template count
-        p = self.__fingerprint.getTemplateCount();
-
-        if ( p[0] == FINGERPRINT_OK ):
-            self.__logger.log(Logger.DEBUG, 'Read successfully.')
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
-            self.__logger.log(Logger.ERROR, 'Communication error')
-            return False
-        else:
-            self.__logger.log(Logger.ERROR, 'Unknown error')
-            return False
-
-        templateCount = p[1]
-        templateCount = utilities.leftShift(templateCount, 8)
-        templateCount = templateCount | p[2]
-
-        ## Stores fingerprint image in sensor database
-        positionNumber = templateCount + 1
-        p = self.__fingerprint.storeTemplate(positionNumber)
-
-        if ( p[0] == FINGERPRINT_OK ):
-            self.__logger.log(Logger.DEBUG, 'Template stored.')
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
-            self.__logger.log(Logger.ERROR, 'Communication error')
-            return False
-        elif ( p[0] == FINGERPRINT_BADLOCATION ):
-            self.__logger.log(Logger.ERROR, 'Could not store in that location!')
-            return False
-        elif ( p[0] == FINGERPRINT_FLASHERR ):
-            self.__logger.log(Logger.ERROR, 'Error writing to flash!')
-            return False
-        else:
-            self.__logger.log(Logger.ERROR, 'Unknown error')
-            return False        
-
-        ## Tries to store tuple <userName> = <template ID> to config
+        ## Tries to create new template for user
         try:
+            result = self.__fingerprint.createTemplate()
+
+        except Exception as e:
+            print e 
+            return False
+
+        positionNumber = result[1]
+        
+        ## Store tuple <userName> = <template ID> to config
+        if ( ( result[0] == True ) and ( positionNumber > 0 ) ):
             self.__config.writeString('Users', userName, positionNumber)
             self.__logger.log(Logger.NOTICE, 'User '+ userName +' added successfully!')
             return True
-
-        except Exception:
+        else:
             self.__logger.log(Logger.ERROR, 'Error while adding user '+ userName +'!')
             return False 
         
@@ -281,31 +149,31 @@ class PamFingerprint(object):
     "" @return boolean
     """
     def removeUser(self, userName):
+
+        ## Gets user ID
+        userId = self.__getIdForName(userName)
         
+        if ( userId < 0 ):
+            self.__logger.log(Logger.ERROR, 'User \"'+ userName +'\" not found!')
+            return False
+
         ## Confirmation dialog 
         answer = raw_input('Remove user ' + userName + '? (Y/n)')
 
         if ( answer in ['n', 'N'] ):
             print 'Abort!'
             return False
+            
+        ## Tries to delete template
+        try:
+            result = self.__fingerprint.deleteTemplate(userId)
 
-        userId = self.__getIdForName(userName)
-        
-        if ( userId < 0 ):
-            self.__logger.log(Logger.ERROR, 'User not found!')
-            return False
-
-        p = [-1]
-        p = self.__fingerprint.deleteTemplate(userId)
-
-        if ( p[0] == FINGERPRINT_OK ):
-            self.__logger.log(Logger.DEBUG, 'Template removed.')
-        else:
-            self.__logger.log(Logger.ERROR, 'Unknown error')
+        except Exception as e:
+            print e
             return False
 
         ## Removes user from config
-        if ( self.__config.remove('Users', userName) == True ):
+        if ( ( result == True ) and ( self.__config.remove('Users', userName) == True ) ):
             self.__logger.log(Logger.NOTICE, 'User '+ userName +' removed successfully!')
             return True
         else:
@@ -331,7 +199,7 @@ class PamFingerprint(object):
 
         ## Tries to check fingerprint
         try:
-            result = self.__fingerprint.checkFingerprint()
+            result = self.__fingerprint.searchTemplate()
 
         except Exception as e:
             print e
@@ -340,20 +208,19 @@ class PamFingerprint(object):
         if ( result[0] == False ):
             print 'No match found!'
             return False
-
+        
         positionNumber = result[1]
         
         ## Checks in config if <userName> matches <template ID>
-        users = self.__config.getItems('Users')
-
-        for user in users:
-            if ( self.__config.readInteger(user) == positionNumber ):
-                self.__logger.log(Logger.NOTICE, 'Check for user '+ user +' was successful!')
+        items = self.__config.getItems('Users')
+        
+        for user in items:
+            if ( self.__config.readInteger('Users', user[0]) == positionNumber ):
+                self.__logger.log(Logger.NOTICE, 'Check for user '+ user[0] +' was successful!')
                 return True
 
-        self.__logger.log(Logger.ERROR, 'Error while checking user '+ user +'!')
+        self.__logger.log(Logger.ERROR, 'Error while checking user '+ user[0] +'!')
         return False
-
 
 
 PamFingerprint()
