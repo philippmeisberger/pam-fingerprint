@@ -1,13 +1,12 @@
 ﻿"""
 "" PAM Fingerprint
-"" Configuration file class.
+"" Configuration file management.
 "" 
-""
 "" Copyright 2014 Philipp Meisberger, Bastian Raschke.
 "" All rights reserved.
 """
 
-## Dodumentation: @see http://docs.python.org/3/library/configparser.html
+## Documentation: @see http://docs.python.org/3/library/configparser.html
 import ConfigParser
 import os
 
