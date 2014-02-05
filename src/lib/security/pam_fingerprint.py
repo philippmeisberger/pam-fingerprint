@@ -2,8 +2,6 @@
 "" PAM Fingerprint
 "" PAM module implementation.
 ""
-"" @author Philipp Meisberger
-""
 "" Copyright 2014 Philipp Meisberger, Bastian Raschke.
 "" All rights reserved. 
 """

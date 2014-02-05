@@ -2,11 +2,9 @@
 
 """
 "" PAM Fingerprint
-"" Main program
+"" Configuration program
 ""
-"" @author Philipp Meisberger
-""
-"" Copyright 2014 Bastian Raschke, Philipp Meisberger.
+"" Copyright 2014 Philipp Meisberger, Bastian Raschke.
 "" All rights reserved.
 """
 

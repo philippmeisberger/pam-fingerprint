@@ -1,14 +1,13 @@
 ﻿"""
 "" PAM Fingerprint
 "" Configuration file class.
-"" @see http://docs.python.org/3/library/configparser.html
+"" 
 ""
-"" @author Philipp Meisberger
-""
-"" Copyright 2014 Bastian Raschke, Philipp Meisberger.
+"" Copyright 2014 Philipp Meisberger, Bastian Raschke.
 "" All rights reserved.
 """
 
+## Dodumentation: @see http://docs.python.org/3/library/configparser.html
 import ConfigParser
 import os
 

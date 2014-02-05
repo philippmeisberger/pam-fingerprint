@@ -1,10 +1,8 @@
 ﻿"""
 "" PAM Fingerprint
-"" Logger class.
+"" Lightweight system logger.
 ""
-"" @author Philipp Meisberger
-""
-"" Copyright 2014 Bastian Raschke, Philipp Meisberger.
+"" Copyright 2014 Philipp Meisberger, Bastian Raschke.
 "" All rights reserved.
 """
 
