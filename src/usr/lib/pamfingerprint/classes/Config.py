@@ -16,6 +16,12 @@ import os
 class Config(object):
 
     """
+    "" The config file path
+    "" @var string __configFile
+    """
+    __configFile = None
+
+    """
     "" The ConfigParser object
     "" @var ConfigParser __configParser
     """
@@ -45,11 +51,15 @@ class Config(object):
     """
     def __del__(self):
 
-        f = open(self.__configFile, 'w')
+        if ( self.__configFile ):
 
-        ## Saves config file
-        self.__configParser.write(f)
-        f.close()
+            f = open(self.__configFile, 'w')
+
+        if ( self.__configParser ):
+
+            ## Saves config file
+            self.__configParser.write(f)
+            f.close()
 
     """
     "" Removes data from config file.

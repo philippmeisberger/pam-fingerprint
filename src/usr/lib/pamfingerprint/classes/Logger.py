@@ -42,7 +42,7 @@ class Logger(object):
     "" @param integer logLevel
     "" @return void
     """
-    def __init__(self, logFile, logLevel = Logger.NOTICE):
+    def __init__(self, logFile, logLevel):
 
         ## Checks if path/file is writable
         if ( os.access(logFile, os.W_OK) == False ):
@@ -54,7 +54,6 @@ class Logger(object):
         ## Opens log file for appending text 
         self.__file = open(logFile, 'a')
 
-        ## Default log level
         self.__logLevel = logLevel
 
     """
@@ -65,7 +64,7 @@ class Logger(object):
     def __del__(self):
 
         ## Closes file if is open
-        if (self.__file):
+        if ( self.__file ):
             self.__file.close()
 
     """
@@ -95,4 +94,4 @@ class Logger(object):
 
             ## Appends message to log and prints it
             self.__file.write(time.strftime('%Y-%m-%d %H:%M:%S: ') + levelLabel + ' ' + message + '\n')
-            print 'pam_fingerprint: ' + levelLabel + ' ' + message
+            print levelLabel + ' ' + message

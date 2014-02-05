@@ -26,14 +26,14 @@ import os
 def pam_sm_authenticate(pamh, flags, argv):
 
     print 'pamfingerprint: loading module...'
-    
+
     ## Tries to init Config
     try:
         config = Config('/etc/pamfingerprint.conf')
 
     except Exception as e:
-        print e
-        return pamh.PAM_IGNORE
+        print 'Exception: ' + str(e)
+        return pamh.PA_AUTH_ERR
 
     ## Tries to init Logger
     try:
@@ -41,8 +41,8 @@ def pam_sm_authenticate(pamh, flags, argv):
         logger = Logger('/var/log/pamfingerprint.log', logLevel)
 
     except Exception as e:
-        print e
-        return pamh.PAM_IGNORE
+        print 'Exception: ' + str(e)
+        return pamh.PA_AUTH_ERR
 
     ## Gets connection values
     port = config.readString('PyFingerprint', 'port')
@@ -55,35 +55,35 @@ def pam_sm_authenticate(pamh, flags, argv):
         fingerprint = PyFingerprint(port, baudRate, address, password)
 
     except Exception as e:
-        print e
-        return pamh.PAM_IGNORE
+        print 'Exception: ' + str(e)
+        return pamh.PA_AUTH_ERR
 
     ## Tries to check fingerprint
     try:
         result = fingerprint.searchTemplate()
 
     except Exception as e:
-        print e
-        return pamh.PAM_IGNORE
+        print 'Exception: ' + str(e)
+        return pamh.PA_AUTH_ERR
 
     if ( result[0] == False ):
         print 'No match found!'
-        return pamh.PAM_IGNORE
+        return pamh.PA_AUTH_ERR
 
     positionNumber = result[1]
 
-    ## Gets all tuples <userName> = <template ID> from config
+    ## Gets all allowed users from config
     users = config.getItems('Users')
 
-    ## Checks in config if <userName> matches <template ID>
+    ## Checks if matched positionNumber is assigned to user
     for user in users:
-        if ( config.readInteger('Users', user[0]) == positionNumber ):
-            print 'Access granted for user '+ user[0] +'!'
+
+        if ( user[1] == str(positionNumber)):
+            print 'Access granted for user ' + user[0] + '.'
             return pamh.PAM_SUCCESS
 
     ## Denies for default
     print 'Access denied!'
-    #return pamh.IGNORE
     return pamh.PA_AUTH_ERR
 
 """
