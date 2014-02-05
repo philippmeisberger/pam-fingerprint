@@ -2,7 +2,7 @@ Package: pamfingerprint
 Version: 0.1
 Section: admin
 Priority: extra
-Depends: python (>= 2.5), python-pam, python-serial
+Depends: python (>= 2.7), libpam-python, python-serial
 Architecture: all
 Installed-Size: 200
 Maintainer: PM Codeworks <team@pm-codeworks.de>

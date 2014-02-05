@@ -42,7 +42,7 @@ class Logger(object):
     "" @param integer logLevel
     "" @return void
     """
-    def __init__(self, logFile, logLevel = 1):
+    def __init__(self, logFile, logLevel = Logger.NOTICE):
 
         ## Checks if path/file is writable
         if ( os.access(logFile, os.W_OK) == False ):
