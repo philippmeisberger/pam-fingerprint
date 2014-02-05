@@ -7,7 +7,7 @@
 "" Copyright 2014 Bastian Raschke, Philipp Meisberger.
 "" All rights reserved. 
 """
-print 'sudo test1'
+
 from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
 from PyFingerprint.PyFingerprint import *
@@ -25,7 +25,7 @@ import os
 """
 def pam_sm_authenticate(pamh, flags, argv):
 
-    print 'pamfingerprint: loading module...'
+    print 'pamfingerprint: loading module for user "' + str(pamh.ruser) + '" [service "' + str(pamh.service) + '"].'
 
     ## Tries to init Config
     try:
