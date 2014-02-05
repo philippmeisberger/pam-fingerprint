@@ -79,7 +79,7 @@ def pam_sm_authenticate(pamh, flags, argv):
     for user in users:
 
         if ( user[1] == str(positionNumber)):
-            print 'Access granted for user ' + user[0] + '.'
+            print 'Access granted.'
             return pamh.PAM_SUCCESS
 
     ## Denies for default
