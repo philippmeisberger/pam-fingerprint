@@ -60,13 +60,9 @@ class PyFingerprintConnection(object):
 
         ## Initializes connection
         self.__uart = serial.Serial(port, baudRate, serial.EIGHTBITS)
-
-        ## Sets timeout
-        ## self.__uart.timeout = 2
-
-        ## Re-opens connection
-        self.__uart.close()
         self.__uart.open()
+
+        self.__uart.timeout = 2
 
     """
     "" Destructor
@@ -85,7 +81,7 @@ class PyFingerprintConnection(object):
     "" @param integer address (4 bytes)
     "" @param integer packetType (1 byte)
     "" @param integer length (2 byte)
-    "" @param array<integer> packetData
+    "" @param tuple<integer> packetData
     "" @return boolean
     """
     def writePacket(self, address, packetType, length, packetData):
@@ -110,7 +106,6 @@ class PyFingerprintConnection(object):
 
         ## Writes payload
         for i in range(0, len(packetData)):
-
             self.__uart.write(utilities.byteToString(packetData[i]))
             checksum += packetData[i]
 
@@ -132,7 +127,7 @@ class PyFingerprintConnection(object):
 
         while True:
 
-            ## Tries to read one byte
+            ## Reads one byte
             read = self.__uart.read()
 
             if ( len(read) != 0 ):
@@ -212,29 +207,29 @@ class PyFingerprintConnection(object):
     """
     "" Verifies password of the fingerprint sensor.
     ""
-    "" @return integer (1 byte)
+    "" @return tuple<integer (1 byte)>
     """
     def verifyPassword(self):
 
-        packetData = [
+        packetData = (
             FINGERPRINT_VERIFYPASSWORD,
             utilities.rightShift(self.__password, 24),
             utilities.rightShift(self.__password, 16),
             utilities.rightShift(self.__password, 8),
-            utilities.rightShift(self.__password, 0)
-        ]
+            utilities.rightShift(self.__password, 0),
+        )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return -1
+            return (-1)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return -1
+            return (-1)
 
         return receivedPacketData
 
@@ -242,31 +237,42 @@ class PyFingerprintConnection(object):
     "" Sets the password of the fingerprint sensor.
     ""
     "" @param integer newPassword (4 bytes)
-    "" @return integer (1 byte)
+    "" @return tuple<integer (1 byte)>
     """
     def setPassword(self, newPassword):
 
-        packetData = [
+        packetData = (
             FINGERPRINT_SETPASSWORD,
             utilities.rightShift(newPassword, 24),
             utilities.rightShift(newPassword, 16),
             utilities.rightShift(newPassword, 8),
-            utilities.rightShift(newPassword, 0)
-        ]
+            utilities.rightShift(newPassword, 0),
+        )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return -1
+            return (-1)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return -1
+            return (-1)
 
         return receivedPacketData
+
+
+
+
+
+
+
+
+
+
+
 
     """
     "" Sets the module address of the fingerprint sensor.
