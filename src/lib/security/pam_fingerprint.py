@@ -7,7 +7,7 @@
 "" Copyright 2014 Bastian Raschke, Philipp Meisberger.
 "" All rights reserved. 
 """
-
+print 'sudo test1'
 from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
 from PyFingerprint.PyFingerprint import *
@@ -68,7 +68,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     if ( result[0] == False ):
         print 'No match found!'
-        return pamh.PAM_IGNORE
+        return pamh.PA_AUTH_ERR
 
     positionNumber = result[1]
 
@@ -83,7 +83,6 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     ## Denies for default
     print 'Access denied!'
-    #return pamh.IGNORE
     return pamh.PA_AUTH_ERR
 
 """
@@ -98,56 +97,3 @@ def pam_sm_setcred(pamh, flags, argv):
 
     ## Needed for getting root access rights!
     return pamh.PAM_SUCCESS
-
-"""
-"" PAM service function for account management.
-""
-"" @param pamh
-"" @param flags
-"" @param argv
-"" @return integer
-""
-def pam_sm_acct_mgmt(pamh, flags, argv):
-
-    print 'pam_sm_acct_mgmt: '+ pamh.get_user()
-    return pamh.PAM_SUCCESS
-"""
-"""
-"" PAM service function to open session management.
-""
-"" @param pamh
-"" @param flags
-"" @param argv
-"" @return integer
-""
-def pam_sm_open_session(pamh, flags, argv):
-
-    print 'pam_sm_open_session: '+ pamh.get_user()
-    return pamh.PAM_SUCCESS
-"""
-"""
-"" PAM service function to terminate session management.
-""
-"" @param pamh
-"" @param flags
-"" @param argv
-"" @return integer
-""
-def pam_sm_close_session(pamh, flags, argv):
-
-    print 'pam_sm_close_session: '+ pamh.get_user()
-    return pamh.PAM_SUCCESS
-"""
-"""
-"" PAM service function for authentication token management.
-""
-"" @param pamh
-"" @param flags
-"" @param argv
-"" @return integer
-""
-def pam_sm_chauthtok(pamh, flags, argv):
-
-    print 'pam_sm_chauthtok: '+ pamh.get_user()
-    return pamh.PAM_SUCCESS
-"""

@@ -161,17 +161,17 @@ class PamFingerprint(object):
             return False        
 
     """
-    "" Enrolls new fingerprint for existing user.
+    "" Updates fingerprint for an existing user.
     ""
     "" @param string userName
     "" @return boolean
     """
     def update(self, userName):
-        
-        pass
-        
+
+        pass        
+
     """
-    "" Enrolls fingerprint and checks if user was found.
+    "" Checks fingerprint and returns if user exists
     ""
     "" @return boolean
     """
@@ -204,13 +204,13 @@ class PamFingerprint(object):
         return False
 
 ## Main
-self.__parser = argparse.ArgumentParser(description='pamfingerprint configuration program.')
-self.__parser.add_argument('--add-user', metavar='name', help='Adds a new user and enrolls new fingerprint image.')
-self.__parser.add_argument('--remove-user', metavar='name', help='Removes an user from the fingerprint database.')
-self.__parser.add_argument('--update', metavar='name', help='Enrolls new fingerprint image for an existing user.')
-self.__parser.add_argument('--check', metavar='', help='Enrolls fingerprint and checks if user was found.')
+parser = argparse.ArgumentParser(description='pamfingerprint configuration:')
+parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
+parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
+parser.add_argument('--update', metavar='NAME', help='Updates fingerprint for an existing user.')
+parser.add_argument('--check', metavar='', help='Checks fingerprint and returns if user exists.')
 
-args = vars(self.__parser.parse_args())
+args = vars(parser.parse_args())
 
 if ( args['add_user'] ):
     PamFingerprint().addUser(args['add_user'])
@@ -221,4 +221,4 @@ elif ( args['update'] ):
 elif ( args['check'] ):
     PamFingerprint().check()
 else:
-    self.__parser.print_help()
+    parser.print_help()

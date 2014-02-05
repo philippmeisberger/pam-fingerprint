@@ -334,8 +334,8 @@ class PyFingerprint(object):
 
 ## Tests:
 
-f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
-print 'Currently stored templates: ' + str(f.getTemplateCount())
+#f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+#print 'Currently stored templates: ' + str(f.getTemplateCount())
 
 ##f.createTemplate()
 #print f.searchTemplate()
