@@ -8,24 +8,24 @@ pamfingerprint-conf - PAM Fingerprint configuration tool
 .br
 
 .SH DESCRIPTION
-\fBPAM Fingerprint\fP is a open-source Unix PAM module that allows biometric fingerprint authenticatio.
+\fBPAM Fingerprint\fP is an open-source Linux PAM module that allows biometric fingerprint authentication.
 
 It is totally written in python and uses a python framework called pam_python to allow writing PAM modules in python instead in C. Pyserial, a python written library for serial connections, is used for the connection between the sensor and a computer. The sensor is connected with a USB TTL converter. pamfingerprint works with any application supporting PAM, for example su, sudo, etc.
 .PP
 
 .SH ACTIONS
 
-.IP --add-user[user]
-Adds new user and enrolls new fingerprint image.
+.IP --add-user
+Adds a new user.
 
-.IP --remove-user [user]
-Removes user from fingerprint database.
+.IP --remove-user
+Removes an user.
 
-.IP --update [user]
-Enrolls new fingerprint image for an existing user.
+.IP --update
+Updates fingerprint for an existing user.
 
 .IP --check
-Enrolls fingerprint and checks if user exist.
+Checks fingerprint and returns if user exists.
 
 .SH "SEE ALSO"
 \fBUsed fingerprint sensor\fP: http://www.adafruit.com/products/751
