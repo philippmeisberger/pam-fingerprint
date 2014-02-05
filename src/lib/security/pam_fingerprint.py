@@ -1,10 +1,10 @@
 """
 "" PAM Fingerprint
-"" PAM interface implementation
+"" PAM module implementation.
 ""
 "" @author Philipp Meisberger
 ""
-"" Copyright 2014 Bastian Raschke, Philipp Meisberger.
+"" Copyright 2014 Philipp Meisberger, Bastian Raschke.
 "" All rights reserved. 
 """
 
@@ -25,7 +25,7 @@ import os
 """
 def pam_sm_authenticate(pamh, flags, argv):
 
-    print 'pamfingerprint: loading module for user "' + str(pamh.ruser) + '" [service "' + str(pamh.service) + '"].'
+    print 'pamfingerprint: User "' + str(pamh.ruser) + '" is asking for permission for service "' + str(pamh.service) + '".'
 
     ## Tries to init Config
     try:
@@ -44,7 +44,7 @@ def pam_sm_authenticate(pamh, flags, argv):
         print 'Exception: ' + str(e)
         return pamh.PA_AUTH_ERR
 
-    ## Gets connection values
+    ## Gets sensor connection values
     port = config.readString('PyFingerprint', 'port')
     baudRate = config.readInteger('PyFingerprint', 'baudRate')
     address = config.readHex('PyFingerprint', 'address')
@@ -55,15 +55,15 @@ def pam_sm_authenticate(pamh, flags, argv):
         fingerprint = PyFingerprint(port, baudRate, address, password)
 
     except Exception as e:
-        print 'Exception: ' + str(e)
+        print 'PyFingerprint exception: ' + str(e)
         return pamh.PA_AUTH_ERR
 
-    ## Tries to check fingerprint
+    ## Tries to read fingerprint
     try:
         result = fingerprint.searchTemplate()
 
     except Exception as e:
-        print 'Exception: ' + str(e)
+        print 'PyFingerprint exception: ' + str(e)
         return pamh.PA_AUTH_ERR
 
     if ( result[0] == False ):
@@ -72,15 +72,20 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     positionNumber = result[1]
 
-    ## Gets all allowed users from config
-    users = config.getItems('Users')
+    try:
+        assignedPositionNumber = config.readString('Users', pamh.ruser)
 
-    ## Checks if matched positionNumber is assigned to user
-    for user in users:
+    except ConfigParser.NoOptionError:
+        print 'The found match is not assigned to any user!'
+        return pamh.PA_AUTH_ERR
 
-        if ( user[1] == str(positionNumber)):
-            print 'Access granted.'
-            return pamh.PAM_SUCCESS
+    ## Checks if the position number of fingerprint template is assigned to user
+    if ( assignedPositionNumber == str(positionNumber) ):
+        print 'Access granted.'
+        return pamh.PAM_SUCCESS
+    else:
+        print 'The found match is not assigned to user!'
+        return pamh.PA_AUTH_ERR
 
     ## Denies for default
     print 'Access denied!'
