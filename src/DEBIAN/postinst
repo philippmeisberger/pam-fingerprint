@@ -1,12 +1,16 @@
 #!/bin/sh
 
 if ( test "$1" = "remove" || test "$1" = "purge" ); then
+
+    ## Removed PAM configuration from "/etc/pam.d/common-auth"
     pam-auth-update --package --remove pamfingerprint
+
 else
 
+    ## Adds PAM configuration to "/etc/pam.d/common-auth"
     pam-auth-update --package pamfingerprint
 
+    ## Change owner of log file
     chown 1000:1000 /var/log/pamfingerprint.log
 
 fi
-

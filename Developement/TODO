@@ -1,6 +1,2 @@
-- Write owner of pam_fingerprint.log
-- Main-program pamfingerprint-conf
 - CTRL+C while getImage()
-
-Basti:
 - in createTemplate(): check first if template already exists! If so: return tuple (True, <template id>)
