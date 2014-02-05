@@ -83,7 +83,8 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     ## Denies for default
     print 'Access denied!'
-    return pamh.IGNORE
+    #return pamh.IGNORE
+    return pamh.PA_AUTH_ERR
 
 """
 "" PAM service function to alter credentials.

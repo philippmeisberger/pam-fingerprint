@@ -24,12 +24,6 @@ class PamFingerprint(object):
     "" @var PyFingerprint __fingerprint
     """
     __fingerprint = None
-    
-    """
-    "" Argument parser instance
-    "" @var argparse __parser
-    """
-    __parser = None
 
     """
     "" Logger instance
@@ -54,8 +48,8 @@ class PamFingerprint(object):
         try:
             self.__config = Config('/etc/pamfingerprint.conf')
 
-        except Exception:
-            print 'TODO: Config Exception message'
+        except Exception as e:
+            print e
             exit(1)
 
         ## Tries to init logger instance
@@ -79,25 +73,6 @@ class PamFingerprint(object):
         except Exception as e:
             print e
             exit(1)
-            
-        self.__parser = argparse.ArgumentParser(description='pamfingerprint configuration program.')
-        self.__parser.add_argument('--add-user', metavar='name', help='Adds a new user and enrolls new fingerprint image.')
-        self.__parser.add_argument('--remove-user', metavar='name', help='Removes an user from the fingerprint database.')
-        self.__parser.add_argument('--update', metavar='name', help='Enrolls new fingerprint image for an existing user.')
-        self.__parser.add_argument('--check', metavar='', help='Enrolls fingerprint and checks if user was found.')
-
-        args = vars(self.__parser.parse_args())
-
-        if ( args['add_user'] ):
-            self.addUser(args['add_user'])
-        elif ( args['remove_user'] ):
-            self.removeUser(args['remove_user'])
-        elif ( args['update'] ):
-            self.update(args['update'])
-        elif ( args['check'] ):
-            self.check()
-        else:
-            self.__parser.print_help()
 
     """
     "" Returns ID of user for a given name.
@@ -135,7 +110,7 @@ class PamFingerprint(object):
         positionNumber = result[1]
         
         ## Store tuple <userName> = <template ID> to config
-        if ( ( result[0] == True ) and ( positionNumber > 0 ) ):
+        if ( result[0] == True ):
             self.__config.writeString('Users', userName, positionNumber)
             self.__logger.log(Logger.NOTICE, 'User '+ userName +' added successfully!')
             return True
@@ -161,7 +136,7 @@ class PamFingerprint(object):
         ## Confirmation dialog 
         answer = raw_input('Remove user ' + userName + '? (Y/n)')
 
-        if ( answer in ['n', 'N'] ):
+        if ( not answer in ['y', 'Y', ''] ):
             print 'Abort!'
             return False
             
@@ -173,8 +148,12 @@ class PamFingerprint(object):
             print e
             return False
 
+        if ( result == False ):
+            self.__logger.log(Logger.ERROR, 'Template could not be removed!')
+            return False
+            
         ## Removes user from config
-        if ( ( result == True ) and ( self.__config.remove('Users', userName) == True ) ):
+        if ( self.__config.remove('Users', userName) == True ):
             self.__logger.log(Logger.NOTICE, 'User '+ userName +' removed successfully!')
             return True
         else:
@@ -224,5 +203,22 @@ class PamFingerprint(object):
         self.__logger.log(Logger.ERROR, 'Error while checking user '+ user[0] +'!')
         return False
 
+## Main
+self.__parser = argparse.ArgumentParser(description='pamfingerprint configuration program.')
+self.__parser.add_argument('--add-user', metavar='name', help='Adds a new user and enrolls new fingerprint image.')
+self.__parser.add_argument('--remove-user', metavar='name', help='Removes an user from the fingerprint database.')
+self.__parser.add_argument('--update', metavar='name', help='Enrolls new fingerprint image for an existing user.')
+self.__parser.add_argument('--check', metavar='', help='Enrolls fingerprint and checks if user was found.')
 
-PamFingerprint()
+args = vars(self.__parser.parse_args())
+
+if ( args['add_user'] ):
+    PamFingerprint().addUser(args['add_user'])
+elif ( args['remove_user'] ):
+    PamFingerprint().removeUser(args['remove_user'])
+elif ( args['update'] ):
+    PamFingerprint().update(args['update'])
+elif ( args['check'] ):
+    PamFingerprint().check()
+else:
+    self.__parser.print_help()
