@@ -79,6 +79,23 @@ class PamFingerprint(object):
             exit(1)
 
     """
+    "" Shows confirmation dialog with choice for yes/no.
+    ""
+    "" @param string question
+    "" @return boolean
+    """
+    def __showConfirmationDialog(self, question=''):
+
+        ## Confirmation dialog 
+        answer = raw_input(question +' (Y/n)')
+
+        if ( answer not in ['y', 'Y', ''] ):
+            print 'Canceled.'
+            return False
+        else:
+            return True
+
+    """
     "" Returns user ID for a given name.
     ""
     "" @param string userName
@@ -104,11 +121,8 @@ class PamFingerprint(object):
     """
     def addUser(self, userName):
 
-        ## Confirmation dialog 
-        answer = raw_input('Add user ' + userName + '? (Y/n)')
-
-        if ( answer not in ['y', 'Y', ''] ):
-            print 'Canceled.'
+        ## Confirmation dialog
+        if ( self.__showConfirmationDialog('Add user ' + userName + '?') == False ):
             return False
 
         ## Tries to create new template for user
@@ -119,10 +133,8 @@ class PamFingerprint(object):
             self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
             return False
 
-        positionNumber = result[1]
-
         if ( result[0] == True ):
-
+            positionNumber = result[1]
             self.__config.writeString('Users', userName, positionNumber)
 
             if ( self.__config.save() == True ):
@@ -131,7 +143,6 @@ class PamFingerprint(object):
             else
                 self.__logger.log(Logger.ERROR, 'The configuration could not be written!')
                 return False
-
         else:
             self.__logger.log(Logger.ERROR, 'Error while adding user "' + userName + '"!')
             return False 
@@ -151,10 +162,7 @@ class PamFingerprint(object):
             return False
 
         ## Confirmation dialog 
-        answer = raw_input('Remove user ' + userName + '? (Y/n)')
-
-        if ( answer not in ['y', 'Y', ''] ):
-            print 'Canceled.'
+        if ( self.__showConfirmationDialog('Remove user ' + userName + '?') == False ):
             return False
             
         ## Tries to delete template
@@ -166,7 +174,7 @@ class PamFingerprint(object):
             return False
 
         if ( result == True ):
-
+            
             if ( self.__config.remove('Users', userName) == True and self.__config.save() == True ):
                 self.__logger.log(Logger.NOTICE, 'The user "' + userName + '" has been removed successfully!')
                 return True
@@ -178,6 +186,42 @@ class PamFingerprint(object):
             self.__logger.log(Logger.ERROR, 'Error while removing user "' + userName + '"!')
             return False       
 
+    """
+    "" Updates fingerprint for a given user name.
+    ""
+    "" @param string userName
+    "" @return boolean
+    """
+    def update(self, userName):
+
+        ## Checks if user found on sensor database
+        if ( self.check(userName) == False ):
+            return False
+        
+        ## Confirmation dialog
+        if ( self.__showConfirmationDialog('Update user ' + userName + '?') == False ):
+            return False
+
+        ## Gets user ID
+        userId = self.getUserIdForName(userName)
+        
+        ## Tries to delete template
+        try:
+            result = self.__fingerprint.deleteTemplate(userId)
+
+        except Exception as e:
+            self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
+            return False
+
+        ## Tries to enroll new template
+        if ( self.addUser(userName) == True ):
+            self.__logger.log(Logger.NOTICE, 'The user "'+ userName +'" has been updated successfully!')
+            return True
+        else:
+            self.__logger.log(Logger.ERROR, 'Error while updating user "' + userName + '"!')
+            return False
+
+        
     """
     "" Checks fingerprint for a given user name.
     ""
