@@ -80,7 +80,6 @@ class PyFingerprint(object):
     """
     def searchTemplate(self):
 
-        print 'Waiting for finger...'
         p = [-1]
 
         while ( p[0] != FINGERPRINT_OK ):
@@ -297,17 +296,19 @@ class PyFingerprint(object):
 
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Template deleted successfully')
+            return True
 
         elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
             raise Exception('Communication error')
 
         elif ( p[0] == FINGERPRINT_DELETEFAIL ):
-            raise Exception('Could not delete template')
+            utilities.printDebug('Could not delete template')
+            return False
 
         else:
             raise Exception('Unknown error')
 
-        return True
+        return False
 
     """
     "" Deletes the complete sensor database.
@@ -320,18 +321,19 @@ class PyFingerprint(object):
 
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Template database cleared successfully')
+            return True
 
         elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
             raise Exception('Communication error')
 
         elif ( p[0] == FINGERPRINT_DBCLEARFAIL ):
-            raise Exception('Could not clear template database')
+            utilities.printDebug('Could not clear template database')
+            return False
 
         else:
             raise Exception('Unknown error')
 
-        return True
-
+        return False
 
 ## Tests:
 

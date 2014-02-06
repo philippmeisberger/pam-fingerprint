@@ -37,9 +37,9 @@ class PyFingerprintConnection(object):
 
     """
     "" UART serial connection via PySerial
-    "" @var Serial __uart
+    "" @var Serial __serial
     """
-    __uart = None
+    __serial = None
 
     """
     "" Constructor
@@ -59,11 +59,11 @@ class PyFingerprintConnection(object):
         self.__password = password
 
         ## Initializes connection
-        self.__uart = serial.Serial(port, baudRate, serial.EIGHTBITS)
-        self.__uart.close()
-        self.__uart.open()
+        self.__serial = serial.Serial(port, baudRate, serial.EIGHTBITS)
+        self.__serial.close()
+        self.__serial.open()
 
-        self.__uart.timeout = 2
+        self.__serial.timeout = 2
 
     """
     "" Destructor
@@ -73,8 +73,8 @@ class PyFingerprintConnection(object):
     def __del__(self):
 
         ## Closes connection if established
-        if ( self.__uart ):
-            self.__uart.close()
+        if ( self.__serial ):
+            self.__serial.close()
 
     """
     "" Sends a packet to fingerprint sensor.
@@ -82,24 +82,24 @@ class PyFingerprintConnection(object):
     "" @param integer address (4 bytes)
     "" @param integer packetType (1 byte)
     "" @param integer length (2 byte)
-    "" @param tuple<integer> packetData
+    "" @param tuple (integer, ...) packetData
     "" @return boolean
     """
     def writePacket(self, address, packetType, length, packetData):
 
         ## Writes header (one byte at once)
-        self.__uart.write(utilities.byteToString(utilities.rightShift(FINGERPRINT_STARTCODE, 8)))
-        self.__uart.write(utilities.byteToString(utilities.rightShift(FINGERPRINT_STARTCODE, 0)))
+        self.__serial.write(utilities.byteToString(utilities.rightShift(FINGERPRINT_STARTCODE, 8)))
+        self.__serial.write(utilities.byteToString(utilities.rightShift(FINGERPRINT_STARTCODE, 0)))
 
-        self.__uart.write(utilities.byteToString(utilities.rightShift(address, 24)))
-        self.__uart.write(utilities.byteToString(utilities.rightShift(address, 16)))
-        self.__uart.write(utilities.byteToString(utilities.rightShift(address, 8)))
-        self.__uart.write(utilities.byteToString(utilities.rightShift(address, 0)))
+        self.__serial.write(utilities.byteToString(utilities.rightShift(address, 24)))
+        self.__serial.write(utilities.byteToString(utilities.rightShift(address, 16)))
+        self.__serial.write(utilities.byteToString(utilities.rightShift(address, 8)))
+        self.__serial.write(utilities.byteToString(utilities.rightShift(address, 0)))
 
-        self.__uart.write(utilities.byteToString(packetType))
+        self.__serial.write(utilities.byteToString(packetType))
 
-        self.__uart.write(utilities.byteToString(utilities.rightShift(length, 8)))
-        self.__uart.write(utilities.byteToString(utilities.rightShift(length, 0)))
+        self.__serial.write(utilities.byteToString(utilities.rightShift(length, 8)))
+        self.__serial.write(utilities.byteToString(utilities.rightShift(length, 0)))
 
         ## Calculates checksum:
         ## checksum = packet type (1 byte) + packet length (2 bytes) + payload (n bytes)
@@ -107,12 +107,12 @@ class PyFingerprintConnection(object):
 
         ## Writes payload
         for i in range(0, len(packetData)):
-            self.__uart.write(utilities.byteToString(packetData[i]))
+            self.__serial.write(utilities.byteToString(packetData[i]))
             checksum += packetData[i]
 
         ## Writes checksum (2 bytes)
-        self.__uart.write(utilities.byteToString(utilities.rightShift(checksum, 8)))
-        self.__uart.write(utilities.byteToString(utilities.rightShift(checksum, 0)))
+        self.__serial.write(utilities.byteToString(utilities.rightShift(checksum, 8)))
+        self.__serial.write(utilities.byteToString(utilities.rightShift(checksum, 0)))
 
         return True
 
@@ -129,7 +129,7 @@ class PyFingerprintConnection(object):
         while True:
 
             ## Reads one byte
-            read = self.__uart.read()
+            read = self.__serial.read()
 
             if ( len(read) != 0 ):
 
@@ -208,7 +208,7 @@ class PyFingerprintConnection(object):
     """
     "" Verifies password of the fingerprint sensor.
     ""
-    "" @return tuple<integer (1 byte)>
+    "" @return tuple (integer [1 byte])
     """
     def verifyPassword(self):
 
@@ -224,13 +224,13 @@ class PyFingerprintConnection(object):
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return (-1)
+            return (-1,)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return (-1)
+            return (-1,)
 
         return receivedPacketData
 
@@ -238,7 +238,7 @@ class PyFingerprintConnection(object):
     "" Sets the password of the fingerprint sensor.
     ""
     "" @param integer newPassword (4 bytes)
-    "" @return tuple<integer (1 byte)>
+    "" @return tuple (integer [1 byte])
     """
     def setPassword(self, newPassword):
 
@@ -254,104 +254,93 @@ class PyFingerprintConnection(object):
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return (-1)
+            return (-1,)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return (-1)
+            return (-1,)
 
         return receivedPacketData
-
-
-
-
-
-
-
-
-
-
-
 
     """
     "" Sets the module address of the fingerprint sensor.
     ""
     "" @param integer newAddress (4 bytes)
-    "" @return integer (1 byte)
+    "" @return tuple (integer [1 byte])
     """
     def setAddress(self, newAddress):
 
-        packetData = [
+        packetData = (
             FINGERPRINT_SETADDRESS,
             utilities.rightShift(newAddress, 24),
             utilities.rightShift(newAddress, 16),
             utilities.rightShift(newAddress, 8),
-            utilities.rightShift(newAddress, 0)
-        ]
+            utilities.rightShift(newAddress, 0),
+        )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return -1
+            return (-1,)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return -1
+            return (-1,)
 
         return receivedPacketData
 
     """
     "" Gets the number of stored templates.
     ""
-    "" @return integer (2 bytes)
+    "" @return tuple (integer [2 bytes])
     """
     def getTemplateCount(self):
 
-        packetData = [
-            FINGERPRINT_TEMPLATECOUNT
-        ]
+        packetData = (
+            FINGERPRINT_TEMPLATECOUNT,
+        )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return -1
+            return (-1,)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return -1
+            return (-1,)
 
         return receivedPacketData
 
     """
     "" Reads the image of a finger.
     ""
-    "" @return integer (1 byte)
+    "" @return tuple (integer [1 byte])
     """
     def getImage(self):
 
-        packetData = [
-            FINGERPRINT_GETIMAGE
-        ]
+        packetData = (
+            FINGERPRINT_GETIMAGE,
+        )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return -1
+            return (-1,)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return -1
+            return (-1,)
 
         return receivedPacketData
 
@@ -359,51 +348,51 @@ class PyFingerprintConnection(object):
     "" Generates fingerprint characteristics of readed image and stores temporarily in ImageBuffer1 or ImageBuffer2.
     ""
     "" @param integer bufferNumber (1 byte)
-    "" @return integer (1 byte)
+    "" @return tuple (integer [1 byte])
     """
     def image2Tz(self, bufferNumber = 0x01):
 
-        packetData = [
+        packetData = (
             FINGERPRINT_IMAGE2TZ,
-            bufferNumber 
-        ]
+            bufferNumber,
+        )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return -1
+            return (-1,)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return -1
+            return (-1,)
 
         return receivedPacketData
 
     """
     "" Combines fingerprint characteristics of ImageBuffer1 with ImageBuffer2 to a template.
     ""
-    "" @return integer (1 byte)
+    "" @return tuple (integer [1 byte])
     """
     def createTemplate(self):
 
-        packetData = [
-            FINGERPRINT_REGMODEL
-        ]
+        packetData = (
+            FINGERPRINT_REGMODEL,
+        )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return -1
+            return (-1,)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return -1
+            return (-1,)
 
         return receivedPacketData
 
@@ -411,30 +400,30 @@ class PyFingerprintConnection(object):
     "" Saves the template of ImageBufferN on a specific position number.
     ""
     "" @param integer positionNumber (2 bytes)
-    "" @return integer (1 byte)
+    "" @return tuple (integer [1 byte])
     """
     def storeTemplate(self, positionNumber):
 
         bufferNumber = 0x01
 
-        packetData = [
+        packetData = (
             FINGERPRINT_STORE,
             bufferNumber,
             utilities.rightShift(positionNumber, 8),
-            utilities.rightShift(positionNumber, 0)
-        ]
+            utilities.rightShift(positionNumber, 0),
+        )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return -1
+            return (-1,)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return -1
+            return (-1,)
 
         return receivedPacketData
 
@@ -442,63 +431,63 @@ class PyFingerprintConnection(object):
     "" Deletes one template from fingerprint database.
     ""
     "" @param integer positionNumber (2 bytes)
-    "" @return integer (1 byte)
+    "" @return tuple (integer [1 byte])
     """
     def deleteTemplate(self, positionNumber):
 
         period = 0x0001
         
-        packetData = [
+        packetData = (
             FINGERPRINT_DELETECHAR,
             utilities.rightShift(positionNumber, 8),
             utilities.rightShift(positionNumber, 0),
             utilities.rightShift(period, 8),
-            utilities.rightShift(period, 0)
-        ]
+            utilities.rightShift(period, 0),
+        )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return -1
+            return (-1,)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return -1
+            return (-1,)
 
         return receivedPacketData
 
     """
     "" Clears the complete template database.
     ""
-    "" @return integer (1 byte)
+    "" @return tuple (integer [1 byte])
     """
     def clearDatabase(self):
 
-        packetData = [
-            FINGERPRINT_EMPTY
-        ]
+        packetData = (
+            FINGERPRINT_EMPTY,
+        )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return -1
+            return (-1,)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return -1
+            return (-1,)
 
         return receivedPacketData
 
     """
     "" Search if the readed image in ImageBufferN in database.
     ""
-    "" @return integer (5 bytes)
+    "" @return tuple (integer [5 bytes])
     """
     def searchTemplate(self):
 
@@ -509,25 +498,25 @@ class PyFingerprintConnection(object):
         positionStart = 0x0000
         templatesCount = 0x00A3
 
-        packetData = [
+        packetData = (
             FINGERPRINT_SEARCH,
             bufferNumber,
             utilities.rightShift(positionStart, 8),
             utilities.rightShift(positionStart, 0),
             utilities.rightShift(templatesCount, 8),
-            utilities.rightShift(templatesCount, 0)
-        ]
+            utilities.rightShift(templatesCount, 0),
+        )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
         receivedPacket = self.readPacket()
 
         if ( receivedPacket == False ):
-            return -1
+            return (-1,)
 
         receivedPacketType = receivedPacket[0]
         receivedPacketData = receivedPacket[1]
 
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            return -1
+            return (-1,)
 
         return receivedPacketData

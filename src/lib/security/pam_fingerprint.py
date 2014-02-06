@@ -12,6 +12,7 @@ sys.path.append('/usr/lib')
 from pamfingerprint.version import VERSION
 from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
+
 from PyFingerprint.PyFingerprint import *
 
 import os
