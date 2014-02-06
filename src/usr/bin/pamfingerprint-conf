@@ -173,12 +173,20 @@ class PamFingerprint(object):
         pass        
 
     """
-    "" Checks fingerprint and returns if user exists
+    "" Checks fingerprint for a given user name.
     ""
+    "" @param string userName
     "" @return boolean
     """
-    def check(self):
+    def check(self, userName):
 
+        try:
+            expectedId = self.__config.readInteger('Users', userName)
+
+        except Exception:
+            self.__logger.log(Logger.ERROR, 'User '+ userName +' does not exist!')
+            return False
+        
         ## Tries to check fingerprint
         try:
             result = self.__fingerprint.searchTemplate()
@@ -193,16 +201,12 @@ class PamFingerprint(object):
         
         positionNumber = result[1]
 
-        ## Gets all tuples <userName> = <template ID> from config
-        users = self.__config.getItems('Users')
-
-        ## Checks in config if <userName> matches <template ID>
-        for user in users:
-            if ( self.__config.readInteger('Users', user[0]) == positionNumber ):
-                self.__logger.log(Logger.NOTICE, 'Check for user '+ user[0] +' was successful!')
-                return True
-
-        self.__logger.log(Logger.ERROR, 'Error while checking user '+ user[0] +'!')
+        ## Checks if <user ID> matches <template ID>
+        if ( expectedId == positionNumber ):
+            self.__logger.log(Logger.NOTICE, 'Check for user '+ userName +' was successful!')
+            return True
+        
+        self.__logger.log(Logger.ERROR, 'Check for user '+ userName +' failed!')
         return False
 
 ## Main
@@ -210,7 +214,7 @@ parser = argparse.ArgumentParser(description='pamfingerprint configuration:')
 parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
 parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
 parser.add_argument('--update', metavar='NAME', help='Updates fingerprint for an existing user.')
-parser.add_argument('--check', metavar='', help='Checks fingerprint and returns if user exists.', nargs='?', const=True)
+parser.add_argument('--check', metavar='NAME', help='Checks fingerprint for an existing user.')
 
 args = vars(parser.parse_args())
 
@@ -221,6 +225,6 @@ elif ( args['remove_user'] ):
 elif ( args['update'] ):
     PamFingerprint().update(args['update'])
 elif ( args['check'] ):
-    PamFingerprint().check()
+    PamFingerprint().check(args['check'])
 else:
     parser.print_help()
