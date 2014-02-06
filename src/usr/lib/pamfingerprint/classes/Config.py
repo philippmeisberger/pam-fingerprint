@@ -58,13 +58,13 @@ class Config(object):
     """
     def save(self):
 
+        # Checks if path/file is writable
         if ( os.access(self.__configFile, os.W_OK) == True ):
 
             f = open(self.__configFile, 'w')
-
-            # Saves config file
             self.__configParser.write(f)
             f.close()
+
             return True
 
         return False

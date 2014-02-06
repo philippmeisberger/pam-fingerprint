@@ -14,6 +14,7 @@ sys.path.append('/usr/lib')
 from pamfingerprint.version import VERSION
 from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
+
 from PyFingerprint.PyFingerprint import *
 
 import argparse
@@ -51,7 +52,7 @@ class PamFingerprint(object):
             self.__config = Config('/etc/pamfingerprint.conf')
 
         except Exception as e:
-            print 'Exception: '+ str(e)
+            print 'Exception: ' + str(e)
             exit(1)
 
         ## Tries to init logger instance
@@ -60,7 +61,7 @@ class PamFingerprint(object):
             self.__logger = Logger('/var/log/pamfingerprint.log', logLevel)
 
         except Exception as e:
-            print 'Exception: '+ str(e)
+            print 'Exception: ' + str(e)
             exit(1)
 
         ## Gets connection values
@@ -74,64 +75,77 @@ class PamFingerprint(object):
             self.__fingerprint = PyFingerprint(port, baudRate, address, password)
 
         except Exception as e:
-            self.__logger.log(Logger.ERROR, 'Exception: '+ str(e))
+            self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
             exit(1)
 
     """
-    "" Returns ID of user for a given name.
+    "" Returns user ID for a given name.
     ""
     "" @param string userName
     "" @return integer
     """
-    def __getIdForName(self, userName):
+    def getUserIdForName(self, userName):
 
         userId = -1
-        
+
         try:
             userId = self.__config.readInteger('Users', userName)
 
         except ConfigParser.NoOptionError:
-            self.__logger.log(Logger.ERROR, 'User "'+ userName +'" does not exist!')
+            self.__logger.log(Logger.ERROR, 'The user "'+ userName +'" does not exist!')
 
         return userId
         
     """
-    "" Adds new user and enrolls new fingerprint image.
+    "" Enrolls new fingerprint template and adds user to PAM.
     ""
-    "" @param string name
+    "" @param string userName
     "" @return boolean
     """
     def addUser(self, userName):
+
+        ## Confirmation dialog 
+        answer = raw_input('Add user ' + userName + '? (Y/n)')
+
+        if ( answer not in ['y', 'Y', ''] ):
+            print 'Canceled.'
+            return False
 
         ## Tries to create new template for user
         try:
             result = self.__fingerprint.createTemplate()
 
         except Exception as e:
-            self.__logger.log(Logger.ERROR, 'Exception: '+ str(e))
+            self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
             return False
 
         positionNumber = result[1]
-        
-        ## Store tuple <userName> = <template ID> to config
+
         if ( result[0] == True ):
+
             self.__config.writeString('Users', userName, positionNumber)
-            self.__logger.log(Logger.NOTICE, 'User '+ userName +' added successfully!')
-            return True
+
+            if ( self.__config.save() == True ):
+                self.__logger.log(Logger.NOTICE, 'The user "' + userName + '" has been added successfully!')
+                return True
+            else
+                self.__logger.log(Logger.ERROR, 'The configuration could not be written!')
+                return False
+
         else:
-            self.__logger.log(Logger.ERROR, 'Error while adding user '+ userName +'!')
+            self.__logger.log(Logger.ERROR, 'Error while adding user "' + userName + '"!')
             return False 
-        
+
     """
-    "" Removes an user from the fingerprint database.
+    "" Removes fingerprint template from sensor and removes user from PAM.
     ""
-    "" @param string name
+    "" @param string userName
     "" @return boolean
     """
     def removeUser(self, userName):
 
         ## Gets user ID
-        userId = self.__getIdForName(userName)             
+        userId = self.getUserIdForName(userName)             
         
         if ( userId == -1 ):
             return False
@@ -139,8 +153,8 @@ class PamFingerprint(object):
         ## Confirmation dialog 
         answer = raw_input('Remove user ' + userName + '? (Y/n)')
 
-        if ( not answer in ['y', 'Y', ''] ):
-            print 'Abort!'
+        if ( answer not in ['y', 'Y', ''] ):
+            print 'Canceled.'
             return False
             
         ## Tries to delete template
@@ -148,30 +162,21 @@ class PamFingerprint(object):
             result = self.__fingerprint.deleteTemplate(userId)
 
         except Exception as e:
-            self.__logger.log(Logger.ERROR, 'Exception: '+ str(e))
+            self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
             return False
 
-        if ( result == False ):
-            self.__logger.log(Logger.ERROR, 'Template could not be removed!')
-            return False
-            
-        ## Removes user from config
-        if ( self.__config.remove('Users', userName) == True ):
-            self.__logger.log(Logger.NOTICE, 'User '+ userName +' removed successfully!')
-            return True
+        if ( result == True ):
+
+            if ( self.__config.remove('Users', userName) == True and self.__config.save() == True ):
+                self.__logger.log(Logger.NOTICE, 'The user "' + userName + '" has been removed successfully!')
+                return True
+            else
+                self.__logger.log(Logger.ERROR, 'The configuration could not be written!')
+                return False
+
         else:
-            self.__logger.log(Logger.ERROR, 'Error while removing user '+ userName +'!')
-            return False        
-
-    """
-    "" Updates fingerprint for an existing user.
-    ""
-    "" @param string userName
-    "" @return boolean
-    """
-    def update(self, userName):
-
-        pass        
+            self.__logger.log(Logger.ERROR, 'Error while removing user "' + userName + '"!')
+            return False       
 
     """
     "" Checks fingerprint for a given user name.
@@ -182,35 +187,37 @@ class PamFingerprint(object):
     def check(self, userName):
 
         ## Gets user ID
-        expectedId = self.__getIdForName(userName)             
+        userId = self.getUserIdForName(userName)
         
-        if ( expectedId == -1 ):
+        if ( userId == -1 ):
             return False
-        
+
         ## Tries to check fingerprint
         try:
             result = self.__fingerprint.searchTemplate()
 
         except Exception as e:
-            self.__logger.log(Logger.ERROR, 'Exception: '+ str(e))
+            self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
             return False
 
         if ( result[0] == False ):
             self.__logger.log(Logger.NOTICE, 'No match found!')
             return False
-        
+
         positionNumber = result[1]
 
         ## Checks if user ID matches template ID
-        if ( expectedId == positionNumber ):
-            self.__logger.log(Logger.NOTICE, 'Check for user '+ userName +' was successful!')
+        if ( userId == positionNumber ):
+            self.__logger.log(Logger.NOTICE, 'Check for user ' + userName + ' was successful!')
             return True
-        
-        self.__logger.log(Logger.ERROR, 'Check for user '+ userName +' failed!')
+
+        self.__logger.log(Logger.ERROR, 'Check for user ' + userName + ' failed!')
         return False
 
+
 ## Main
-parser = argparse.ArgumentParser(description='pamfingerprint configuration:')
+parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')
+
 parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
 parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
 parser.add_argument('--update', metavar='NAME', help='Updates fingerprint for an existing user.')
