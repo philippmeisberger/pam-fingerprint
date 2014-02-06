@@ -76,14 +76,14 @@ def pam_sm_authenticate(pamh, flags, argv):
     positionNumber = result[1]
 
     try:
-        assignedPositionNumber = config.readInteger('Users', pamh.ruser)
+        expectedId = config.readInteger('Users', pamh.ruser)
 
     except ConfigParser.NoOptionError:
         logger.log(Logger.WARNING, 'The found match is not assigned to any user!')
         return pamh.PA_AUTH_ERR
 
-    ## Checks if the position number of fingerprint template is assigned to user
-    if ( assignedPositionNumber == positionNumber ):
+    ## Checks if user ID matches template ID
+    if ( expectedId == positionNumber ):
         logger.log(Logger.NOTICE, 'Access granted.')
         return pamh.PAM_SUCCESS
     else:

@@ -85,12 +85,15 @@ class PamFingerprint(object):
     """
     def __getIdForName(self, userName):
 
+        userId = -1
+        
         try:
-            expectedId = self.__config.readInteger('Users', userName)
+            userId = self.__config.readInteger('Users', userName)
 
         except ConfigParser.NoOptionError:
-            self.__logger.log(Logger.ERROR, 'User '+ userName +' does not exist!')
-            return -1
+            self.__logger.log(Logger.ERROR, 'User "'+ userName +'" does not exist!')
+
+        return userId
         
     """
     "" Adds new user and enrolls new fingerprint image.
@@ -105,7 +108,7 @@ class PamFingerprint(object):
             result = self.__fingerprint.createTemplate()
 
         except Exception as e:
-            print 'Exception: '+ str(e) 
+            self.__logger.log(Logger.ERROR, 'Exception: '+ str(e))
             return False
 
         positionNumber = result[1]
@@ -127,7 +130,7 @@ class PamFingerprint(object):
     """
     def removeUser(self, userName):
 
-        ## Tries to get user ID
+        ## Gets user ID
         userId = self.__getIdForName(userName)             
         
         if ( userId == -1 ):
@@ -145,7 +148,7 @@ class PamFingerprint(object):
             result = self.__fingerprint.deleteTemplate(userId)
 
         except Exception as e:
-            print 'Exception: '+ str(e)
+            self.__logger.log(Logger.ERROR, 'Exception: '+ str(e))
             return False
 
         if ( result == False ):
@@ -178,7 +181,7 @@ class PamFingerprint(object):
     """
     def check(self, userName):
 
-        ## Tries to get user ID
+        ## Gets user ID
         expectedId = self.__getIdForName(userName)             
         
         if ( expectedId == -1 ):
@@ -189,32 +192,22 @@ class PamFingerprint(object):
             result = self.__fingerprint.searchTemplate()
 
         except Exception as e:
-            print 'Exception: '+ str(e)
+            self.__logger.log(Logger.ERROR, 'Exception: '+ str(e))
             return False
 
         if ( result[0] == False ):
-            print 'No match found!'
+            self.__logger.log(Logger.NOTICE, 'No match found!')
             return False
         
         positionNumber = result[1]
 
-        ## Checks if <user ID> matches <template ID>
+        ## Checks if user ID matches template ID
         if ( expectedId == positionNumber ):
             self.__logger.log(Logger.NOTICE, 'Check for user '+ userName +' was successful!')
             return True
         
         self.__logger.log(Logger.ERROR, 'Check for user '+ userName +' failed!')
         return False
-
-
-
-
-
-
-
-
-
-
 
 ## Main
 parser = argparse.ArgumentParser(description='pamfingerprint configuration:')
