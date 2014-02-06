@@ -202,9 +202,9 @@ class PamFingerprint(object):
 
         if ( result[0] == False ):
             self.__logger.log(Logger.NOTICE, 'No match found!')
-            return False
-
-        positionNumber = result[1]
+            positionNumber = -1
+        else:
+            positionNumber = result[1]
 
         ## Checks if user ID matches template ID
         if ( userId == positionNumber ):
@@ -222,10 +222,10 @@ parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
 parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
 parser.add_argument('--update', metavar='NAME', help='Updates fingerprint for an existing user.')
 parser.add_argument('--check', metavar='NAME', help='Checks fingerprint for an existing user.')
-parser.add_argument('--version', nargs='?', const=True, help='Prints version and exists.')
+parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Print version and exit.')
 
 args = vars(parser.parse_args())
-
+    
 if ( args['add_user'] ):
     PamFingerprint().addUser(args['add_user'])
 elif ( args['remove_user'] ):
@@ -234,7 +234,5 @@ elif ( args['update'] ):
     PamFingerprint().update(args['update'])
 elif ( args['check'] ):
     PamFingerprint().check(args['check'])
-elif ( args['version'] ):
-    print 'pamfingerprint version '+ VERSION
 else:
     parser.print_help()
