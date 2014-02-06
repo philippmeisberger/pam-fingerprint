@@ -178,7 +178,7 @@ class PamFingerprint(object):
             if ( self.__config.remove('Users', userName) == True and self.__config.save() == True ):
                 self.__logger.log(Logger.NOTICE, 'The user "' + userName + '" has been removed successfully!')
                 return True
-            else
+            else:
                 self.__logger.log(Logger.ERROR, 'The configuration could not be written!')
                 return False
 

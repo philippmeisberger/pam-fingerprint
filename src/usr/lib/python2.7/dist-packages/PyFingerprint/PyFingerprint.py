@@ -196,7 +196,9 @@ class PyFingerprint(object):
         else:
             raise Exception('Unknown error')
 
+        print 'Remove finger...'
         time.sleep(2)
+
         p = [-1]
 
         ## Waiting the user removes finger
@@ -340,7 +342,7 @@ class PyFingerprint(object):
 #f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 #print 'Currently stored templates: ' + str(f.getTemplateCount())
 
-#f.deleteDatabase()
+f.deleteDatabase()
 
 #f.createTemplate()
 #print f.searchTemplate()

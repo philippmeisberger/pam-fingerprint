@@ -28,8 +28,7 @@ import os
 """
 def pam_sm_authenticate(pamh, flags, argv):
 
-    print 'pamfingerprint '+ VERSION
-    print 'User "' + str(pamh.ruser) + '" is asking for permission for service "' + str(pamh.service) + '".'
+    print 'pamfingerprint ' + VERSION
 
     ## Tries to init Config
     try:
@@ -47,6 +46,16 @@ def pam_sm_authenticate(pamh, flags, argv):
     except Exception as e:
         print 'Exception: ' + str(e)
         return pamh.PAM_IGNORE
+
+    logger.log(Logger.NOTICE, 'The user "' + str(pamh.ruser) + '" is asking for permission for service "' + str(pamh.service) + '".')
+
+    ## Checks if the user is assigned to any ID
+    try:
+        expectedId = config.readInteger('Users', pamh.ruser)
+
+    except ConfigParser.NoOptionError:
+        logger.log(Logger.NOTICE, 'The user "' + str(pamh.ruser) + '" is not assigned!')
+        return pamh.PA_AUTH_ERR
 
     ## Gets sensor connection values
     port = config.readString('PyFingerprint', 'port')
@@ -76,13 +85,6 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     positionNumber = result[1]
 
-    try:
-        expectedId = config.readInteger('Users', pamh.ruser)
-
-    except ConfigParser.NoOptionError:
-        logger.log(Logger.WARNING, 'The found match is not assigned to any user!')
-        return pamh.PA_AUTH_ERR
-
     ## Checks if user ID matches template ID
     if ( expectedId == positionNumber ):
         logger.log(Logger.NOTICE, 'Access granted.')
@@ -105,5 +107,4 @@ def pam_sm_authenticate(pamh, flags, argv):
 """
 def pam_sm_setcred(pamh, flags, argv):
 
-    ## Needed for getting root access rights!
     return pamh.PAM_SUCCESS

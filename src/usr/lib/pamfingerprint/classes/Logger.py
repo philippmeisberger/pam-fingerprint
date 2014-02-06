@@ -91,5 +91,5 @@ class Logger(object):
                 levelLabel = '[Unknown level]'
 
             ## Appends message to log and prints it
-            self.__file.write(time.strftime('%Y-%m-%d %H:%M:%S: ') + levelLabel + ' ' + message + '\n')
-            print levelLabel + ' ' + message
+            self.__file.write(time.strftime('%Y-%m-%d %H:%M:%S ') + levelLabel + ' ' + message + '\n')
+            print message
