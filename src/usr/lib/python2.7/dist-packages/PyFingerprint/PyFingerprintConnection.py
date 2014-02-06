@@ -60,6 +60,7 @@ class PyFingerprintConnection(object):
 
         ## Initializes connection
         self.__uart = serial.Serial(port, baudRate, serial.EIGHTBITS)
+        self.__uart.close()
         self.__uart.open()
 
         self.__uart.timeout = 2
