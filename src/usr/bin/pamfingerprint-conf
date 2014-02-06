@@ -105,7 +105,7 @@ class PamFingerprint(object):
     def addUser(self, userName):
 
         ## Confirmation dialog 
-        answer = raw_input('Add user ' + userName + '? (Y/n)')
+        answer = raw_input('Add user "' + userName + '"? (Y/n)')
 
         if ( answer not in ['y', 'Y', ''] ):
             print 'Canceled.'
@@ -128,7 +128,7 @@ class PamFingerprint(object):
             if ( self.__config.save() == True ):
                 self.__logger.log(Logger.NOTICE, 'The user "' + userName + '" has been added successfully!')
                 return True
-            else
+            else:
                 self.__logger.log(Logger.ERROR, 'The configuration could not be written!')
                 return False
 
@@ -151,7 +151,7 @@ class PamFingerprint(object):
             return False
 
         ## Confirmation dialog 
-        answer = raw_input('Remove user ' + userName + '? (Y/n)')
+        answer = raw_input('Remove user "' + userName + '"? (Y/n)')
 
         if ( answer not in ['y', 'Y', ''] ):
             print 'Canceled.'
@@ -170,7 +170,7 @@ class PamFingerprint(object):
             if ( self.__config.remove('Users', userName) == True and self.__config.save() == True ):
                 self.__logger.log(Logger.NOTICE, 'The user "' + userName + '" has been removed successfully!')
                 return True
-            else
+            else:
                 self.__logger.log(Logger.ERROR, 'The configuration could not be written!')
                 return False
 
@@ -208,10 +208,10 @@ class PamFingerprint(object):
 
         ## Checks if user ID matches template ID
         if ( userId == positionNumber ):
-            self.__logger.log(Logger.NOTICE, 'Check for user ' + userName + ' was successful!')
+            self.__logger.log(Logger.NOTICE, 'Check for user "' + userName + '" was successful!')
             return True
 
-        self.__logger.log(Logger.ERROR, 'Check for user ' + userName + ' failed!')
+        self.__logger.log(Logger.ERROR, 'Check for user "' + userName + '" failed!')
         return False
 
 
@@ -220,7 +220,6 @@ parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')
 
 parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
 parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
-parser.add_argument('--update', metavar='NAME', help='Updates fingerprint for an existing user.')
 parser.add_argument('--check', metavar='NAME', help='Checks fingerprint for an existing user.')
 parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Print version and exit.')
 
@@ -230,8 +229,6 @@ if ( args['add_user'] ):
     PamFingerprint().addUser(args['add_user'])
 elif ( args['remove_user'] ):
     PamFingerprint().removeUser(args['remove_user'])
-elif ( args['update'] ):
-    PamFingerprint().update(args['update'])
 elif ( args['check'] ):
     PamFingerprint().check(args['check'])
 else:
