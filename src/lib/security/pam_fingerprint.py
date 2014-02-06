@@ -9,6 +9,7 @@
 import sys 
 sys.path.append('/usr/lib')
 
+from pamfingerprint.version import VERSION
 from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
 from PyFingerprint.PyFingerprint import *
@@ -26,7 +27,8 @@ import os
 """
 def pam_sm_authenticate(pamh, flags, argv):
 
-    print 'pamfingerprint: User "' + str(pamh.ruser) + '" is asking for permission for service "' + str(pamh.service) + '".'
+    print 'pamfingerprint '+ VERSION
+    print 'User "' + str(pamh.ruser) + '" is asking for permission for service "' + str(pamh.service) + '".'
 
     ## Tries to init Config
     try:
@@ -56,7 +58,7 @@ def pam_sm_authenticate(pamh, flags, argv):
         fingerprint = PyFingerprint(port, baudRate, address, password)
 
     except Exception as e:
-        print 'PyFingerprint exception: ' + str(e)
+        logger.log(Logger.ERROR, 'Exception: ' + str(e))
         return pamh.PAM_IGNORE
 
     ## Tries to read fingerprint
@@ -64,12 +66,11 @@ def pam_sm_authenticate(pamh, flags, argv):
         result = fingerprint.searchTemplate()
 
     except Exception as e:
-        print 'PyFingerprint exception: ' + str(e)
-        return pamh.PAM_IGNORE
+        logger.log(Logger.ERROR, 'Exception: ' + str(e))
         return pamh.PAM_IGNORE
 
     if ( result[0] == False ):
-        print 'No match found!'
+        logger.log(Logger.NOTICE, 'No match found!')
         return pamh.PA_AUTH_ERR
 
     positionNumber = result[1]
@@ -78,19 +79,19 @@ def pam_sm_authenticate(pamh, flags, argv):
         assignedPositionNumber = config.readInteger('Users', pamh.ruser)
 
     except ConfigParser.NoOptionError:
-        print 'The found match is not assigned to any user!'
+        logger.log(Logger.WARNING, 'The found match is not assigned to any user!')
         return pamh.PA_AUTH_ERR
 
     ## Checks if the position number of fingerprint template is assigned to user
     if ( assignedPositionNumber == positionNumber ):
-        print 'Access granted.'
+        logger.log(Logger.NOTICE, 'Access granted.')
         return pamh.PAM_SUCCESS
     else:
-        print 'The found match is not assigned to user!'
+        logger.log(Logger.WARNING, 'The found match is not assigned to user!')
         return pamh.PA_AUTH_ERR
 
     ## Denies for default
-    print 'Access denied!'
+    logger.log(Logger.NOTICE, 'Access denied!')
     return pamh.PA_AUTH_ERR
 
 """

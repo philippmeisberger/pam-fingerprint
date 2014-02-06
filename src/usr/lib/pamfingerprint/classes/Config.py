@@ -49,15 +49,25 @@ class Config(object):
     """
     def __del__(self):
 
-        if ( self.__configFile ):
+        self.save()
+        
+    """
+    "" Writes modifications to config file.
+    ""
+    "" @return boolean
+    """
+    def save(self):
+
+        if ( os.access(self.__configFile, os.W_OK) == True ):
 
             f = open(self.__configFile, 'w')
 
-        if ( self.__configParser ):
-
-            ## Saves config file
+            # Saves config file
             self.__configParser.write(f)
             f.close()
+            return True
+
+        return False
 
     """
     "" Removes data from config file.
