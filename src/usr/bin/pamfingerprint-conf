@@ -11,9 +11,9 @@
 import sys 
 sys.path.append('/usr/lib')
 
-from PyFingerprint.PyFingerprint import *
 from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
+from PyFingerprint.PyFingerprint import *
 
 import argparse
 
@@ -55,7 +55,8 @@ class PamFingerprint(object):
 
         ## Tries to init logger instance
         try:
-            self.__logger = Logger('/var/log/pamfingerprint.log')
+            logLevel = self.__config.readInteger('Logger', 'level')
+            self.__logger = Logger('/var/log/pamfingerprint.log', logLevel)
 
         except Exception as e:
             print str(e)
@@ -209,7 +210,7 @@ parser = argparse.ArgumentParser(description='pamfingerprint configuration:')
 parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
 parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
 parser.add_argument('--update', metavar='NAME', help='Updates fingerprint for an existing user.')
-parser.add_argument('--check', metavar='', help='Checks fingerprint and returns if user exists.')
+parser.add_argument('--check', metavar='', help='Checks fingerprint and returns if user exists.', nargs='?', const=True)
 
 args = vars(parser.parse_args())
 
