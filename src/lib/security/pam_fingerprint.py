@@ -31,7 +31,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except Exception as e:
         print 'Exception: ' + str(e)
-        return pamh.PA_AUTH_ERR
+        return pamh.PAM_IGNORE
 
     ## Tries to init Logger
     try:
@@ -40,7 +40,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except Exception as e:
         print 'Exception: ' + str(e)
-        return pamh.PA_AUTH_ERR
+        return pamh.PAM_IGNORE
 
     ## Gets sensor connection values
     port = config.readString('PyFingerprint', 'port')
@@ -54,7 +54,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except Exception as e:
         print 'PyFingerprint exception: ' + str(e)
-        return pamh.PA_AUTH_ERR
+        return pamh.PAM_IGNORE
 
     ## Tries to read fingerprint
     try:
@@ -62,7 +62,8 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except Exception as e:
         print 'PyFingerprint exception: ' + str(e)
-        return pamh.PA_AUTH_ERR
+        return pamh.PAM_IGNORE
+        return pamh.PAM_IGNORE
 
     if ( result[0] == False ):
         print 'No match found!'
@@ -71,14 +72,14 @@ def pam_sm_authenticate(pamh, flags, argv):
     positionNumber = result[1]
 
     try:
-        assignedPositionNumber = config.readString('Users', pamh.ruser)
+        assignedPositionNumber = config.readInteger('Users', pamh.ruser)
 
     except ConfigParser.NoOptionError:
         print 'The found match is not assigned to any user!'
         return pamh.PA_AUTH_ERR
 
     ## Checks if the position number of fingerprint template is assigned to user
-    if ( assignedPositionNumber == str(positionNumber) ):
+    if ( assignedPositionNumber == positionNumber ):
         print 'Access granted.'
         return pamh.PAM_SUCCESS
     else:
