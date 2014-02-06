@@ -8,9 +8,12 @@
 "" All rights reserved.
 """
 
+import sys 
+sys.path.append('/usr/lib')
+
+from PyFingerprint.PyFingerprint import *
 from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
-from PyFingerprint.PyFingerprint import *
 
 import argparse
 
