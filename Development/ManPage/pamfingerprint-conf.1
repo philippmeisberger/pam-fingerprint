@@ -2,46 +2,66 @@
 
 .SH NAME
 pamfingerprint-conf - PAM Fingerprint configuration tool
+
 .SH SYNOPSIS
-.B pamfingerprint-conf
-.RI [ actions ]
-.br
+.nf
+.fam C
+\fBpamfingerprint-conf\fP [\fB--help\fP | \fB--add-user\fP NAME | \fB--remove-user\fP NAME | \fB--update\fP NAME | \fB--version\fP]
+.fam T
+.fi
 
 .SH DESCRIPTION
-\fBPAM Fingerprint\fP is an open-source Linux PAM module that allows biometric fingerprint authentication.
+\fBPAM Fingerprint\fR is an open-source Linux PAM module that allows biometric fingerprint authentication.
 
 It is totally written in python and uses a python framework called pam_python to allow writing PAM modules in python instead in C. Pyserial, a python written library for serial connections, is used for the connection between the sensor and a computer. The sensor is connected with a USB TTL converter. pamfingerprint works with any application supporting PAM, for example su, sudo, etc.
 .PP
 
 .SH ACTIONS
+.TP
+.B
+\fB--help\fP, \fB-h\fP
+Show summary of actions.
 
-.IP --add-user
+.TP
+.B
+\fB--add-user\fP
 Adds a new user.
 
-.IP --remove-user
+.TP
+.B
+\fB--remove-user\fP
 Removes an user.
 
-.IP --update
+.TP
+.B
+\fB--update\fP 
 Updates fingerprint for an existing user.
 
-.IP --check
-Checks fingerprint and returns if user exists.
+.TP
+.B
+\fB--check\fP  
+Checks fingerprint for an existing user.
+
+.TP
+.B
+\fB--version\fP
+Prints version and exits.
 
 .SH "SEE ALSO"
-\fBUsed fingerprint sensor\fP: http://www.adafruit.com/products/751
-
-\fBPyserial\fP: http://pyserial.sourceforge.net/
-
-\fBpam_python\fP: http://ace-host.stuart.id.au/russell/files/pam_python/
+\fBUsed fingerprint sensor\fR: http://www.adafruit.com/products/751
+.br
+\fBPyserial\fR: http://pyserial.sourceforge.net/
+.br
+\fBpam_python\fR: http://ace-host.stuart.id.au/russell/files/pam_python/
 
 .SH FILES
-/etc/pam_fingerprint.conf
+/etc/pamfingerprint.conf
 .br
-/var/log/pam_fingerprint.log
+/var/log/pamfingerprint.log
 
 .SH AUTHORS
 Philipp Meisberger <team@pm-codeworks.de> 
 .br
 Bastian Raschke <>
 
-Please report Bugs to one of those mail addresses. Visit www.pm-codeworks.de for more interesting projects.
+Please send bug reports to one of those mail addresses. Visit www.pm-codeworks.de for more interesting projects.
