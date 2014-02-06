@@ -140,7 +140,7 @@ class PamFingerprint(object):
             if ( self.__config.save() == True ):
                 self.__logger.log(Logger.NOTICE, 'The user "' + userName + '" has been added successfully!')
                 return True
-            else
+            else:
                 self.__logger.log(Logger.ERROR, 'The configuration could not be written!')
                 return False
         else:
@@ -221,7 +221,6 @@ class PamFingerprint(object):
             self.__logger.log(Logger.ERROR, 'Error while updating user "' + userName + '"!')
             return False
 
-        
     """
     "" Checks fingerprint for a given user name.
     ""
