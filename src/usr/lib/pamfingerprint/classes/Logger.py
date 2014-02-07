@@ -8,6 +8,7 @@
 
 import time
 import os
+import sys
 
 
 class Logger(object):
@@ -92,4 +93,4 @@ class Logger(object):
 
             ## Appends message to log and prints it
             self.__file.write(time.strftime('%Y-%m-%d %H:%M:%S ') + levelLabel + ' ' + message + '\n')
-            print message
+            sys.stderr.write(message +'\n')

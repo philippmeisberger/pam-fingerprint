@@ -52,7 +52,7 @@ class PamFingerprint(object):
             self.__config = Config('/etc/pamfingerprint.conf')
 
         except Exception as e:
-            print 'Exception: ' + str(e)
+            sys.stderr.write('Exception: ' + str(e))
             exit(1)
 
         ## Tries to init logger instance
@@ -61,7 +61,7 @@ class PamFingerprint(object):
             self.__logger = Logger('/var/log/pamfingerprint.log', logLevel)
 
         except Exception as e:
-            print 'Exception: ' + str(e)
+            sys.stderr.write('Exception: ' + str(e))
             exit(1)
 
         ## Gets connection values
@@ -90,7 +90,7 @@ class PamFingerprint(object):
         answer = raw_input(question +' (Y/n)')
 
         if ( answer not in ['y', 'Y', ''] ):
-            print 'Canceled.'
+            sys.stderr.write('Canceled.')
             return False
         else:
             return True
