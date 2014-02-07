@@ -27,12 +27,23 @@ import os
 """
 def pam_sm_authenticate(pamh, flags, argv):
 
-    sys.stderr.write('pamfingerprint '+ VERSION +' loading module...\n')
-    
+    msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Waiting for finger...\n')
+    pamh.conversation(msg)
+
     if ( pamh.ruser == None ):
         user = pamh.get_user()
     else:
         user = pamh.ruser
+
+    """
+    try:
+
+
+    except pamh.exception as e:
+        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e) +'\n')
+        pamh.conversation(msg)
+        return pamh.PAM_ABORT
+    """
 
     ## Tries to init Config
     try:
