@@ -8,7 +8,6 @@
 
 import time
 import os
-import sys
 
 
 class Logger(object):
@@ -33,6 +32,12 @@ class Logger(object):
     "" @var integer __logLevel
     """
     __logLevel = None
+
+    """
+    "" PAM handle
+    "" @var handle __pamh
+    """
+    __pamh = None
     
     """
     "" Constructor
@@ -41,7 +46,7 @@ class Logger(object):
     "" @param integer logLevel
     "" @return void
     """
-    def __init__(self, logFile, logLevel):
+    def __init__(self, logFile, logLevel, pamhandle=None):
 
         ## Checks if path/file is writable
         if ( os.access(logFile, os.W_OK) == False ):
@@ -54,6 +59,7 @@ class Logger(object):
         self.__file = open(logFile, 'a')
 
         self.__logLevel = logLevel
+        self.__pamh = pamhandle
 
     """
     "" Destructor
@@ -80,17 +86,30 @@ class Logger(object):
         if ( level >= self.__logLevel ):           
 
             ## Gets log level label
-            if (level == Logger.DEBUG):
+            if (level == self.DEBUG):
                 levelLabel = '[Debug]'
-            elif (level == Logger.NOTICE):
+            elif (level == self.NOTICE):
                 levelLabel = '[Notice]'
-            elif (level == Logger.WARNING):
+            elif (level == self.WARNING):
                 levelLabel = '[Warning]'
-            elif (level == Logger.ERROR):
-                levelLabel = '[Error]'
+            elif (level == self.ERROR):
+                levelLabel = '[Error]' 
             else:
                 levelLabel = '[Unknown level]'
 
             ## Appends message to log and prints it
-            self.__file.write(time.strftime('%Y-%m-%d %H:%M:%S ') + levelLabel + ' ' + message + '\n')
-            sys.stderr.write(message +'\n')
+            self.__file.write(time.strftime('%Y-%m-%d %H:%M:%S ') + levelLabel +' '+ message +'\n')
+            
+            if ( self.__pamh == None ):
+                ## Normal print
+                print levelLabel + ' ' + message
+            else:
+                ## Use PAM library function
+                if (level == self.ERROR):
+                    pamMsgStyle = self.__pamh.PAM_ERROR_MSG
+                else:
+                    pamMsgStyle = self.__pamh.PAM_TEXT_INFO
+
+                ## TODO: Add levelLabel to message???
+                msg = self.__pamh.Message(pamMsgStyle, message)
+                self.__pamh.conversation(msg)

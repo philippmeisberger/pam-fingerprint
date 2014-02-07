@@ -7,7 +7,7 @@
 
 ## Enables debug mode
 ##
-DEBUG = True
+DEBUG = False
 
 
 ## Baotou start byte

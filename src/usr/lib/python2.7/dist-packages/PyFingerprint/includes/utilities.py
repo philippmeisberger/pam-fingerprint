@@ -8,7 +8,6 @@
 from constants import *
 
 import struct
-import sys
 
 
 """
@@ -20,7 +19,7 @@ import sys
 def printDebug(message):
 
     if ( DEBUG == True ):
-        sys.stderr.write('PyFingerprint: '+ message +'\n')
+        print 'PyFingerprint: '+ message
 
 """
 "" Shifts a byte.

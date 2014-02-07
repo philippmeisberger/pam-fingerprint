@@ -27,39 +27,46 @@ import os
 """
 def pam_sm_authenticate(pamh, flags, argv):
 
-    msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Waiting for finger...\n')
+    msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Waiting for finger...')
     pamh.conversation(msg)
 
+    ## Tries to get user which is asking for permission
     try:
         if ( pamh.ruser == None ):
             user = pamh.get_user()
         else:
             user = pamh.ruser
-
+        
     except pamh.exception as e:
-        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e) +'\n')
+        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e))
         pamh.conversation(msg)
         return pamh.PAM_ABORT
 
+    ## Be sure "user" is set 
+    if ( user == None ):
+        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'User not known!')
+        pamh.conversation(msg)
+        return pamh.PAM_USER_UNKNOWN
+        
     ## Tries to init Config
     try:
         config = Config('/etc/pamfingerprint.conf')
 
     except Exception as e:
-        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e) +'\n')
+        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e))
         pamh.conversation(msg)
         return pamh.PAM_ABORT
-
+    
     ## Tries to init Logger
     try:
         logLevel = config.readInteger('Logger', 'level')
-        logger = Logger('/var/log/pamfingerprint.log', logLevel)
+        logger = Logger('/var/log/pamfingerprint.log', logLevel, pamh)
 
     except Exception as e:
-        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e) +'\n')
+        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e))
         pamh.conversation(msg)
         return pamh.PAM_ABORT
-
+    
     logger.log(Logger.NOTICE, 'User "' + str(user) + '" is asking for permission for service "' + str(pamh.service) + '".')
 
     ## Checks if the user is assigned to any ID
@@ -75,14 +82,13 @@ def pam_sm_authenticate(pamh, flags, argv):
     baudRate = config.readInteger('PyFingerprint', 'baudRate')
     address = config.readHex('PyFingerprint', 'address')
     password = config.readHex('PyFingerprint', 'password')
-
+    
     ## Tries to init PyFingerprint
     try:
         fingerprint = PyFingerprint(port, baudRate, address, password)
 
     except Exception as e:
-        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e) +'\n')
-        pamh.conversation(msg)
+        logger.log(Logger.ERROR, 'Exception: ' + str(e))
         return pamh.PAM_ABORT
 
     ## Tries to read fingerprint
@@ -90,10 +96,9 @@ def pam_sm_authenticate(pamh, flags, argv):
         result = fingerprint.searchTemplate()
 
     except Exception as e:
-        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e) +'\n')
-        pamh.conversation(msg)
+        logger.log(Logger.ERROR, 'Exception: ' + str(e))
         return pamh.PAM_ABORT
-
+    
     if ( result[0] == False ):
         logger.log(Logger.NOTICE, 'No match found!')
         return pamh.PA_AUTH_ERR
