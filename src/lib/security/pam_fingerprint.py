@@ -27,8 +27,7 @@ import os
 """
 def pam_sm_authenticate(pamh, flags, argv):
 
-    sys.stderr.write('pamfingerprint ' + VERSION +'\n')
-    #pamh.message('123', 'test')
+    sys.stderr.write('pamfingerprint '+ VERSION +' loading module...\n')
     
     if ( pamh.ruser == None ):
         user = pamh.get_user()
@@ -40,7 +39,7 @@ def pam_sm_authenticate(pamh, flags, argv):
         config = Config('/etc/pamfingerprint.conf')
 
     except Exception as e:
-        sys.stderr.write('Exception: ' + str(e))
+        sys.stderr.write('Exception: ' + str(e) +'\n')
         return pamh.PAM_IGNORE
 
     ## Tries to init Logger
@@ -49,17 +48,17 @@ def pam_sm_authenticate(pamh, flags, argv):
         logger = Logger('/var/log/pamfingerprint.log', logLevel)
 
     except Exception as e:
-        sys.stderr.write('Exception: ' + str(e))
+        sys.stderr.write('Exception: ' + str(e) +'\n')
         return pamh.PAM_IGNORE
 
-    logger.log(Logger.NOTICE, 'The user "' + str(user) + '" is asking for permission for service "' + str(pamh.service) + '".')
+    logger.log(Logger.NOTICE, 'User "' + str(user) + '" is asking for permission for service "' + str(pamh.service) + '".')
 
     ## Checks if the user is assigned to any ID
     try:
         expectedId = config.readInteger('Users', user)
 
     except ConfigParser.NoOptionError:
-        logger.log(Logger.NOTICE, 'The user "' + str(user) + '" is not assigned!')
+        logger.log(Logger.NOTICE, 'User "' + str(user) + '" is not assigned!')
         return pamh.PA_AUTH_ERR
 
     ## Gets sensor connection values

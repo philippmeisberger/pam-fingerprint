@@ -20,7 +20,7 @@ import sys
 def printDebug(message):
 
     if ( DEBUG == True ):
-        sys.stderr.write('PyFingerprint: '+ message)
+        sys.stderr.write('PyFingerprint: '+ message +'\n')
 
 """
 "" Shifts a byte.
