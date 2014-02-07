@@ -30,28 +30,25 @@ def pam_sm_authenticate(pamh, flags, argv):
     msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Waiting for finger...\n')
     pamh.conversation(msg)
 
-    if ( pamh.ruser == None ):
-        user = pamh.get_user()
-    else:
-        user = pamh.ruser
-
-    """
     try:
-
+        if ( pamh.ruser == None ):
+            user = pamh.get_user()
+        else:
+            user = pamh.ruser
 
     except pamh.exception as e:
         msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e) +'\n')
         pamh.conversation(msg)
         return pamh.PAM_ABORT
-    """
 
     ## Tries to init Config
     try:
         config = Config('/etc/pamfingerprint.conf')
 
     except Exception as e:
-        sys.stderr.write('Exception: ' + str(e) +'\n')
-        return pamh.PAM_IGNORE
+        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e) +'\n')
+        pamh.conversation(msg)
+        return pamh.PAM_ABORT
 
     ## Tries to init Logger
     try:
@@ -59,8 +56,9 @@ def pam_sm_authenticate(pamh, flags, argv):
         logger = Logger('/var/log/pamfingerprint.log', logLevel)
 
     except Exception as e:
-        sys.stderr.write('Exception: ' + str(e) +'\n')
-        return pamh.PAM_IGNORE
+        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e) +'\n')
+        pamh.conversation(msg)
+        return pamh.PAM_ABORT
 
     logger.log(Logger.NOTICE, 'User "' + str(user) + '" is asking for permission for service "' + str(pamh.service) + '".')
 
@@ -83,16 +81,18 @@ def pam_sm_authenticate(pamh, flags, argv):
         fingerprint = PyFingerprint(port, baudRate, address, password)
 
     except Exception as e:
-        logger.log(Logger.ERROR, 'Exception: ' + str(e))
-        return pamh.PAM_IGNORE
+        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e) +'\n')
+        pamh.conversation(msg)
+        return pamh.PAM_ABORT
 
     ## Tries to read fingerprint
     try:
         result = fingerprint.searchTemplate()
 
     except Exception as e:
-        logger.log(Logger.ERROR, 'Exception: ' + str(e))
-        return pamh.PAM_IGNORE
+        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e) +'\n')
+        pamh.conversation(msg)
+        return pamh.PAM_ABORT
 
     if ( result[0] == False ):
         logger.log(Logger.NOTICE, 'No match found!')
