@@ -261,6 +261,10 @@ class PamFingerprint(object):
 
 
 ## Main
+## Checks if user is root
+if ( os.geteuid() != 0 ):
+    exit("You need to have root privileges to run pamfingerprint-conf!\n")
+
 parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')
 
 parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
