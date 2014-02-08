@@ -8,6 +8,8 @@
 
 import time
 import os
+import syslog
+from pamfingerprint.version import VERSION
 
 
 class Logger(object):
@@ -69,15 +71,14 @@ class Logger(object):
     def __del__(self):
 
         ## Closes file if is open
-        if ( self.__file ):
+        if ( self.__file != None ):
             self.__file.close()
 
     """
-    "" Appends a string into the log file.
+    "" Appends a string to the log file.
     ""
     "" @param integer level
     "" @param string message
-    "" 
     "" @return void
     """
     def log(self, level, message):
@@ -86,13 +87,13 @@ class Logger(object):
         if ( level >= self.__logLevel ):           
 
             ## Gets log level label
-            if (level == self.DEBUG):
+            if ( level == self.DEBUG ):
                 levelLabel = '[Debug]'
-            elif (level == self.NOTICE):
+            elif ( level == self.NOTICE ):
                 levelLabel = '[Notice]'
-            elif (level == self.WARNING):
+            elif ( level == self.WARNING ):
                 levelLabel = '[Warning]'
-            elif (level == self.ERROR):
+            elif ( level == self.ERROR ):
                 levelLabel = '[Error]' 
             else:
                 levelLabel = '[Unknown level]'
@@ -105,11 +106,36 @@ class Logger(object):
                 print levelLabel + ' ' + message
             else:
                 ## Use PAM library function
-                if (level == self.ERROR):
+                if ( level == self.ERROR ):
                     pamMsgStyle = self.__pamh.PAM_ERROR_MSG
                 else:
                     pamMsgStyle = self.__pamh.PAM_TEXT_INFO
 
                 ## TODO: Add levelLabel to message???
-                msg = self.__pamh.Message(pamMsgStyle, message)
+                msg = self.__pamh.Message(pamMsgStyle, 'pamfingerprint '+ VERSION +': '+ message)
                 self.__pamh.conversation(msg)
+
+    """
+    "" Appends a string to system log file.
+    ""
+    "" @param integer level
+    "" @param string message
+    "" @return void
+    """
+    def logsystem(self, level, message):
+
+        ## Gets log level label
+        if ( level == self.DEBUG ):
+            levelLabel = syslog.LOG_DEBUG
+        elif ( level == self.NOTICE ):
+            levelLabel = syslog.LOG_NOTICE
+        elif ( level == self.WARNING ):
+            levelLabel = syslog.LOG_WARNING
+        elif ( level == self.ERROR ):
+            levelLabel = syslog.LOG_ERR
+        else:
+            syslog.syslog(message)
+            return
+
+        ## Appends to syslog
+        syslog.syslog(levelLabel, message)

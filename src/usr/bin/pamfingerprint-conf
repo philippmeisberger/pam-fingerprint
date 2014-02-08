@@ -227,8 +227,10 @@ class PamFingerprint(object):
     "" @param string userName
     "" @return boolean
     """
-    def check(self, userName):
+    def checkUser(self, userName):
 
+        print 'pamfingerprint '+ VERSION +': Waiting for finger...'
+        
         ## Gets user ID
         userId = self.getUserIdForName(userName)
         
@@ -276,6 +278,6 @@ elif ( args['remove_user'] ):
 #elif ( args['update'] ):
 #    PamFingerprint().update(args['update'])
 elif ( args['check_user'] ):
-    PamFingerprint().check(args['check_user'])
+    PamFingerprint().checkUser(args['check_user'])
 else:
     parser.print_help()

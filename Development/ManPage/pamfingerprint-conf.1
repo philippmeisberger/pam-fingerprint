@@ -6,15 +6,15 @@
 .SH SYNOPSIS
 .nf
 .fam C
-\fBpamfingerprint-conf\fP [\fB--help\fP | \fB--add-user\fP NAME | \fB--remove-user\fP NAME | \fB--update\fP NAME | \fB--check\fP NAME | \fB--version\fP]
+\fBpamfingerprint-conf\fP [\fB--help\fP | \fB--add-user\fP NAME | \fB--remove-user\fP NAME | \fB--check-user\fP NAME | \fB--version\fP]
 .fam T
 .fi
 
 .SH DESCRIPTION
-\fBpamfingerprint\fR is a free/open-source Linux PAM module that allows biometric fingerprint authentication without entering a password. The standard Unix passwort authentication is set as fallback in case that no fingerprint sensor is connected. The module has to be configured by the \fBpamfingerprint-conf\fR program. It can add or remove users, update fingerprints and check if authentication succeeds.  
+\fBpamfingerprint\fR is a free/open-source Linux PAM module that allows biometric fingerprint authentication without entering a password. The standard Unix passwort authentication is set as fallback in case that no fingerprint sensor is connected. The module has to be configured by the \fBpamfingerprint-conf\fR program. It can add or remove users and check if authentication succeeds.  
 .br
 
-pamfingerprint is totally written in python and uses a python framework called pam_python to allow writing PAM modules in python instead in C. Pyserial, a python written library for serial connections, is used for the connection between the sensor and a computer. The sensor is connected with a USB TTL converter. pamfingerprint works with any application supporting PAM, for example su, sudo, etc.
+\fBpamfingerprint\fR is totally written in python and uses a python framework called pam_python to allow writing PAM modules in python instead in C. Pyserial, a python written library for serial connections, is used for the connection between the sensor and a computer. The sensor is connected with a USB TTL converter. pamfingerprint works with any application supporting PAM, for example su, sudo, etc.
 .PP
 
 .SH ACTIONS
@@ -35,12 +35,7 @@ Removes an user.
 
 .TP
 .B
-\fB--update\fP 
-Updates fingerprint for an existing user.
-
-.TP
-.B
-\fB--check\fP  
+\fB--check-user\fP  
 Checks fingerprint for an existing user.
 
 .TP
