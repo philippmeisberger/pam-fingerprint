@@ -187,41 +187,6 @@ class PamFingerprint(object):
             return False       
 
     """
-    "" Updates fingerprint for a given user name.
-    ""
-    "" @param string userName
-    "" @return boolean
-    ""
-    def update(self, userName):
-
-        ## Checks if user found on sensor database
-        if ( self.check(userName) == False ):
-            return False
-        
-        ## Confirmation dialog
-        if ( self.__showConfirmationDialog('Update user ' + userName + '?') == False ):
-            return False
-
-        ## Gets user ID
-        userId = self.getUserIdForName(userName)
-        
-        ## Tries to delete template
-        try:
-            result = self.__fingerprint.deleteTemplate(userId)
-
-        except Exception as e:
-            self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
-            return False
-
-        ## Tries to enroll new template
-        if ( self.addUser(userName) == True ):
-            self.__logger.log(Logger.NOTICE, 'The user "'+ userName +'" has been updated successfully!')
-            return True
-        else:
-            self.__logger.log(Logger.ERROR, 'Error while updating user "' + userName + '"!')
-            return False
-    """
-    """
     "" Checks fingerprint for a given user name.
     ""
     "" @param string userName
@@ -269,7 +234,6 @@ parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')
 
 parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
 parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
-#parser.add_argument('--update', metavar='NAME', help='Updates fingerprint for an existing user.')
 parser.add_argument('--check-user', metavar='NAME', help='Checks fingerprint for an existing user.')
 parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Print version and exit.')
 
@@ -279,8 +243,6 @@ if ( args['add_user'] ):
     PamFingerprint().addUser(args['add_user'])
 elif ( args['remove_user'] ):
     PamFingerprint().removeUser(args['remove_user'])
-#elif ( args['update'] ):
-#    PamFingerprint().update(args['update'])
 elif ( args['check_user'] ):
     PamFingerprint().checkUser(args['check_user'])
 else:
