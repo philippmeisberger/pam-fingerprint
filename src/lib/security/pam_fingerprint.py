@@ -15,8 +15,6 @@ from pamfingerprint.classes.Config import *
 
 from PyFingerprint.PyFingerprint import *
 
-#import os
-
 """
 "" PAM service function for user authentication.
 ""
@@ -86,7 +84,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except Exception as e:
         logger.log(Logger.ERROR, 'Exception: ' + str(e))
-        return pamh.PAM_RESULT
+        return pamh.PAM_IGNORE
 
     msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Waiting for finger...')
     pamh.conversation(msg)
@@ -97,7 +95,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except Exception as e:
         logger.log(Logger.ERROR, 'Exception:' + str(e))
-        return pamh.PAM_RESULT
+        return pamh.PAM_ABORT
 
     if ( result[0] == False ):
         logger.log(Logger.NOTICE, 'No match found!')

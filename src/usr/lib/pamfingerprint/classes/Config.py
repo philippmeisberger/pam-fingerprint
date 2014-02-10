@@ -24,23 +24,30 @@ class Config(object):
     "" @var ConfigParser __configParser
     """
     __configParser = None
-        
+
+    """
+    "" Flag indicates config file is opened read-only 
+    "" @var boolean __readOnly
+    """
+    __readOnly = False
+    
     """
     "" Constructor
     ""
     "" @param string configFile
     "" @return void
     """
-    def __init__(self, configFile):
+    def __init__(self, configFile, readOnly=False):
 
         # Checks if path/file is readable
         if ( os.access(configFile, os.R_OK) == False ):
-            raise Exception('The configuration file \"' + configFile + '\" is not readable!')
+            raise Exception('The configuration file "' + configFile + '" is not readable!')
 
         self.__configFile = configFile
 
         self.__configParser = ConfigParser.ConfigParser()
         self.__configParser.read(configFile)
+        self.__readOnly = readOnly
 
     """
     "" Destructor
@@ -49,7 +56,8 @@ class Config(object):
     """
     def __del__(self):
 
-        self.save()
+        if ( self.__readOnly == False ):
+            self.save()
         
     """
     "" Writes modifications to config file.

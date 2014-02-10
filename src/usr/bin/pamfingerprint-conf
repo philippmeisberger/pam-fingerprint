@@ -12,7 +12,6 @@ import sys
 sys.path.append('/usr/lib')
 
 from pamfingerprint.version import VERSION
-from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
 
 from PyFingerprint.PyFingerprint import *
@@ -27,12 +26,6 @@ class PamFingerprint(object):
     "" @var PyFingerprint __fingerprint
     """
     __fingerprint = None
-
-    """
-    "" Logger instance
-    "" @var Logger __logger
-    """
-    __logger = None
 
     """
     "" Config instance
@@ -184,66 +177,26 @@ class PamFingerprint(object):
 
         else:
             self.__logger.log(Logger.ERROR, 'Error while removing user "' + userName + '"!')
-            return False       
-
-    """
-    "" Checks fingerprint for a given user name.
-    ""
-    "" @param string userName
-    "" @return boolean
-    """
-    def checkUser(self, userName):
-
-        print 'pamfingerprint '+ VERSION +': Waiting for finger...'
-        
-        ## Gets user ID
-        userId = self.getUserIdForName(userName)
-        
-        if ( userId == -1 ):
             return False
 
-        ## Tries to check fingerprint
-        try:
-            result = self.__fingerprint.searchTemplate()
 
-        except Exception as e:
-            self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
-            return False
+if ( __name__ == '__main__' ):
 
-        if ( result[0] == False ):
-            self.__logger.log(Logger.NOTICE, 'No match found!')
-            positionNumber = -1
-        else:
-            positionNumber = result[1]
+    ## Checks if user is root
+    if ( os.geteuid() != 0 ):
+        exit("You need to have root privileges to run pamfingerprint-conf!\n")
 
-        ## Checks if user ID matches template ID
-        if ( userId == positionNumber ):
-            self.__logger.log(Logger.NOTICE, 'Check for user ' + userName + ' was successful!')
-            return True
+    parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')
 
-        self.__logger.log(Logger.ERROR, 'Check for user ' + userName + ' failed!')
-        return False
+    parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
+    parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
+    parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Print version and exit.')
 
-
-## Main
-## Checks if user is root
-if ( os.geteuid() != 0 ):
-    exit("You need to have root privileges to run pamfingerprint-conf!\n")
-
-parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')
-
-parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
-parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
-parser.add_argument('--check-user', metavar='NAME', help='Checks fingerprint for an existing user.')
-parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Print version and exit.')
-
-args = vars(parser.parse_args())
-    
-if ( args['add_user'] ):
-    PamFingerprint().addUser(args['add_user'])
-elif ( args['remove_user'] ):
-    PamFingerprint().removeUser(args['remove_user'])
-elif ( args['check_user'] ):
-    PamFingerprint().checkUser(args['check_user'])
-else:
-    parser.print_help()
+    args = vars(parser.parse_args())
+        
+    if ( args['add_user'] ):
+        PamFingerprint().addUser(args['add_user'])
+    elif ( args['remove_user'] ):
+        PamFingerprint().removeUser(args['remove_user'])
+    else:
+        parser.print_help()
