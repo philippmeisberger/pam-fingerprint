@@ -10,10 +10,19 @@ import sys
 sys.path.append('/usr/lib')
 
 from pamfingerprint.version import VERSION
-from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
-
 from PyFingerprint.PyFingerprint import *
+
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+## Creates and adds a file handler
+fileHandler = logging.FileHandler('/var/log/pamfingerprint.log')
+fileHandler.setLevel(logging.INFO)
+fileHandler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+logger.addHandler(fileHandler)
+
 
 """
 "" PAM service function for user authentication.
@@ -32,44 +41,32 @@ def pam_sm_authenticate(pamh, flags, argv):
         else:
             user = pamh.ruser
 
-    except pamh.exception as e:
-        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e))
-        pamh.conversation(msg)
+    except pamh.exception, e:
+        logger.error('', exc_info=True)
         return pamh.PAM_USER_UNKNOWN
 
     ## Be sure the user is set 
     if ( user == None ):
-        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'The user is not known!')
-        pamh.conversation(msg)
+        logger.error('The user is not known!', exc_info=False)
         return pamh.PAM_USER_UNKNOWN
   
     ## Tries to init Config
     try:
         config = Config('/etc/pamfingerprint.conf')
 
-    except Exception as e:
-        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e))
-        pamh.conversation(msg)
+    except Exception:
+        logger.error('', exc_info=True)
         return pamh.PAM_IGNORE
 
-    ## Tries to init Logger
-    try:
-        logLevel = config.readInteger('Logger', 'level')
-        logger = Logger('/var/log/pamfingerprint.log', logLevel, pamh)
+    logger.info('The user "' + str(user) + '" is asking for permission for service "' + str(pamh.service) + '".')
 
-    except Exception as e:
-        msg = pamh.Message(pamh.PAM_ERROR_MSG, 'Exception: ' + str(e))
-        pamh.conversation(msg)
-        return pamh.PAM_IGNORE
-
-    logger.log(Logger.NOTICE, 'The user "' + str(user) + '" is asking for permission for service "' + str(pamh.service) + '".')
-
+    ## TODO: Change to Hash
     ## Checks if the user is assigned to any ID
     try:
         expectedId = config.readInteger('Users', user)
 
     except ConfigParser.NoOptionError:
-        logger.log(Logger.NOTICE, 'The user "' + str(user) + '" is not assigned!')
+        logger.error('The user "' + str(user) + '" is not assigned!', exc_info=False)
         return pamh.PA_AUTH_ERR
 
     ## Gets sensor connection values
@@ -82,8 +79,10 @@ def pam_sm_authenticate(pamh, flags, argv):
     try:
         fingerprint = PyFingerprint(port, baudRate, address, password)
 
-    except Exception as e:
-        logger.log(Logger.ERROR, 'Exception: ' + str(e))
+    except Exception, e:
+        logger.error('Connection to fingerprint sensor failed!', exc_info=True)
+        msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': '+ str(e) +' Using fallback...')
+        pamh.conversation(msg)
         return pamh.PAM_IGNORE
 
     msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Waiting for finger...')
@@ -93,26 +92,23 @@ def pam_sm_authenticate(pamh, flags, argv):
     try:
         result = fingerprint.searchTemplate()
 
-    except Exception as e:
-        logger.log(Logger.ERROR, 'Exception:' + str(e))
+    except Exception:
+        logger.error('', exc_info=True)
         return pamh.PAM_ABORT
 
-    if ( result[0] == False ):
-        logger.log(Logger.NOTICE, 'No match found!')
-        return pamh.PA_AUTH_ERR
-
-    positionNumber = result[1]
-
     ## Checks if user ID matches template ID
-    if ( expectedId == positionNumber ):
-        logger.log(Logger.NOTICE, 'Access granted.')
+    if ( ( result[0] == True ) and ( expectedId == result[1] ) ):
+        logger.info('Access granted!')
+        msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access granted!')
+        pamh.conversation(msg)
         return pamh.PAM_SUCCESS
     else:
-        logger.log(Logger.WARNING, 'The found match is not assigned to user!')
+        logger.info('No match found or the found match is not assigned to user!')
+        msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!')
+        pamh.conversation(msg)
         return pamh.PA_AUTH_ERR
 
     ## Denies for default
-    logger.log(Logger.NOTICE, 'Access denied!')
     return pamh.PA_AUTH_ERR
 
 """
