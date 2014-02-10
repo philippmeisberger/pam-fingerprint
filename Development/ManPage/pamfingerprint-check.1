@@ -1,0 +1,40 @@
+.TH pamfingerprint-check 1 "" "" "PAM Fingerprint"
+
+.SH NAME
+\fBpamfingerprint-check\fP - pamfingerprint simulation tool
+
+.SH SYNOPSIS
+.nf
+.fam C
+\fBpamfingerprint-check\fP [\fB--help\fP | \fB--check-user\fP NAME | \fB--version\fP]
+.fam T
+.fi
+
+.SH DESCRIPTION
+\fBpamfingerprint-check\fP is a helper program which simulates fingerprint authentication.
+
+.SH ACTIONS
+.TP
+.B
+\fB--help\fR, \fB-h\fR
+Show summary of actions.
+
+.TP
+.B
+\fB--check-user\fR NAME
+Checks fingerprint for an existing user.
+
+.TP
+.B
+\fB--version\fR
+Prints version and exits.
+
+.SH FILES
+/etc/pamfingerprint.conf
+
+.SH AUTHORS
+Philipp Meisberger <team@pm-codeworks.de> 
+.br
+Bastian Raschke <bastian.raschke@posteo.de>
+
+Please send bug reports to one of those mail addresses. Visit www.pm-codeworks.de for more interesting projects.
