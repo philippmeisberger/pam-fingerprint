@@ -1,14 +1,8 @@
 - CTRL+C while getImage()
 - in createTemplate(): check first if template already exists! If so: return tuple (True, <template id>)
-- LoadChar implementieren
 - UpChar implementieren
 - DownChar implementieren
 - Funtion 19 implementieren
 
-- __main__ abfrage in pamfingerprint-con
-- pamfingerprint-check Programm
-- prof. Logger einbinden + Exception logging wie viktorlin.de.. 
-- alte Logger depends raus
-- weniger Ausgaben und mehr Logging
 - UserId zu Hash ändern
 - Bash completition --check-user ändern

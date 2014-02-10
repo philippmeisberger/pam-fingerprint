@@ -17,7 +17,6 @@ _pamfingerprint-conf() {
 
 complete -o plusdirs -F _pamfingerprint-conf pamfingerprint-conf
 
-
 ## bash completion for pamfingerprint-check
 ##
 
@@ -35,4 +34,4 @@ _pamfingerprint-check() {
     fi
 }
 
-complete -o plusdirs -F _pamfingerprint-conf pamfingerprint-conf
+complete -o plusdirs -F _pamfingerprint-check pamfingerprint-check
