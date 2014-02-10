@@ -108,12 +108,16 @@ class PamFingerprintCheck(object):
             logger.error(e.message, exc_info=True)
             return False
 
+        if ( result[0] == False ):
+            logger.error('Check for user "' + userName + '" failed: No match found!', exc_info=False)
+            return False
+             
         ## Checks if user ID matches template ID
-        if ( ( result[0] == True ) and ( userId == result[1] ) ):
+        if ( userId == result[1] ):
             logger.info('Check for user "' + userName + '" was successful!')
             return True
 
-        logger.error('Check for user "' + userName + '" failed: No match found or the found match is not assigned to user!')
+        logger.error('Check for user "' + userName + '" failed: Match is not assigned to user!', exc_info=False)
         return False
 
 

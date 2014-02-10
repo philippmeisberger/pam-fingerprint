@@ -11,7 +11,29 @@
 .fi
 
 .SH DESCRIPTION
-\fBpamfingerprint-check\fP is a helper program which simulates fingerprint authentication.
+\fBpamfingerprint-check\fP is a helper program of pamfingerprint which simulates fingerprint authentication. The --check-user option is required followed by a name that will be check. It can be run without root permissions.
+
+.SH EXAMPLE
+.SS Good case 
+$ pamfingerprint-check --check-user bob
+.br
+[INFO] Waiting for finger...
+.br
+[INFO] Check for user "bob" was successful!
+
+.SS Bad case 1
+$ pamfingerprint-check --check-user alice
+.br
+[INFO] Waiting for finger...
+.br
+[ERROR] Check for user "alice" failed: No match found!
+
+.SS Bad case 2
+$ pamfingerprint-check --check-user melory
+.br
+[INFO] Waiting for finger...
+.br
+[ERROR] Check for user "melory" failed: Match is not assigned to user!
 
 .SH ACTIONS
 .TP
