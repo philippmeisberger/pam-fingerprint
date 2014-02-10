@@ -37,12 +37,12 @@ def pam_sm_authenticate(pamh, flags, argv):
     ## Tries to get user which is asking for permission
     try:
         if ( pamh.ruser == None ):
-            user = pamh.get_user()
+            user = str(pamh.get_user())
         else:
-            user = pamh.ruser
+            user = str(pamh.ruser)
 
     except pamh.exception, e:
-        logger.error('', exc_info=True)
+        logger.error(e.message, exc_info=True)
         return pamh.PAM_USER_UNKNOWN
 
     ## Be sure the user is set 
@@ -54,11 +54,11 @@ def pam_sm_authenticate(pamh, flags, argv):
     try:
         config = Config('/etc/pamfingerprint.conf')
 
-    except Exception:
-        logger.error('', exc_info=True)
+    except Exception, e:
+        logger.error(e.message, exc_info=True)
         return pamh.PAM_IGNORE
 
-    logger.info('The user "' + str(user) + '" is asking for permission for service "' + str(pamh.service) + '".')
+    logger.info('The user "' + user + '" is asking for permission for service "' + str(pamh.service) + '".')
 
     ## TODO: Change to Hash
     ## Checks if the user is assigned to any ID
@@ -66,7 +66,7 @@ def pam_sm_authenticate(pamh, flags, argv):
         expectedId = config.readInteger('Users', user)
 
     except ConfigParser.NoOptionError:
-        logger.error('The user "' + str(user) + '" is not assigned!', exc_info=False)
+        logger.error('The user "' + user + '" is not assigned!', exc_info=False)
         return pamh.PA_AUTH_ERR
 
     ## Gets sensor connection values
@@ -81,7 +81,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except Exception, e:
         logger.error('Connection to fingerprint sensor failed!', exc_info=True)
-        msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': '+ str(e) +' Using fallback...')
+        msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': '+ e.message)
         pamh.conversation(msg)
         return pamh.PAM_IGNORE
 
@@ -92,8 +92,8 @@ def pam_sm_authenticate(pamh, flags, argv):
     try:
         result = fingerprint.searchTemplate()
 
-    except Exception:
-        logger.error('', exc_info=True)
+    except Exception, e:
+        logger.error(e.message, exc_info=True)
         return pamh.PAM_ABORT
 
     ## Checks if user ID matches template ID

@@ -55,8 +55,8 @@ class Config(object):
     "" @return void
     """
     def __del__(self):
-
-        if ( self.__readOnly == False ):
+        
+        if ( ( hasattr(self, '__readOnly') == True ) and ( self.__readOnly == False ) ):
             self.save()
         
     """

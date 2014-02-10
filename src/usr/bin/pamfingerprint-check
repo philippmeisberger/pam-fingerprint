@@ -12,7 +12,6 @@ import sys
 sys.path.append('/usr/lib')
 
 from pamfingerprint.version import VERSION
-#from pamfingerprint.classes.Logger import logger
 from pamfingerprint.classes.Config import *
 
 from PyFingerprint.PyFingerprint import *
@@ -26,11 +25,11 @@ logger.setLevel(logging.INFO)
 # Creates and adds an output handler
 strmHandler = logging.StreamHandler()
 strmHandler.setLevel(logging.DEBUG)
-strmHandler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+strmHandler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
 logger.addHandler(strmHandler)
 
 
-class PamFingerprintCheck(self):
+class PamFingerprintCheck(object):
     
     """
     "" The fingerprint library object
@@ -49,8 +48,8 @@ class PamFingerprintCheck(self):
         try:
             self.__config = Config('/etc/pamfingerprint.conf')
 
-        except Exception:
-            logger.error('', exc_info=True)
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
             exit(1)
 
         ## Gets connection values
@@ -63,8 +62,8 @@ class PamFingerprintCheck(self):
         try:
             self.__fingerprint = PyFingerprint(port, baudRate, address, password)
 
-        except Exception:
-            logger.error('', exc_info=True)
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
             exit(1)
 
     """
@@ -105,16 +104,16 @@ class PamFingerprintCheck(self):
         try:
             result = self.__fingerprint.searchTemplate()
 
-        except Exception:
-            logger.error('', exc_info=True)
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
             return False
 
         ## Checks if user ID matches template ID
         if ( ( result[0] == True ) and ( userId == result[1] ) ):
-            logger.info('Check for user ' + userName + ' was successful!')
+            logger.info('Check for user "' + userName + '" was successful!')
             return True
 
-        logger.error('Check for user ' + userName + ' failed: No match found or the found match is not assigned to user!')
+        logger.error('Check for user "' + userName + '" failed: No match found or the found match is not assigned to user!')
         return False
 
 
@@ -128,6 +127,6 @@ if ( __name__ == '__main__' ):
     args = vars(parser.parse_args())
         
     if ( args['check_user'] ):
-        PamFingerprint().addUser(args['check_user'])
+        PamFingerprintCheck().checkUser(args['check_user'])
     else:
         parser.print_help()

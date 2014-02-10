@@ -12,7 +12,6 @@ import sys
 sys.path.append('/usr/lib')
 
 from pamfingerprint.version import VERSION
-#from pamfingerprint.classes.Logger import logger
 from pamfingerprint.classes.Config import *
 
 from PyFingerprint.PyFingerprint import *
@@ -27,7 +26,7 @@ logger.setLevel(logging.INFO)
 # Creates and adds an output handler
 strmHandler = logging.StreamHandler()
 strmHandler.setLevel(logging.DEBUG)
-strmHandler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+strmHandler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
 logger.addHandler(strmHandler)
 
 
@@ -56,8 +55,8 @@ class PamFingerprint(object):
         try:
             self.__config = Config('/etc/pamfingerprint.conf')
 
-        except Exception:
-            logger.error('', exc_info=True)
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
             exit(1)
 
         ## Gets connection values
@@ -70,8 +69,8 @@ class PamFingerprint(object):
         try:
             self.__fingerprint = PyFingerprint(port, baudRate, address, password)
 
-        except Exception:
-            logger.error('', exc_info=True)
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
             exit(1)
 
     """
@@ -118,15 +117,15 @@ class PamFingerprint(object):
     def addUser(self, userName):
 
         ## Confirmation dialog
-        if ( self.__showConfirmationDialog('Add user ' + userName + '?') == False ):
+        if ( self.__showConfirmationDialog('Add user "' + userName + '"?') == False ):
             return False
 
         ## Tries to create new template for user
         try:
             result = self.__fingerprint.createTemplate()
 
-        except Exception:
-            logger.error('', exc_info=True)
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
             return False
 
         if ( result[0] == True ):
@@ -158,15 +157,15 @@ class PamFingerprint(object):
             return False
 
         ## Confirmation dialog 
-        if ( self.__showConfirmationDialog('Remove user ' + userName + '?') == False ):
+        if ( self.__showConfirmationDialog('Remove user "' + userName + '"?') == False ):
             return False
             
         ## Tries to delete template
         try:
             result = self.__fingerprint.deleteTemplate(userId)
 
-        except Exception:
-            logger.error('', exc_info=True)
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
             return False
 
         if ( result == True ):
