@@ -36,7 +36,7 @@ class PyFingerprint(object):
         self.__connection = PyFingerprintConnection(port, baudRate, address, password)
 
         if ( self.verifyPassword() == False ):
-            raise Exception('The fingerprint sensor password is not correct!')
+            raise ValueError('The fingerprint sensor password is not correct!')
 
     """
     "" Verifies password of the fingerprint sensor.
@@ -52,7 +52,7 @@ class PyFingerprint(object):
             return True
 
         ## DEBUG: Communication error
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             return False
 
         ## DEBUG: Sensor password is wrong
@@ -70,10 +70,6 @@ class PyFingerprint(object):
     """
     def setPassword(self, newPassword):
 
-        ## Validates the password (maximum 4 bytes)
-        if ( newPassword < 0x00000000 or newPassword > 0xFFFFFFFF ):
-            raise Exception('The given password is not valid!')
-
         p = self.__connection.setPassword(newPassword)
 
         ## DEBUG: Password set was successful
@@ -81,7 +77,7 @@ class PyFingerprint(object):
             return True
 
         ## DEBUG: Communication error
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             return False
 
         ## DEBUG: Unknown error
@@ -95,25 +91,70 @@ class PyFingerprint(object):
     """
     def setAddress(self, newAddress):
 
-        ## Validates the address (maximum 4 bytes)
-        if ( newAddress < 0x00000000 or newAddress > 0xFFFFFFFF ):
-            raise Exception('The given address is not valid!')
-
         p = self.__connection.setAddress(newPassword)
 
-        ## DEBUG: Password set was successful
+        ## DEBUG: Address set was successful
         if ( p[0] == FINGERPRINT_OK ):
             return True
 
         ## DEBUG: Communication error
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             return False
 
         ## DEBUG: Unknown error
         return False
 
-    ## TODO:
-    ## def getSystemParameters(self):
+    """
+    "" Sets a system parameter of the fingerprint sensor.
+    ""
+    "" @param integer parameterNumber (1 byte)
+    "" @param integer parameterValue (1 byte)
+    "" @return boolean
+    """
+    def setSystemParameter(self, parameterNumber, parameterValue):
+
+        p = self.__connection.setSystemParameter(parameterNumber, parameterValue)
+
+        ## DEBUG: Parameter set was successful
+        if ( p[0] == FINGERPRINT_OK ):
+            return True
+
+        ## DEBUG: Communication error
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            return False
+
+        ## DEBUG: Invalid register no?
+        elif ( p[0] == FINGERPRINT_INVALIDREG ):
+            return False
+
+        ## DEBUG: Unknown error
+        return False
+
+    """
+    "" Gets all system parameters of the fingerprint sensor.
+    ""
+    "" @return tuple (integer [1 byte], integer [1 byte], integer [1 byte])
+    """
+    """
+    def getSystemParameters(self):
+        p = self.__connection.getSystemParameters();
+
+        ## DEBUG: Read successfully
+        if ( p[0] == FINGERPRINT_OK ):
+
+            packetLength =
+            securityLevel =
+            baudRate = 
+
+            return (baudRate, securityLevel, packetLength)
+
+        ## DEBUG: Communication error
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            return ()
+
+        ## DEBUG: Unknown error
+        return ()
+    """
 
     """
     "" Gets the number of templates stored in database.
@@ -126,20 +167,106 @@ class PyFingerprint(object):
 
         ## DEBUG: Read successfully
         if ( p[0] == FINGERPRINT_OK ):
-
-            templateCount = p[1]
-            templateCount = utilities.leftShift(templateCount, 8)
-            templateCount = templateCount | p[2]
-
+            templateCount = utilities.leftShift(p[1], 8) | p[2]
             return templateCount
 
         ## DEBUG: Communication error
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             return -1
 
         ## DEBUG: Unknown error
         return -1
 
+    """
+    "" Reads the characteristics of a finger.
+    ""
+    "" @return boolean
+    """
+    def readImage(self):
+
+        p = [-1]
+
+        while ( p[0] != FINGERPRINT_OK ):
+
+            p = self.__connection.readImage()
+
+            ## DEBUG: Image taken
+            if ( p[0] == FINGERPRINT_OK ):
+                return True
+
+            ## DEBUG: Communication error
+            elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
+                return False
+
+            ## DEBUG: No finger found
+            elif ( p[0] == FINGERPRINT_NOFINGER ):
+                continue
+
+            ## DEBUG: Imaging error
+            elif ( p[0] == FINGERPRINT_IMAGEFAIL ):
+                return False
+
+            ## DEBUG: Unknown error
+            else:
+                return False
+
+    """
+    "" Converts the read finger characteristics and stores it temporarily in ImageBuffer1 or ImageBuffer2.
+    ""
+    "" @param integer bufferNumber (1 byte)
+    "" @return boolean
+    """
+    def convertImage(self, bufferNumber = 1):
+
+        p = self.__connection.convertImage(bufferNumber)
+
+        ## DEBUG: Image converted
+        if ( p[0] == FINGERPRINT_OK ):
+            return True
+
+        ## DEBUG: Communication error
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            return False
+
+        ## DEBUG: Image is too messy
+        elif ( p[0] == FINGERPRINT_IMAGEMESS ):
+            return False
+
+        ## DEBUG: Could not find fingerprint features
+        elif ( p[0] == FINGERPRINT_FEATUREFAIL ):
+            return False
+
+        ## DEBUG: Could not find fingerprint features
+        elif ( p[0] == FINGERPRINT_INVALIDIMAGE ):
+            return False
+
+        ## DEBUG: Unknown error
+        return False
+
+    """
+    "" Compares the finger characteristics of ImageBuffer1 with ImageBuffer2 and returns the accuracy score.
+    ""
+    "" @return integer
+    """
+    def compareImages(self):
+
+        p = self.__connection.compareImages();
+
+        ## DEBUG: Read successfully
+        if ( p[0] == FINGERPRINT_OK ):
+            accuracyScore = utilities.leftShift(p[1], 8) | p[2]
+            return accuracyScore
+
+        ## DEBUG: Communication error
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            return -1
+
+        ## DEBUG: The characteristics does not match
+        elif ( p[0] == FINGERPRINT_NOMATCH ):
+            return -1
+
+        ## DEBUG: Unknown error
+        return -1
 
 
 
@@ -175,7 +302,7 @@ class PyFingerprint(object):
             if ( p[0] == FINGERPRINT_OK ):
                 utilities.printDebug('Image taken')
 
-            elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+            elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
                 raise Exception('Communication error')
 
             elif ( p[0] == FINGERPRINT_NOFINGER ):
@@ -193,7 +320,7 @@ class PyFingerprint(object):
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Image converted')
 
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             raise Exception('Communication error')
 
         elif ( p[0] == FINGERPRINT_IMAGEMESS ):
@@ -214,7 +341,7 @@ class PyFingerprint(object):
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Found a match')
 
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             raise Exception('Communication error')
 
         elif ( p[0] == FINGERPRINT_NOTFOUND ):
@@ -229,6 +356,16 @@ class PyFingerprint(object):
         positionNumber = positionNumber | p[2]
 
         return (True, positionNumber)
+
+
+
+
+
+
+
+
+
+
 
     """
     "" Creates a new finger template.
@@ -248,7 +385,7 @@ class PyFingerprint(object):
             if ( p[0] == FINGERPRINT_OK ):
                 utilities.printDebug('Image taken')
 
-            elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+            elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
                 raise Exception('Communication error')
 
             elif ( p[0] == FINGERPRINT_NOFINGER ):
@@ -266,7 +403,7 @@ class PyFingerprint(object):
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Image converted')
 
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             raise Exception('Communication error')
 
         elif ( p[0] == FINGERPRINT_IMAGEMESS ):
@@ -301,7 +438,7 @@ class PyFingerprint(object):
             if ( p[0] == FINGERPRINT_OK ):
                 utilities.printDebug('Image taken')
 
-            elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+            elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
                 raise Exception('Communication error')
 
             elif ( p[0] == FINGERPRINT_NOFINGER ):
@@ -319,7 +456,7 @@ class PyFingerprint(object):
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Image converted')
 
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             raise Exception('Communication error')
 
         elif ( p[0] == FINGERPRINT_IMAGEMESS ):
@@ -340,7 +477,7 @@ class PyFingerprint(object):
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Images matching')
 
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             raise Exception('Communication error')
 
         elif ( p[0] == FINGERPRINT_ENROLLMISMATCH ):
@@ -357,7 +494,7 @@ class PyFingerprint(object):
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Template stored successfully')
 
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             raise Exception('Communication error')
 
         elif ( p[0] == FINGERPRINT_BADLOCATION ):
@@ -385,7 +522,7 @@ class PyFingerprint(object):
             utilities.printDebug('Template deleted successfully')
             return True
 
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             raise Exception('Communication error')
 
         elif ( p[0] == FINGERPRINT_DELETEFAIL ):
@@ -410,7 +547,7 @@ class PyFingerprint(object):
             utilities.printDebug('Template database cleared successfully')
             return True
 
-        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
             raise Exception('Communication error')
 
         elif ( p[0] == FINGERPRINT_DBCLEARFAIL ):
@@ -424,9 +561,41 @@ class PyFingerprint(object):
 
 ## Tests:
 
-#f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 #print 'Currently stored templates: ' + str(f.getTemplateCount())
 
+print 'ENROLL'
+print 'Waiting for finger...'
+
+f.readImage()
+f.convertImage(1)
+
+
+"""
+
+if ( f.searchTemplate()[0] != 0 ):
+    print 'Template already existing.'
+
+"""
+
+
+
+print 'Remove finger.'
+time.sleep(3)
+
+print 'Waiting for same finger again...'
+
+
+
+
+f.readImage()
+f.convertImage(2)
+
+
+
+
+
+print f.compareImages()
 
 #f.deleteDatabase()
 

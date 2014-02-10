@@ -1,25 +1,12 @@
 """
 "" PyFingerprint
 ""
-"" Copyright 2014 Bastian Raschke, Philipp Meisberger.
+"" Copyright 2014 Bastian Raschke.
 "" All rights reserved.
 """
 
-from constants import *
-
 import struct
 
-
-"""
-"" Prints debug message if debugging is enabled.
-""
-"" @param string message
-"" @return void
-"""
-def printDebug(message):
-
-    if ( DEBUG == True ):
-        print 'PyFingerprint: '+ message
 
 """
 "" Shifts a byte.
