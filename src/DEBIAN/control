@@ -1,5 +1,5 @@
 Package: pamfingerprint
-Version: 0.5
+Version: 0.7
 Section: admin
 Priority: extra
 Depends: python (>= 2.7), libpam-python, python-serial

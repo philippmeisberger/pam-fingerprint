@@ -11,20 +11,18 @@
 .fi
 
 .SH DESCRIPTION
-\fBpamfingerprint\fR is a free/open-source Linux PAM module that allows biometric fingerprint authentication without entering a password. The standard Unix passwort authentication is set as fallback in case that no fingerprint sensor is connected. The module has to be configured by the \fBpamfingerprint-conf\fR program. It can add or remove users and check if authentication succeeds. A authentication process can be simulated by calling the \fBpamfingerprint-check\fR program.   
+\fBpamfingerprint\fR is a free/open-source Linux PAM module that allows biometric fingerprint authentication without entering a password. The standard Unix passwort authentication is set as fallback in case that no fingerprint sensor is connected. The module has to be configured by the \fBpamfingerprint-conf\fR program. This can add or remove users. Therefore it needs root permissions. To simulate an authentication process the \fBpamfingerprint-check\fR program has to be called. The check program needs no root permissions.
 .br
 
 \fBpamfingerprint\fR is totally written in python and uses a python framework called pam_python to allow writing PAM modules in python instead in C. Pyserial, a python written library for serial connections, is used for the connection between the sensor and a computer. The sensor is connected with a USB TTL converter. pamfingerprint works with any application supporting PAM, for example su, sudo, etc.
 
-NOTE: Root permissions are required to run \fBpamfingerprint-conf\fR
-
 .PP
 
-.SH ACTIONS
+.SH OPTIONS
 .TP
 .B
 \fB--help\fR, \fB-h\fR
-Show summary of actions.
+Show summary of options.
 
 .TP
 .B
