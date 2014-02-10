@@ -1,0 +1,132 @@
+#!/usr/bin/env python
+
+"""
+"" PAM Fingerprint
+"" Configuration check program
+""
+"" Copyright 2014 Philipp Meisberger, Bastian Raschke.
+"" All rights reserved.
+"""
+
+import sys 
+sys.path.append('/usr/lib')
+
+from pamfingerprint.version import VERSION
+from pamfingerprint.classes.Config import *
+
+from PyFingerprint.PyFingerprint import *
+
+import argparse
+
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# Creates and adds an output handler
+strmHandler = logging.StreamHandler()
+strmHandler.setLevel(logging.DEBUG)
+strmHandler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+logger.addHandler(strmHandler)
+
+
+class PamFingerprintCheck(object):
+    
+    """
+    "" The fingerprint library object
+    "" @var PyFingerprint __fingerprint
+    """
+    __fingerprint = None
+
+    """
+    "" Constructor
+    ""
+    "" @return void
+    """
+    def __init__(self):
+
+        ## Tries to init config instance
+        try:
+            self.__config = Config('/etc/pamfingerprint.conf')
+
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
+            exit(1)
+
+        ## Gets connection values
+        port = self.__config.readString('PyFingerprint', 'port')
+        baudRate = self.__config.readInteger('PyFingerprint', 'baudRate')
+        address = self.__config.readHex('PyFingerprint', 'address')
+        password = self.__config.readHex('PyFingerprint', 'password')
+
+        ## Tries to establish connection
+        try:
+            self.__fingerprint = PyFingerprint(port, baudRate, address, password)
+
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
+            exit(1)
+
+    """
+    "" Returns user ID for a given name.
+    ""
+    "" @param string userName
+    "" @return integer
+    """
+    def getUserIdForName(self, userName):
+
+        userId = -1
+
+        try:
+            userId = self.__config.readInteger('Users', userName)
+
+        except ConfigParser.NoOptionError:
+            logger.error('The user "'+ userName +'" does not exist!', exc_info=False)
+
+        return userId
+        
+    """
+    "" Checks fingerprint for a given user name.
+    ""
+    "" @param string userName
+    "" @return boolean
+    """
+    def checkUser(self, userName):
+
+        logger.info('Waiting for finger...')
+        
+        ## Gets user ID
+        userId = self.getUserIdForName(userName)
+        
+        if ( userId == -1 ):
+            return False
+
+        ## Tries to check fingerprint
+        try:
+            result = self.__fingerprint.searchTemplate()
+
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
+            return False
+
+        ## Checks if user ID matches template ID
+        if ( ( result[0] == True ) and ( userId == result[1] ) ):
+            logger.info('Check for user "' + userName + '" was successful!')
+            return True
+
+        logger.error('Check for user "' + userName + '" failed: No match found or the found match is not assigned to user!')
+        return False
+
+
+if ( __name__ == '__main__' ):
+
+    parser = argparse.ArgumentParser(description = 'pamfingerprint configuration check:')
+
+    parser.add_argument('--check-user', metavar='NAME', help='Checks fingerprint for an existing user.')
+    parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Print version and exit.')
+
+    args = vars(parser.parse_args())
+        
+    if ( args['check_user'] ):
+        PamFingerprintCheck().checkUser(args['check_user'])
+    else:
+        parser.print_help()

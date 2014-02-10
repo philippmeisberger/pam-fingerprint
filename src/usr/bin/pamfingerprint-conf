@@ -12,12 +12,22 @@ import sys
 sys.path.append('/usr/lib')
 
 from pamfingerprint.version import VERSION
-from pamfingerprint.classes.Logger import *
 from pamfingerprint.classes.Config import *
 
 from PyFingerprint.PyFingerprint import *
 
 import argparse
+import os
+
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# Creates and adds an output handler
+strmHandler = logging.StreamHandler()
+strmHandler.setLevel(logging.DEBUG)
+strmHandler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+logger.addHandler(strmHandler)
 
 
 class PamFingerprint(object):
@@ -27,12 +37,6 @@ class PamFingerprint(object):
     "" @var PyFingerprint __fingerprint
     """
     __fingerprint = None
-
-    """
-    "" Logger instance
-    "" @var Logger __logger
-    """
-    __logger = None
 
     """
     "" Config instance
@@ -51,17 +55,8 @@ class PamFingerprint(object):
         try:
             self.__config = Config('/etc/pamfingerprint.conf')
 
-        except Exception as e:
-            print 'Exception: ' + str(e)
-            exit(1)
-
-        ## Tries to init logger instance
-        try:
-            logLevel = self.__config.readInteger('Logger', 'level')
-            self.__logger = Logger('/var/log/pamfingerprint.log', logLevel)
-
-        except Exception as e:
-            print 'Exception: ' + str(e)
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
             exit(1)
 
         ## Gets connection values
@@ -74,8 +69,8 @@ class PamFingerprint(object):
         try:
             self.__fingerprint = PyFingerprint(port, baudRate, address, password)
 
-        except Exception as e:
-            self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
             exit(1)
 
     """
@@ -109,7 +104,7 @@ class PamFingerprint(object):
             userId = self.__config.readInteger('Users', userName)
 
         except ConfigParser.NoOptionError:
-            self.__logger.log(Logger.ERROR, 'The user "'+ userName +'" does not exist!')
+            logger.error('The user "'+ userName +'" does not exist!', exc_info=False)
 
         return userId
         
@@ -122,15 +117,15 @@ class PamFingerprint(object):
     def addUser(self, userName):
 
         ## Confirmation dialog
-        if ( self.__showConfirmationDialog('Add user ' + userName + '?') == False ):
+        if ( self.__showConfirmationDialog('Add user "' + userName + '"?') == False ):
             return False
 
         ## Tries to create new template for user
         try:
             result = self.__fingerprint.createTemplate()
 
-        except Exception as e:
-            self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
             return False
 
         if ( result[0] == True ):
@@ -138,13 +133,13 @@ class PamFingerprint(object):
             self.__config.writeString('Users', userName, positionNumber)
 
             if ( self.__config.save() == True ):
-                self.__logger.log(Logger.NOTICE, 'The user "' + userName + '" has been added successfully!')
+                logger.info('The user "' + userName + '" has been added successfully!')
                 return True
             else:
-                self.__logger.log(Logger.ERROR, 'The configuration could not be written!')
+                logger.error('The configuration could not be written!', exc_info=False)
                 return False
         else:
-            self.__logger.log(Logger.ERROR, 'Error while adding user "' + userName + '"!')
+            logger.error('Error while adding user "' + userName + '"!', exc_info=False)
             return False 
 
     """
@@ -162,88 +157,49 @@ class PamFingerprint(object):
             return False
 
         ## Confirmation dialog 
-        if ( self.__showConfirmationDialog('Remove user ' + userName + '?') == False ):
+        if ( self.__showConfirmationDialog('Remove user "' + userName + '"?') == False ):
             return False
             
         ## Tries to delete template
         try:
             result = self.__fingerprint.deleteTemplate(userId)
 
-        except Exception as e:
-            self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
+        except Exception, e:
+            logger.error(e.message, exc_info=True)
             return False
 
         if ( result == True ):
             
             if ( self.__config.remove('Users', userName) == True and self.__config.save() == True ):
-                self.__logger.log(Logger.NOTICE, 'The user "' + userName + '" has been removed successfully!')
+                logger.info('The user "' + userName + '" has been removed successfully!')
                 return True
             else:
-                self.__logger.log(Logger.ERROR, 'The configuration could not be written!')
+                logger.error('The configuration could not be written!', exc_info=True)
                 return False
 
         else:
-            self.__logger.log(Logger.ERROR, 'Error while removing user "' + userName + '"!')
-            return False       
-
-    """
-    "" Checks fingerprint for a given user name.
-    ""
-    "" @param string userName
-    "" @return boolean
-    """
-    def checkUser(self, userName):
-
-        print 'pamfingerprint '+ VERSION +': Waiting for finger...'
-        
-        ## Gets user ID
-        userId = self.getUserIdForName(userName)
-        
-        if ( userId == -1 ):
+            logger.error('Error while removing user "' + userName + '"!', exc_info=True)
             return False
 
-        ## Tries to check fingerprint
-        try:
-            result = self.__fingerprint.searchTemplate()
 
-        except Exception as e:
-            self.__logger.log(Logger.ERROR, 'Exception: ' + str(e))
-            return False
+if ( __name__ == '__main__' ):
 
-        if ( result[0] == False ):
-            self.__logger.log(Logger.NOTICE, 'No match found!')
-            positionNumber = -1
-        else:
-            positionNumber = result[1]
+    ## Checks if user is root
+    if ( os.geteuid() != 0 ):
+        logger.error('You need to have root privileges to run pamfingerprint-conf!', exc_info=False)
+        exit(1)
 
-        ## Checks if user ID matches template ID
-        if ( userId == positionNumber ):
-            self.__logger.log(Logger.NOTICE, 'Check for user ' + userName + ' was successful!')
-            return True
-
-        self.__logger.log(Logger.ERROR, 'Check for user ' + userName + ' failed!')
-        return False
-
-
-## Main
-## Checks if user is root
-if ( os.geteuid() != 0 ):
-    exit("You need to have root privileges to run pamfingerprint-conf!\n")
-
-parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')
-
-parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
-parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
-parser.add_argument('--check-user', metavar='NAME', help='Checks fingerprint for an existing user.')
-parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Print version and exit.')
-
-args = vars(parser.parse_args())
+    parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')
     
-if ( args['add_user'] ):
-    PamFingerprint().addUser(args['add_user'])
-elif ( args['remove_user'] ):
-    PamFingerprint().removeUser(args['remove_user'])
-elif ( args['check_user'] ):
-    PamFingerprint().checkUser(args['check_user'])
-else:
-    parser.print_help()
+    parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
+    parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
+    parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Print version and exit.')
+
+    args = vars(parser.parse_args())
+        
+    if ( args['add_user'] ):
+        PamFingerprint().addUser(args['add_user'])
+    elif ( args['remove_user'] ):
+        PamFingerprint().removeUser(args['remove_user'])
+    else:
+        parser.print_help()
