@@ -9,7 +9,6 @@
 
 import includes.utilities as utilities
 from includes.constants import *
-
 from PyFingerprintConnection import *
 
 import time
@@ -35,19 +34,86 @@ class PyFingerprint(object):
     def __init__(self, port, baudRate, address, password):
 
         self.__connection = PyFingerprintConnection(port, baudRate, address, password)
+
+        if ( self.verifyPassword() == False ):
+            raise Exception('The fingerprint sensor password is not correct!')
+
+    """
+    "" Verifies password of the fingerprint sensor.
+    ""
+    "" @return boolean
+    """
+    def verifyPassword(self):
+
         p = self.__connection.verifyPassword()
 
+        ## DEBUG: Sensor password is correct
         if ( p[0] == FINGERPRINT_OK ):
-            utilities.printDebug('Sensor password is correct')
+            return True
 
+        ## DEBUG: Communication error
         elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
-            raise Exception('Communication error')
+            return False
 
+        ## DEBUG: Sensor password is wrong
         elif ( p[0] == FINGERPRINT_PASSFAIL ):
-            raise Exception('Sensor password is wrong')
+            return False
 
-        else:
-            raise Exception('Unknown error')
+        ## DEBUG: Unknown error
+        return False
+
+    """
+    "" Sets the password of the fingerprint sensor.
+    ""
+    "" @param integer newPassword (4 bytes)
+    "" @return boolean
+    """
+    def setPassword(self, newPassword):
+
+        ## Validates the password (maximum 4 bytes)
+        if ( newPassword < 0x00000000 or newPassword > 0xFFFFFFFF ):
+            raise Exception('The given password is not valid!')
+
+        p = self.__connection.setPassword(newPassword)
+
+        ## DEBUG: Password set was successful
+        if ( p[0] == FINGERPRINT_OK ):
+            return True
+
+        ## DEBUG: Communication error
+        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+            return False
+
+        ## DEBUG: Unknown error
+        return False
+
+    """
+    "" Sets the module address of the fingerprint sensor.
+    ""
+    "" @param integer newAddress (4 bytes)
+    "" @return boolean
+    """
+    def setAddress(self, newAddress):
+
+        ## Validates the address (maximum 4 bytes)
+        if ( newAddress < 0x00000000 or newAddress > 0xFFFFFFFF ):
+            raise Exception('The given address is not valid!')
+
+        p = self.__connection.setAddress(newPassword)
+
+        ## DEBUG: Password set was successful
+        if ( p[0] == FINGERPRINT_OK ):
+            return True
+
+        ## DEBUG: Communication error
+        elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
+            return False
+
+        ## DEBUG: Unknown error
+        return False
+
+    ## TODO:
+    ## def getSystemParameters(self):
 
     """
     "" Gets the number of templates stored in database.
@@ -58,20 +124,39 @@ class PyFingerprint(object):
 
         p = self.__connection.getTemplateCount();
 
+        ## DEBUG: Read successfully
         if ( p[0] == FINGERPRINT_OK ):
-            utilities.printDebug('Read successfully')
 
+            templateCount = p[1]
+            templateCount = utilities.leftShift(templateCount, 8)
+            templateCount = templateCount | p[2]
+
+            return templateCount
+
+        ## DEBUG: Communication error
         elif ( p[0] == FINGERPRINT_PACKETRECIEVEERR ):
-            raise Exception('Communication error')
+            return -1
 
-        else:
-            raise Exception('Unknown error')
+        ## DEBUG: Unknown error
+        return -1
 
-        templateCount = p[1]
-        templateCount = utilities.leftShift(templateCount, 8)
-        templateCount = templateCount | p[2]
 
-        return templateCount
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     """
     "" Search for a finger template.
@@ -176,7 +261,7 @@ class PyFingerprint(object):
                 raise Exception('Unknown error')
 
         ## First step is done
-        p = self.__connection.image2Tz(0x01);
+        p = self.__connection.convertImage(0x01);
 
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Image converted')
@@ -229,7 +314,7 @@ class PyFingerprint(object):
                 raise Exception('Unknown error')
 
         ## Second step is done
-        p = self.__connection.image2Tz(0x02);
+        p = self.__connection.convertImage(0x02);
 
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Image converted')
@@ -267,7 +352,7 @@ class PyFingerprint(object):
 
         ## Stores fingerprint image in sensor database
         positionNumber = self.getTemplateCount() + 1
-        p = self.__connection.storeTemplate(positionNumber)
+        p = self.__connection.storeTemplate(0x01, positionNumber)
 
         if ( p[0] == FINGERPRINT_OK ):
             utilities.printDebug('Template stored successfully')
@@ -341,6 +426,7 @@ class PyFingerprint(object):
 
 #f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 #print 'Currently stored templates: ' + str(f.getTemplateCount())
+
 
 #f.deleteDatabase()
 
