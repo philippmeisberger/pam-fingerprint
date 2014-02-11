@@ -133,28 +133,31 @@ class PyFingerprint(object):
     """
     "" Gets all system parameters of the fingerprint sensor.
     ""
-    "" @return tuple (integer [1 byte], integer [1 byte], integer [1 byte])
-    """
+    "" @return tuple (integer [2 bytes], integer [2 bytes], integer [2 bytes])
     """
     def getSystemParameters(self):
+
         p = self.__connection.getSystemParameters();
 
         ## DEBUG: Read successfully
         if ( p[0] == FINGERPRINT_OK ):
 
-            packetLength =
-            securityLevel =
-            baudRate = 
+            statusRegister = p[1] << 8 | p[2]
+            systemID = p[3] << 8 | p[4]
+            storageCapacity = p[5] << 8 | p[6]
+            securityLevel = p[7] << 8 | p[8]
+            deviceAddress = ((p[9] << 8 | p[10]) << 8 | p[11]) << 8 | p[12]
+            packetLength = p[13] << 8 | p[14]
+            baudRate = p[15] << 8 | p[16]
 
-            return (baudRate, securityLevel, packetLength)
+            return (statusRegister, systemID, storageCapacity, securityLevel, deviceAddress, packetLength, baudRate)
 
         ## DEBUG: Communication error
         elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
-            return ()
+            return (-1, -1, -1, -1, -1, -1, -1)
 
         ## DEBUG: Unknown error
-        return ()
-    """
+        return (-1, -1, -1, -1, -1, -1, -1)
 
     """
     "" Gets the number of templates stored in database.
@@ -248,9 +251,9 @@ class PyFingerprint(object):
     ""
     "" @return integer
     """
-    def compareImages(self):
+    def compareTemplates(self):
 
-        p = self.__connection.compareImages();
+        p = self.__connection.compareTemplates();
 
         ## DEBUG: Read successfully
         if ( p[0] == FINGERPRINT_OK ):
@@ -269,17 +272,60 @@ class PyFingerprint(object):
         return -1
 
 
+    """
+    "" Downloads the finger characteristics of ImageBuffer1 or ImageBuffer2
+    ""
+    "" @param integer bufferNumber (1 byte)
+    "" @return TODO
+    """
+    ## TODO name
+    def downloadTemplate(self, bufferNumber = 1):
+
+        p = self.__connection.downloadTemplate(bufferNumber);
+
+        ## DEBUG: Read successfully
+        if ( p[0] == FINGERPRINT_OK ):
+
+            return p
+
+        ## DEBUG: Communication error
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            return (-1,)
+
+        ## DEBUG: Could not receive follow-up packet
+        elif ( p[0] == FINGERPRINT_PACKETRESPONSEFAIL ):
+            return (-1,)
+
+        ## DEBUG: Unknown error
+        return (-1,)
 
 
 
 
+    """
+    "" Combines the fingerprint characteristics temporarily stored in ImageBuffer1 and ImageBuffer2 to a template.
+    "" The created template (the result) will be stored again in ImageBuffer1 and ImageBuffer2 as the same.
+    ""
+    "" @return tuple (integer [1 byte])
+    """
+    def createTemplate(self):
 
+        p = self.__connection.createTemplate()
 
+        ## DEBUG: Image converted
+        if ( p[0] == FINGERPRINT_OK ):
+            return True
 
+        ## DEBUG: Communication error
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            return False
 
+        ## DEBUG: Images not matching
+        elif ( p[0] == FINGERPRINT_ENROLLMISMATCH ):
+            return False
 
-
-
+        ## DEBUG: Unknown error
+        return False
 
 
 
@@ -371,6 +417,7 @@ class PyFingerprint(object):
     "" Creates a new finger template.
     ""
     "" @return tuple (boolean, integer)
+    """
     """
     def createTemplate(self):
 
@@ -507,6 +554,7 @@ class PyFingerprint(object):
             raise Exception('Unknown error')
 
         return (True, positionNumber)
+        """
 
     """
     "" Deletes a template from sensor database.
@@ -562,23 +610,34 @@ class PyFingerprint(object):
 ## Tests:
 
 f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
-#print 'Currently stored templates: ' + str(f.getTemplateCount())
+# print 'Currently stored templates: ' + str(f.getTemplateCount())
+# print f.getSystemParameters()
 
-print 'ENROLL'
+
 print 'Waiting for finger...'
 
-f.readImage()
-f.convertImage(1)
+print f.readImage()
+print f.convertImage(1)
+
+#print f.createTemplate()
+
+print f.downloadTemplate(1)
+
+exit(0)
+
+
+
+
+
+
+
+
 
 
 """
-
 if ( f.searchTemplate()[0] != 0 ):
     print 'Template already existing.'
-
 """
-
-
 
 print 'Remove finger.'
 time.sleep(3)
@@ -586,16 +645,11 @@ time.sleep(3)
 print 'Waiting for same finger again...'
 
 
-
-
 f.readImage()
 f.convertImage(2)
 
 
-
-
-
-print f.compareImages()
+print f.compareTemplates()
 
 #f.deleteDatabase()
 

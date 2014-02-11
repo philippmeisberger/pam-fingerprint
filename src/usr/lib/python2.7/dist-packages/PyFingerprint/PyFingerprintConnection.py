@@ -21,6 +21,10 @@ import struct
 import os.path
 
 
+## TODO: remove utilities.printDebug(
+
+
+
 class PyFingerprintConnection(object):
 
     """
@@ -135,7 +139,7 @@ class PyFingerprintConnection(object):
             if ( len(read) != 0 ):
 
                 ## Deep DEBUG
-                ## utilities.printDebug('Received packet fragment ' + str(index) + ' = '+ str(struct.unpack('@c', read)[0]))
+                ## print 'Received packet fragment ' + str(index) + ' = ' + struct.unpack('@c', read)[0]
                 read = utilities.stringToByte(read)
 
             ## Skips loop if first byte is not valid
@@ -456,15 +460,24 @@ class PyFingerprintConnection(object):
 
         return receivedPacketData
 
+
+
+
+
+
+
+
+
     """
     "" Compares the finger characteristics of ImageBuffer1 with ImageBuffer2 and returns the accuracy score.
     ""
     "" @return tuple (integer [3 bytes])
     """
-    def compareImages(self):
+    ## TODO: name
+    def compareTemplates(self):
 
         packetData = (
-            FINGERPRINT_COMPAREIMAGES,
+            FINGERPRINT_COMPARETEMPLATES,
         )
 
         self.writePacket(self.__address, FINGERPRINT_COMMANDPACKET, len(packetData) + 2, packetData)
@@ -481,19 +494,30 @@ class PyFingerprintConnection(object):
 
         return receivedPacketData
 
+
+
+
+
+
+
+
+
+
+
     """
     "" Downloads the finger characteristics of ImageBuffer1 or ImageBuffer2
     ""
     "" @param integer bufferNumber (1 byte)
     "" @return tuple (integer [3 bytes])
     """
-    def downloadImage(self, bufferNumber = 1):
+    ## TODO name
+    def downloadTemplate(self, bufferNumber = 1):
 
         if ( bufferNumber != 1 and bufferNumber != 2 ):
             raise ValueError('The given buffer number is not valid!')
 
         packetData = (
-            FINGERPRINT_DOWNLOADIMAGE,
+            FINGERPRINT_DOWNLOADTEMPLATE,
             bufferNumber,
         )
 
@@ -511,26 +535,28 @@ class PyFingerprintConnection(object):
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
             return (-1,)
 
-        """
         completePacketData = [
-
+            receivedPacketData[0],
         ]
 
+        ## Gets follow-up data packets until the last data packet is received
+        while ( receivedPacketType != FINGERPRINT_ENDDATAPACKET ):
 
-        ## Gets follow-up packet
-        receivedPacket = self.readPacket()
+            receivedPacket = self.readPacket()
 
-        if ( receivedPacket == False ):
-            return (-1,)
+            if ( receivedPacket == False ):
+                return (-1,)
 
-        receivedPacketType = receivedPacket[0]
-        receivedPacketData = receivedPacket[1]
+            receivedPacketType = receivedPacket[0]
+            receivedPacketData = receivedPacket[1]
 
-        if ( receivedPacketType != FINGERPRINT_DATAPACKET ):
-            return (-1,)
-        """
+            if ( receivedPacketType != FINGERPRINT_DATAPACKET and receivedPacketType != FINGERPRINT_ENDDATAPACKET ):
+                return (-1,)
 
-        return receivedPacketData
+            for i in range(0, len(receivedPacketData)):
+                completePacketData.append(receivedPacketData[i])
+
+        return completePacketData
 
 
 
