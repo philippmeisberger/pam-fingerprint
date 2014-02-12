@@ -20,7 +20,7 @@ logger.setLevel(logging.INFO)
 ## Creates and adds a file handler
 fileHandler = logging.FileHandler('/var/log/pamfingerprint.log')
 fileHandler.setLevel(logging.INFO)
-fileHandler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+fileHandler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
 logger.addHandler(fileHandler)
 
 
