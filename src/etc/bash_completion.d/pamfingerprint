@@ -1,4 +1,4 @@
-## bash completion for pamfingerprint-conf 
+## bash completion for pamfingerprint-conf
 ##
 
 _pamfingerprint-conf() {

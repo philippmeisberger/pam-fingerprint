@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-"" PAM Fingerprint
-"" Configuration check program
+"" pamfingerprint
+"" Configuration check program.
 ""
 "" Copyright 2014 Philipp Meisberger, Bastian Raschke.
 "" All rights reserved.
@@ -12,17 +12,19 @@ import sys
 sys.path.append('/usr/lib')
 
 from pamfingerprint.version import VERSION
-from pamfingerprint.classes.Config import *
+from pamfingerprint.Config import *
 
 from PyFingerprint.PyFingerprint import *
 
 import argparse
 
 import logging
+
+## Configures logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# Creates and adds an output handler
+## Creates and adds an output handler to logger
 strmHandler = logging.StreamHandler()
 strmHandler.setLevel(logging.DEBUG)
 strmHandler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
@@ -32,7 +34,7 @@ logger.addHandler(strmHandler)
 class PamFingerprintCheck(object):
     
     """
-    "" The fingerprint library object
+    "" The PyFingerprint instance
     "" @var PyFingerprint __fingerprint
     """
     __fingerprint = None
@@ -80,12 +82,12 @@ class PamFingerprintCheck(object):
             userId = self.__config.readInteger('Users', userName)
 
         except ConfigParser.NoOptionError:
-            logger.error('The user "'+ userName +'" does not exist!', exc_info=False)
+            logger.error('The user "' + userName + '" does not exist!', exc_info=False)
 
         return userId
-        
+
     """
-    "" Checks fingerprint for a given user name.
+    "" Do a fingerprint check for a given user.
     ""
     "" @param string userName
     "" @return boolean
@@ -93,10 +95,10 @@ class PamFingerprintCheck(object):
     def checkUser(self, userName):
 
         logger.info('Waiting for finger...')
-        
+
         ## Gets user ID
         userId = self.getUserIdForName(userName)
-        
+
         if ( userId == -1 ):
             return False
 
@@ -109,7 +111,7 @@ class PamFingerprintCheck(object):
             return False
 
         if ( result[0] == False ):
-            logger.error('Check for user "' + userName + '" failed: No match found!', exc_info=False)
+            logger.error('Check for user "' + userName + '" failed: No match found!')
             return False
              
         ## Checks if user ID matches template ID
@@ -117,7 +119,7 @@ class PamFingerprintCheck(object):
             logger.info('Check for user "' + userName + '" was successful!')
             return True
 
-        logger.error('Check for user "' + userName + '" failed: Match is not assigned to user!', exc_info=False)
+        logger.error('Check for user "' + userName + '" failed: The found match is not assigned to user!')
         return False
 
 
