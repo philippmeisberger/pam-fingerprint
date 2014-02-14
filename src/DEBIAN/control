@@ -4,7 +4,7 @@ Section: admin
 Priority: extra
 Depends: python (>= 2.7), libpam-python, python-serial
 Architecture: all
-Installed-Size: 200
+Installed-Size: 70
 Maintainer: PM Codeworks <team@pm-codeworks.de>
 Homepage: www.pm-codeworks.de/pamfingerprint.html
 Description: PAM module for authentication with fingerprint.
