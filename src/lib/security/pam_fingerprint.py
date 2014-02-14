@@ -1,6 +1,6 @@
 """
-"" PAM Fingerprint
-"" PAM module implementation.
+"" pamfingerprint
+"" PAM implementation.
 ""
 "" Copyright 2014 Philipp Meisberger, Bastian Raschke.
 "" All rights reserved. 
@@ -10,14 +10,17 @@ import sys
 sys.path.append('/usr/lib')
 
 from pamfingerprint.version import VERSION
-from pamfingerprint.classes.Config import *
+from pamfingerprint.Config import *
+
 from PyFingerprint.PyFingerprint import *
 
 import logging
+
+## Configures logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-## Creates and adds a file handler
+## Creates and adds a file handler to logger
 fileHandler = logging.FileHandler('/var/log/pamfingerprint.log')
 fileHandler.setLevel(logging.INFO)
 fileHandler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
@@ -47,7 +50,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     ## Be sure the user is set 
     if ( user == None ):
-        logger.error('The user is not known!', exc_info=False)
+        logger.error('The user is not known!')
         return pamh.PAM_USER_UNKNOWN
   
     ## Tries to init Config
@@ -60,7 +63,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     logger.info('The user "' + user + '" is asking for permission for service "' + str(pamh.service) + '".')
 
-    ## TODO: Change to Hash
+    ## TODO: Change to fingerprint hash
     ## Checks if the user is assigned to any ID
     try:
         expectedId = config.readInteger('Users', user)
@@ -81,7 +84,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except Exception, e:
         logger.error('Connection to fingerprint sensor failed!', exc_info=True)
-        msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': '+ e.message)
+        msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': ' + e.message)
         pamh.conversation(msg)
         return pamh.PAM_IGNORE
 

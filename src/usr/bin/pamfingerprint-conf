@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-"" PAM Fingerprint
-"" Configuration program
+"" pamfingerprint
+"" Configuration program.
 ""
 "" Copyright 2014 Philipp Meisberger, Bastian Raschke.
 "" All rights reserved.
@@ -12,7 +12,7 @@ import sys
 sys.path.append('/usr/lib')
 
 from pamfingerprint.version import VERSION
-from pamfingerprint.classes.Config import *
+from pamfingerprint.Config import *
 
 from PyFingerprint.PyFingerprint import *
 
@@ -20,10 +20,12 @@ import argparse
 import os
 
 import logging
+
+## Configures logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# Creates and adds an output handler
+## Creates and adds an output handler to logger
 strmHandler = logging.StreamHandler()
 strmHandler.setLevel(logging.DEBUG)
 strmHandler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
@@ -33,7 +35,7 @@ logger.addHandler(strmHandler)
 class PamFingerprint(object):
 
     """
-    "" The fingerprint library object
+    "" The PyFingerprint instance
     "" @var PyFingerprint __fingerprint
     """
     __fingerprint = None
@@ -74,18 +76,16 @@ class PamFingerprint(object):
             exit(1)
 
     """
-    "" Shows confirmation dialog with choice for yes/no.
+    "" Shows confirmation dialog.
     ""
     "" @param string question
     "" @return boolean
     """
-    def __showConfirmationDialog(self, question=''):
+    def __showConfirmationDialog(self, question = ''):
 
-        ## Confirmation dialog 
         answer = raw_input(question +' (Y/n)')
 
         if ( answer not in ['y', 'Y', ''] ):
-            print 'Canceled.'
             return False
         else:
             return True
@@ -104,12 +104,12 @@ class PamFingerprint(object):
             userId = self.__config.readInteger('Users', userName)
 
         except ConfigParser.NoOptionError:
-            logger.error('The user "'+ userName +'" does not exist!', exc_info=False)
+            logger.error('The user "' + userName + '" does not exist!', exc_info=False)
 
         return userId
-        
+
     """
-    "" Enrolls new fingerprint template and adds user to PAM.
+    "" Enrolls new fingerprint template and adds user to pamfingerprint.
     ""
     "" @param string userName
     "" @return boolean
@@ -118,6 +118,7 @@ class PamFingerprint(object):
 
         ## Confirmation dialog
         if ( self.__showConfirmationDialog('Add user "' + userName + '"?') == False ):
+            print 'Adding user canceled.'
             return False
 
         ## Tries to create new template for user
@@ -138,12 +139,13 @@ class PamFingerprint(object):
             else:
                 logger.error('The configuration could not be written!', exc_info=False)
                 return False
+
         else:
             logger.error('Error while adding user "' + userName + '"!', exc_info=False)
             return False 
 
     """
-    "" Removes fingerprint template from sensor and removes user from PAM.
+    "" Removes fingerprint template from sensor and removes user from pamfingerprint.
     ""
     "" @param string userName
     "" @return boolean
@@ -158,6 +160,7 @@ class PamFingerprint(object):
 
         ## Confirmation dialog 
         if ( self.__showConfirmationDialog('Remove user "' + userName + '"?') == False ):
+            print 'Removing user canceled.'
             return False
             
         ## Tries to delete template
@@ -169,7 +172,7 @@ class PamFingerprint(object):
             return False
 
         if ( result == True ):
-            
+
             if ( self.__config.remove('Users', userName) == True and self.__config.save() == True ):
                 logger.info('The user "' + userName + '" has been removed successfully!')
                 return True

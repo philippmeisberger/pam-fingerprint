@@ -1,11 +1,19 @@
-~# apt-get install libpam-python
-~# apt-get install python-serial
+## Install instructions for Debian 7
+##
 
-~# echo -e '\nexport PYTHONPATH=$PYTHONPATH:/usr/lib/' >> /home/username/.bashrc
+## Add PM Codeworks repository:
+~# echo "deb http://apt.pm-codeworks.de wheezy main" >> /etc/apt/sources.list
 
-## Serial connection permission:
+## Add PM Codeworks key:
+~# wget -O - http://apt.pm-codeworks.de/pm-codeworks.de.gpg.key | apt-key add -
+
+## Install the package:
+~# apt-get update
+~# apt-get install pamfingerprint
+
+## Install "PyFingerprint":
+~# wget -O - https://sicherheitskritisch.de/PyFingerprint.tar.gz | tar xvzf -C /
+
+## Add group "dialout" for each user which should be able to use pamfingerprint:
 ~# usermod -a -G dialout username
 ~# reboot
-
-## Quick install for DEVELOPEMENT:
-~# ./install.sh
