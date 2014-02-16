@@ -82,7 +82,7 @@ class PamFingerprintCheck(object):
             userId = self.__config.readInteger('Users', userName)
 
         except ConfigParser.NoOptionError:
-            logger.error('The user "' + userName + '" does not exist!', exc_info=False)
+            logger.error('The user "'+ userName +'" does not exist!', exc_info=False)
 
         return userId
 
@@ -111,15 +111,15 @@ class PamFingerprintCheck(object):
             return False
 
         if ( result[0] == False ):
-            logger.error('Check for user "' + userName + '" failed: No match found!')
+            logger.error('Check for user "'+ userName +'" failed: No match found!')
             return False
              
         ## Checks if user ID matches template ID
         if ( userId == result[1] ):
-            logger.info('Check for user "' + userName + '" was successful!')
+            logger.info('Check for user "'+ userName +'" was successful!')
             return True
 
-        logger.error('Check for user "' + userName + '" failed: The found match is not assigned to user!')
+        logger.error('Check for user "'+ userName +'" failed: The found match is not assigned to user!')
         return False
 
 
