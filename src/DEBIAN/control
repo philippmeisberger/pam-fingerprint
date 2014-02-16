@@ -7,5 +7,8 @@ Architecture: all
 Installed-Size: 70
 Maintainer: PM Codeworks <team@pm-codeworks.de>
 Homepage: www.pm-codeworks.de/pamfingerprint.html
-Description: PAM module for biomtric fingerprint authentication via UART fingerprint sensor.
- pamfingerprint is a free/open-source Linux PAM module that is written in Python using libpam_python. It allows passwordless authentication. A USB to TTL adapter and a UART fingerprint sensor are required.
+Description: Biometric authentication PAM via UART fingerprint sensor.
+ pamfingerprint is a Python written Pluggable Authentication Module (PAM) which
+ uses libpam-python to work with operating system like a native C module.
+ .
+ It is recommend to connect the sensor via a default USB TTL converter.
