@@ -27,8 +27,8 @@ class PyFingerprint(object):
     ""
     "" @param string port
     "" @param integer baudRate
-    "" @param integer address (32 bit)
-    "" @param integer password (32 bit)
+    "" @param integer address (4 bytes)
+    "" @param integer password (4 bytes)
     "" @return void
     """
     def __init__(self, port, baudRate, address, password):
@@ -133,7 +133,7 @@ class PyFingerprint(object):
     """
     "" Gets all system parameters of the fingerprint sensor.
     ""
-    "" @return tuple (integer [2 bytes], integer [2 bytes], integer [2 bytes])
+    "" @return tuple (integer [2 bytes], integer [2 bytes], integer [2 bytes]) TODO
     """
     def getSystemParameters(self):
 
@@ -179,6 +179,14 @@ class PyFingerprint(object):
 
         ## DEBUG: Unknown error
         return -1
+
+
+
+
+
+
+
+
 
     """
     "" Reads the characteristics of a finger.
@@ -326,6 +334,42 @@ class PyFingerprint(object):
 
         ## DEBUG: Unknown error
         return False
+
+
+
+
+
+
+    """
+    "" Loads an existing template specified by position number to specified CharBuffer.
+    ""
+    "" @param integer positionNumber (2 bytes)
+    "" @param integer charBufferNumber (1 byte)
+    "" @return tuple (integer [1 byte])
+    """
+    def loadTemplate(self, positionNumber, charBufferNumber = 0x01):
+
+        p = self.__connection.loadTemplate(positionNumber, charBufferNumber)
+
+        ## DEBUG: Read successful
+        if ( p[0] == FINGERPRINT_OK ):
+            return True
+
+        ## DEBUG: Communication error
+        elif ( p[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            return False
+
+        ## DEBUG: Read failed
+        elif ( p[0] == FINGERPRINT_READFAILED ):
+            return False
+
+        ## DEBUG: Read failed
+        elif ( p[0] == FINGERPRINT_OUTOFRANGE ):
+            return False
+
+        ## DEBUG: Unknown error
+        return False
+
 
 
 
@@ -607,21 +651,63 @@ class PyFingerprint(object):
 
         return False
 
-## Tests:
+## Tests
 
 f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
-# print 'Currently stored templates: ' + str(f.getTemplateCount())
-# print f.getSystemParameters()
 
+## Gets some sensor information
+##
+
+#print 'Currently stored templates: ' + str(f.getTemplateCount())
+#print 'System parameters: ' + str(f.getSystemParameters())
+
+
+## Enrolls new finger
+##
 
 print 'Waiting for finger...'
+print f.readImage()
+print f.convertImage(0x01)
+
+print 'Remove finger...'
+time.sleep(2)
+
+print 'Waiting for same finger again...'
+print f.readImage()
+print f.convertImage(0x02)
+
+print f.createTemplate()
+
+positionNumber = f.getTemplateCount() + 1
+print 'New position number #' + str(positionNumber)
+f.storeTemplate(positionNumber)
+
+
+## Loads existing template and download it
+##
+
+#print f.loadTemplate(1,1)
+#print f.downloadTemplate(1)
+
+
+## Gets hash of readed finegrprint
+##
 
 print f.readImage()
-print f.convertImage(1)
+print f.convertImage(0x01)
 
-#print f.createTemplate()
+positionNumber = f.searchTemplate()
 
-print f.downloadTemplate(1)
+if ( positionNumber == -1 ):
+    print 'No match found!'
+else:
+    print 'Found template #' + str(positionNumber)
+
+print f.loadTemplate(positionNumber, 0x01)
+print f.downloadTemplate(0x01)
+
+
+
 
 exit(0)
 
@@ -634,19 +720,7 @@ exit(0)
 
 
 
-"""
-if ( f.searchTemplate()[0] != 0 ):
-    print 'Template already existing.'
-"""
 
-print 'Remove finger.'
-time.sleep(3)
-
-print 'Waiting for same finger again...'
-
-
-f.readImage()
-f.convertImage(2)
 
 
 print f.compareTemplates()
