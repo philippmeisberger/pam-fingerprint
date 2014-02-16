@@ -658,8 +658,10 @@ f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 ## Gets some sensor information
 ##
 
-#print 'Currently stored templates: ' + str(f.getTemplateCount())
-#print 'System parameters: ' + str(f.getSystemParameters())
+print 'Currently stored templates: ' + str(f.getTemplateCount())
+print 'System parameters: ' + str(f.getSystemParameters())
+
+exit(0)
 
 
 ## Enrolls new finger
@@ -678,19 +680,16 @@ print f.convertImage(0x02)
 
 print f.createTemplate()
 
-positionNumber = f.getTemplateCount() + 1
+positionNumber = f.getTemplateCount()
+
+if ( positionNumber == -1 ): ## TODO
+    positionNumber = 1
+
 print 'New position number #' + str(positionNumber)
 f.storeTemplate(positionNumber)
 
 
-## Loads existing template and download it
-##
-
-#print f.loadTemplate(1,1)
-#print f.downloadTemplate(1)
-
-
-## Gets hash of readed finegrprint
+## Gets hash of readed fingerprint
 ##
 
 print f.readImage()
@@ -698,34 +697,10 @@ print f.convertImage(0x01)
 
 positionNumber = f.searchTemplate()
 
-if ( positionNumber == -1 ):
+if ( positionNumber == -1 ): ## TODO
     print 'No match found!'
 else:
     print 'Found template #' + str(positionNumber)
 
 print f.loadTemplate(positionNumber, 0x01)
-print f.downloadTemplate(0x01)
-
-
-
-
-exit(0)
-
-
-
-
-
-
-
-
-
-
-
-
-
-print f.compareTemplates()
-
-#f.deleteDatabase()
-
-#f.createTemplate()
-#print f.searchTemplate()
+print f.downloadCharacteristics(0x01)
