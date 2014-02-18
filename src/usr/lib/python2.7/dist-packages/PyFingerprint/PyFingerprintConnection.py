@@ -865,7 +865,7 @@ class PyFingerprintConnection(object):
 
 ## Tests
 ##
-
+"""
 import hashlib
 import time
 
@@ -889,7 +889,7 @@ except (Exception, ValueError) as e:
 
 ## Enrolls new finger
 ##
-"""
+
 try:
     print 'Waiting for finger...'
 
@@ -924,7 +924,7 @@ try:
 
 except Exception as e:
     print 'Fingerprint enroll failed: '+ e.message
-"""
+
 
 ## Gets hash of readed fingerprint
 ##
@@ -953,4 +953,4 @@ try:
 
 except Exception as e:
     print 'Fingerprint read failed: '+ e.message
-
+"""
