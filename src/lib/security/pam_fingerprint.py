@@ -12,7 +12,8 @@ sys.path.append('/usr/lib')
 from pamfingerprint.version import VERSION
 from pamfingerprint.Config import *
 
-from PyFingerprint.PyFingerprint import *
+## TODO: Change PyFingerprintConnection to PyFingerprint
+from PyFingerprint.PyFingerprintConnection import *
 
 import hashlib
 import logging
@@ -70,7 +71,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except ConfigParser.NoOptionError:
         logger.error('The user "' + user + '" is not assigned!', exc_info=False)
-        return pamh.PA_AUTH_ERR
+        return pamh.PAM_AUTH_ERR
 
     ## Gets sensor connection values
     port = config.readString('PyFingerprint', 'port')
@@ -83,12 +84,12 @@ def pam_sm_authenticate(pamh, flags, argv):
         ## TODO: Change PyFingerprintConnection to PyFingerprint
         fingerprint = PyFingerprintConnection(port, baudRate, address, password)
 
-        if ( f.verifyPassword() == False ):
+        if ( fingerprint.verifyPassword() == False ):
             raise ValueError('The given fingerprint sensor password is wrong!')
     
-    except (Exception, ValueError), e:
+    except (Exception, ValueError) as e:
         logger.error('The fingerprint sensor could not be initialized!', exc_info=True)
-        msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Sensor is not connected correctly!')
+        msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Sensor initialization failed!')
         pamh.conversation(msg)
         return pamh.PAM_IGNORE
 
@@ -97,25 +98,29 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     ## Tries to read fingerprint
     try:
-        while ( f.readImage() == False ):
+        while ( fingerprint.readImage() == False ):
             pass
     
-        f.convertImage(0x01)
-        
-        result = f.searchTemplate()
+        fingerprint.convertImage(0x01)
+
+        ## Gets position of template
+        result = fingerprint.searchTemplate()
         positionNumber = result[0]
 
+        ## Invalid position
         if ( positionNumber == -1 ):
             logger.info('No match found!')
             msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!')
             pamh.conversation(msg)
             return pamh.PAM_IGNORE
-
-        f.loadTemplate(positionNumber, 0x01)
-        characterics = f.downloadCharacteristics(0x01)
         
+        fingerprint.loadTemplate(positionNumber, 0x01)
+        characterics = fingerprint.downloadCharacteristics(0x01)
+
+        ## Creates hash of template
         fingerprintHash = hashlib.sha256(str(characterics)).hexdigest()
 
+        ## Checks if read hash matches saved hash
         if ( fingerprintHash == expectedFingerprintHash ):
             logger.info('Access granted!')
             msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access granted!')
@@ -125,14 +130,14 @@ def pam_sm_authenticate(pamh, flags, argv):
             logger.info('The found match is not assigned to user!')
             msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!')
             pamh.conversation(msg)
-            return pamh.PA_AUTH_ERR
+            return pamh.PAM_AUTH_ERR
         
     except Exception, e:
         logger.error('Fingerprint read failed!', exc_info=True)
-        return pamh.PA_AUTH_ERR        
+        return pamh.PAM_AUTH_ERR        
 
     ## Denies for default
-    return pamh.PA_AUTH_ERR
+    return pamh.PAM_AUTH_ERR
 
 """
 "" PAM service function to alter credentials.
