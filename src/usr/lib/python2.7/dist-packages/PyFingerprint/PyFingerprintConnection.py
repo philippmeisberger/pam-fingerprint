@@ -17,7 +17,6 @@ from includes.constants import *
 import includes.utilities as utilities
 
 import serial
-import struct
 import os.path
 
 
@@ -858,7 +857,7 @@ class PyFingerprintConnection(object):
             for i in range(0, len(receivedPacketPayload)):
                 completePacketData.append(receivedPacketPayload[i])
 
-        return completePacketData
+        return completePacketData[1:]
 
 
 
@@ -867,11 +866,91 @@ class PyFingerprintConnection(object):
 ## Tests
 ##
 
-f = PyFingerprintConnection()
-#print f.verifyPassword()
+import hashlib
+import time
 
-f.loadTemplate(0x0001, 0x01)
-l = f.downloadCharacteristics(0x01)
+try:
+    f = PyFingerprintConnection('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 
-#import hashlib
-#print hashlib.sha256(str(l[1:])).hexdigest()
+    if ( f.verifyPassword() == False ):
+        raise ValueError('The given fingerprint sensor password is wrong!')
+
+except (Exception, ValueError) as e:
+    print 'The fingerprint sensor could not be initialized!'
+    print e.message
+
+    
+## Gets some sensor information
+##
+
+#print 'Currently stored templates: ' + str(f.getTemplateCount())
+#print 'System parameters: ' + str(f.getSystemParameters())
+
+
+## Enrolls new finger
+##
+"""
+try:
+    print 'Waiting for finger...'
+
+    while ( f.readImage() == False ):
+        pass
+        
+    f.convertImage(0x01)
+    
+    result = f.searchTemplate()
+    positionNumber = result[0]
+
+    if ( positionNumber > 0 ):
+        print 'Template already exists at #' + str(positionNumber)
+        exit(0)
+    
+    print 'Remove finger...'
+    time.sleep(2)
+
+    print 'Waiting for same finger again...'
+
+    while ( f.readImage() == False ):
+        pass
+        
+    f.convertImage(0x02)
+    f.createTemplate()
+
+    positionNumber = f.getTemplateCount()
+    positionNumber = positionNumber + 1
+    
+    print 'New position number #' + str(positionNumber)
+    f.storeTemplate(positionNumber)
+
+except Exception as e:
+    print 'Fingerprint enroll failed: '+ e.message
+"""
+
+## Gets hash of readed fingerprint
+##
+
+try:
+    print 'Waiting for finger...'
+    
+    while ( f.readImage() == False ):
+        pass
+    
+    f.convertImage(0x01)
+
+    result = f.searchTemplate()
+    positionNumber = result[0]
+
+    if ( positionNumber == -1 ):
+        print 'No match found!'
+        exit(0)
+    else:
+        print 'Found template #' + str(positionNumber)
+
+    f.loadTemplate(positionNumber, 0x01)
+    characterics = f.downloadCharacteristics(0x01)
+    
+    print hashlib.sha256(str(characterics)).hexdigest()
+
+except Exception as e:
+    print 'Fingerprint read failed: '+ e.message
+

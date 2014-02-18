@@ -652,55 +652,81 @@ class PyFingerprint(object):
         return False
 
 ## Tests
+import hashlib
 
-f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+try:
 
+    f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+
+    if ( f.verifyPassword() == False ):
+        raise ValueError('The given fingerprint sensor password is wrong!')
+
+except (Exception, ValueError) as e:
+    print 'The fingerprint sensor could not be initialized!'
+    print e.message
+    
 ## Gets some sensor information
 ##
 
-print 'Currently stored templates: ' + str(f.getTemplateCount())
-print 'System parameters: ' + str(f.getSystemParameters())
+#print 'Currently stored templates: ' + str(f.getTemplateCount())
+#print 'System parameters: ' + str(f.getSystemParameters())
 
-exit(0)
+#exit(0)
 
 
 ## Enrolls new finger
 ##
 
-print 'Waiting for finger...'
-print f.readImage()
-print f.convertImage(0x01)
+try:
+    print 'Waiting for finger...'
 
-print 'Remove finger...'
-time.sleep(2)
+    while ( f.readImage() == False ):
+        pass
+        
+    f.convertImage(0x01)
 
-print 'Waiting for same finger again...'
-print f.readImage()
-print f.convertImage(0x02)
+    print 'Remove finger...'
+    time.sleep(2)
 
-print f.createTemplate()
+    print 'Waiting for same finger again...'
 
-positionNumber = f.getTemplateCount()
+    while ( f.readImage() == False ):
+        pass
+        
+    f.convertImage(0x02)
+    f.createTemplate()
 
-if ( positionNumber == -1 ): ## TODO
-    positionNumber = 1
+    positionNumber = f.getTemplateCount()
+    positionNumber = positionNumber + 1
 
-print 'New position number #' + str(positionNumber)
-f.storeTemplate(positionNumber)
+    #print 'New position number #' + str(positionNumber)
+    f.storeTemplate(positionNumber)
 
-
+except:
+    print 'Fingerprint enroll failed!'
+    
 ## Gets hash of readed fingerprint
 ##
 
-print f.readImage()
-print f.convertImage(0x01)
+try:
+    while ( f.readImage() == False ):
+        pass
+    
+    f.convertImage(0x01)
 
-positionNumber = f.searchTemplate()
+    result = f.searchTemplate()
+    positionNumber = result[0]
 
-if ( positionNumber == -1 ): ## TODO
-    print 'No match found!'
-else:
-    print 'Found template #' + str(positionNumber)
+    if ( positionNumber == -1 ):
+        print 'No match found!'
+    else:
+        print 'Found template #' + str(positionNumber)
 
-print f.loadTemplate(positionNumber, 0x01)
-print f.downloadCharacteristics(0x01)
+    f.loadTemplate(positionNumber, 0x01)
+    characterics = f.downloadCharacteristics(0x01)
+    
+    print hashlib.sha256(str(characterics)).hexdigest()
+
+except:
+    print 'Fingerprint read failed!'
+    
