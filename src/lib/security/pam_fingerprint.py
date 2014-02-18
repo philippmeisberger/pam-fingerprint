@@ -9,6 +9,7 @@
 import sys 
 sys.path.append('/usr/lib')
 
+
 from pamfingerprint.version import VERSION
 from pamfingerprint.Config import *
 
@@ -42,9 +43,9 @@ def pam_sm_authenticate(pamh, flags, argv):
     ## Tries to get user which is asking for permission
     try:
         if ( pamh.ruser == None ):
-            user = str(pamh.get_user())
+            user = pamh.get_user()
         else:
-            user = str(pamh.ruser)
+            user = pamh.ruser
 
     except pamh.exception, e:
         logger.error(e.message, exc_info=True)
@@ -54,7 +55,7 @@ def pam_sm_authenticate(pamh, flags, argv):
     if ( user == None ):
         logger.error('The user is not known!')
         return pamh.PAM_USER_UNKNOWN
-  
+
     ## Tries to init Config
     try:
         config = Config('/etc/pamfingerprint.conf')
@@ -78,7 +79,7 @@ def pam_sm_authenticate(pamh, flags, argv):
     baudRate = config.readInteger('PyFingerprint', 'baudRate')
     address = config.readHex('PyFingerprint', 'address')
     password = config.readHex('PyFingerprint', 'password')
-    
+
     ## Tries to init PyFingerprint
     try:
         ## TODO: Change PyFingerprintConnection to PyFingerprint
@@ -86,11 +87,10 @@ def pam_sm_authenticate(pamh, flags, argv):
 
         if ( fingerprint.verifyPassword() == False ):
             raise ValueError('The given fingerprint sensor password is wrong!')
-    
+
     except (Exception, ValueError) as e:
         logger.error('The fingerprint sensor could not be initialized!', exc_info=True)
-        msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Sensor initialization failed!')
-        pamh.conversation(msg)
+        pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Sensor initialization failed!'))
         return pamh.PAM_IGNORE
 
     msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Waiting for finger...')
@@ -100,7 +100,7 @@ def pam_sm_authenticate(pamh, flags, argv):
     try:
         while ( fingerprint.readImage() == False ):
             pass
-    
+
         fingerprint.convertImage(0x01)
 
         ## Gets position of template
@@ -110,31 +110,28 @@ def pam_sm_authenticate(pamh, flags, argv):
         ## Invalid position
         if ( positionNumber == -1 ):
             logger.info('No match found!')
-            msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!')
-            pamh.conversation(msg)
-            return pamh.PAM_IGNORE
-        
+            pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
+            return pamh.PAM_AUTH_ERR
+
         fingerprint.loadTemplate(positionNumber, 0x01)
         characterics = fingerprint.downloadCharacteristics(0x01)
 
-        ## Creates hash of template
+        ## Calculates hash of template
         fingerprintHash = hashlib.sha256(str(characterics)).hexdigest()
 
-        ## Checks if read hash matches saved hash
+        ## Checks if the calculated hash is equal to expected hash from user
         if ( fingerprintHash == expectedFingerprintHash ):
             logger.info('Access granted!')
-            msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access granted!')
-            pamh.conversation(msg)
-            return pamh.PAM_SUCCESS 
+            pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access granted!'))
+            return pamh.PAM_SUCCESS
         else:
             logger.info('The found match is not assigned to user!')
-            msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!')
-            pamh.conversation(msg)
+            pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
             return pamh.PAM_AUTH_ERR
-        
+
     except Exception, e:
         logger.error('Fingerprint read failed!', exc_info=True)
-        return pamh.PAM_AUTH_ERR        
+        return pamh.PAM_AUTH_ERR
 
     ## Denies for default
     return pamh.PAM_AUTH_ERR
