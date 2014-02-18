@@ -14,8 +14,10 @@ sys.path.append('/usr/lib')
 from pamfingerprint.version import VERSION
 from pamfingerprint.Config import *
 
-from PyFingerprint.PyFingerprint import *
+## TODO: Change PyFingerprintConnection to PyFingerprint
+from PyFingerprint.PyFingerprintConnection import *
 
+import hashlib
 import argparse
 import os
 
@@ -69,10 +71,14 @@ class PamFingerprint(object):
 
         ## Tries to establish connection
         try:
-            self.__fingerprint = PyFingerprint(port, baudRate, address, password)
+            ## TODO: Change PyFingerprintConnection to PyFingerprint
+            self.__fingerprint = PyFingerprintConnection(port, baudRate, address, password)
 
-        except Exception, e:
-            logger.error(e.message, exc_info=True)
+            if ( self.__fingerprint.verifyPassword() == False ):
+                raise ValueError('The given fingerprint sensor password is wrong!')
+
+        except:
+            logger.error('The fingerprint sensor could not be initialized!', exc_info=True)
             exit(1)
 
     """
@@ -91,22 +97,22 @@ class PamFingerprint(object):
             return True
 
     """
-    "" Returns user ID for a given name.
+    "" Returns stored fingerprint hash for a given name.
     ""
     "" @param string userName
-    "" @return integer
+    "" @return string
     """
-    def getUserIdForName(self, userName):
+    def getFingerprintHash(self, userName):
 
-        userId = -1
+        fingerprintHash = ''
 
         try:
-            userId = self.__config.readInteger('Users', userName)
+            fingerprintHash = self.__config.readString('Users', userName)
 
         except ConfigParser.NoOptionError:
-            logger.error('The user "' + userName + '" does not exist!', exc_info=False)
+            logger.error('The user "'+ userName +'" does not exist!')
 
-        return userId
+        return fingerprintHash
 
     """
     "" Enrolls new fingerprint template and adds user to pamfingerprint.
@@ -123,25 +129,62 @@ class PamFingerprint(object):
 
         ## Tries to create new template for user
         try:
-            result = self.__fingerprint.createTemplate()
+            logger.info('Waiting for finger...')    
 
-        except Exception, e:
-            logger.error(e.message, exc_info=True)
+            while ( self.__fingerprint.readImage() == False ):
+                pass
+
+            self.__fingerprint.convertImage(0x01)
+            
+            ## Gets position of template
+            result = self.__fingerprint.searchTemplate()
+            positionNumber = result[0]
+
+            ## Invalid position
+            if ( positionNumber > 0 ):
+                logger.error('Template already exists!')# at position '+ str(positionNumber) +'!')
+                return False
+    
+            logger.info('Remove finger...')
+            time.sleep(2)
+
+            logger.info('Waiting for same finger again...')
+
+            while ( self.__fingerprint.readImage() == False ):
+                pass
+
+            self.__fingerprint.convertImage(0x02)
+
+            ## Creates new template
+            self.__fingerprint.createTemplate()
+
+            ## Gets characteristics and hashes them
+            characteristics = self.__fingerprint.downloadCharacteristics(0x02)
+            fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
+            
+            ## Gets new position number for template
+            positionNumber = self.__fingerprint.getTemplateCount()
+            positionNumber = positionNumber + 1
+    
+            ## Stores new template
+            self.__fingerprint.storeTemplate(positionNumber)
+
+        except:
+            logger.error('Fingerprint enroll failed!', exc_info=True)
             return False
 
-        if ( result[0] == True ):
-            positionNumber = result[1]
-            self.__config.writeString('Users', userName, positionNumber)
+        ## Append data to config
+        if ( fingerprintHash != None ):
+            self.__config.writeString('Users', userName, fingerprintHash)
 
             if ( self.__config.save() == True ):
                 logger.info('The user "' + userName + '" has been added successfully!')
                 return True
             else:
-                logger.error('The configuration could not be written!', exc_info=False)
+                logger.error('The configuration could not be written!')
                 return False
-
         else:
-            logger.error('Error while adding user "' + userName + '"!', exc_info=False)
+            logger.error('Error while adding user "' + userName + '"!')
             return False 
 
     """
@@ -152,10 +195,11 @@ class PamFingerprint(object):
     """
     def removeUser(self, userName):
 
-        ## Gets user ID
-        userId = self.getUserIdForName(userName)             
+        ## Gets fingerprint hash for a user
+        expectedFingerprintHash = self.getFingerprintHash(userName)             
         
-        if ( userId == -1 ):
+        ## Checks for invalid hash
+        if ( expectedFingerprintHash == '' ):
             return False
 
         ## Confirmation dialog 
@@ -165,23 +209,39 @@ class PamFingerprint(object):
             
         ## Tries to delete template
         try:
-            result = self.__fingerprint.deleteTemplate(userId)
+            found = False
+            
+            ## Searches for template hash matches stored hash
+            for position in range(self.__fingerprint.getTemplateCount()):
+                self.__fingerprint.loadTemplate(position, 0x01)
 
-        except Exception, e:
-            logger.error(e.message, exc_info=True)
+                ## Gets characteristics and hashes them
+                characteristics = self.__fingerprint.downloadCharacteristics(0x01)
+                fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
+
+                ## Checks if template hash matches saved hash
+                if ( fingerprintHash == expectedFingerprintHash ):
+                    self.__fingerprint.deleteTemplate(position)
+                    found = True
+                    break
+
+        except:
+            logger.error('Error while removing template!', exc_info=True)
             return False
 
-        if ( result == True ):
+        ## Checks if template was found
+        if ( found == True ):
 
-            if ( self.__config.remove('Users', userName) == True and self.__config.save() == True ):
+            ## Remove entries from configuration file
+            if ( ( self.__config.remove('Users', userName) == True ) and ( self.__config.save() == True ) ):
                 logger.info('The user "' + userName + '" has been removed successfully!')
                 return True
             else:
-                logger.error('The configuration could not be written!', exc_info=True)
+                logger.error('The configuration file could not be written!')
                 return False
-
+            
         else:
-            logger.error('Error while removing user "' + userName + '"!', exc_info=True)
+            logger.error('Template could not be found!')
             return False
 
 
@@ -189,7 +249,7 @@ if ( __name__ == '__main__' ):
 
     ## Checks if user is root
     if ( os.geteuid() != 0 ):
-        logger.error('You need to have root privileges to run pamfingerprint-conf!', exc_info=False)
+        logger.error('You need to have root privileges to run pamfingerprint-conf!')
         exit(1)
 
     parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')
