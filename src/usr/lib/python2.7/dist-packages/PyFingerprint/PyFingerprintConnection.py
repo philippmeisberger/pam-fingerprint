@@ -365,9 +365,8 @@ class PyFingerprintConnection(object):
     """
     "" Gets all system parameters of the fingerprint sensor.
     ""
-    "" @return tuple (integer [17 bytes])
+    "" @return
     """
-    ## TODO
     def getSystemParameters(self):
 
         packetPayload = (
@@ -402,7 +401,7 @@ class PyFingerprintConnection(object):
         else:
             raise Exception('Unknown error')
 
-    ## TODO: implement ReadConList
+    ## TODO: implement ReadConList()
 
     """
     "" Gets the number of stored templates.
@@ -436,27 +435,10 @@ class PyFingerprintConnection(object):
         else:
             raise Exception('Unknown error')
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     """
     "" Reads the image of a finger and stores it in ImageBuffer.
     ""
-    "" @return tuple (integer [1 byte])
+    "" @return boolean
     """
     def readImage(self):
 
@@ -473,11 +455,24 @@ class PyFingerprintConnection(object):
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
             raise Exception('The received packet is no ack packet!')
 
-        return receivedPacketPayload
+        ## DEBUG: Image read successful
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+            return True
 
+        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            raise Exception('Communication error')
 
+        elif ( receivedPacketPayload[0] == FINGERPRINT_NOFINGER ):
+            return False
 
+        elif ( receivedPacketPayload[0] == FINGERPRINT_IMAGEERROR ):
+            raise Exception('Imaging error')
 
+        else:
+            raise Exception('Unknown error')
+
+    ## TODO: implement: uploadImage()
+    ## TODO: implement: downloadImage()
 
     """
     "" Converts the image in ImageBuffer to finger characteristics and stores in CharBuffer1 or CharBuffer2.
@@ -511,7 +506,7 @@ class PyFingerprintConnection(object):
         elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
             raise Exception('Communication error')
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_IMAGEMESS ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_MESSYIMAGE ):
             raise Exception('The image is too messy')
 
         elif ( receivedPacketPayload[0] == FINGERPRINT_FEATUREFAIL ):
@@ -523,6 +518,263 @@ class PyFingerprintConnection(object):
         else:
             raise Exception('Unknown error')
 
+    """
+    "" Combines the fingerprint characteristics which are stored in CharBuffer1 and CharBuffer2 to a template.
+    "" The created template will be stored again in CharBuffer1 and CharBuffer2 as the same.
+    ""
+    "" @return tuple (integer [1 byte])
+    """
+    def createTemplate(self):
+
+        packetPayload = (
+            FINGERPRINT_CREATETEMPLATE,
+        )
+
+        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
+        receivedPacket = self.__readPacket()
+
+        receivedPacketType = receivedPacket[0]
+        receivedPacketPayload = receivedPacket[1]
+
+        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
+            raise Exception('The received packet is no ack packet!')
+
+        ## DEBUG: Template created successful
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+            return True
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            raise Exception('Communication error')
+
+        ## DEBUG: The images not matching
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ENROLLMISMATCH ):
+            return False
+
+        else:
+            raise Exception('Unknown error')
+
+    """
+    "" Saves a template from the specified CharBuffer to the given position number.
+    ""
+    "" @param integer positionNumber (2 bytes)
+    "" @param integer charBufferNumber (1 byte)
+    "" @return tuple (integer [1 byte])
+    """
+    def storeTemplate(self, positionNumber, charBufferNumber = 0x01):
+
+        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
+            raise ValueError('The given position number is not valid!')
+
+        if ( charBufferNumber != 0x01 and charBufferNumber != 0x02 ):
+            raise ValueError('The given char buffer number is not valid!')
+
+        packetPayload = (
+            FINGERPRINT_STORETEMPLATE,
+            charBufferNumber,
+            utilities.rightShift(positionNumber, 8),
+            utilities.rightShift(positionNumber, 0),
+        )
+
+        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
+        receivedPacket = self.__readPacket()
+
+        receivedPacketType = receivedPacket[0]
+        receivedPacketPayload = receivedPacket[1]
+
+        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
+            raise Exception('The received packet is no ack packet!')
+
+        ## DEBUG: Template stored successful
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+            return True
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            raise Exception('Communication error')
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_BADLOCATION ):
+            raise Exception('Could not store template in that location')
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_FLASHERROR ):
+            raise Exception('Error writing to flash')
+
+        else:
+            raise Exception('Unknown error')
+
+    """
+    "" Loads an existing template specified by position number to specified CharBuffer.
+    ""
+    "" @param integer positionNumber (2 bytes)
+    "" @param integer charBufferNumber (1 byte)
+    "" @return tuple (integer [1 byte])
+    """
+    def loadTemplate(self, positionNumber, charBufferNumber = 0x01):
+
+        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
+            raise ValueError('The given position number is not valid!')
+
+        if ( charBufferNumber != 0x01 and charBufferNumber != 0x02 ):
+            raise ValueError('The given char buffer number is not valid!')
+
+        packetPayload = (
+            FINGERPRINT_LOADTEMPLATE,
+            charBufferNumber,
+            utilities.rightShift(positionNumber, 8),
+            utilities.rightShift(positionNumber, 0),
+        )
+
+        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
+        receivedPacket = self.__readPacket()
+
+        receivedPacketType = receivedPacket[0]
+        receivedPacketPayload = receivedPacket[1]
+
+        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
+            raise Exception('The received packet is no ack packet!')
+
+        ## DEBUG: Template loaded successful
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+            return True
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            raise Exception('Communication error')
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_READERROR ):
+            raise Exception('Template read error')
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_OUTOFRANGE ):
+            raise Exception('The template position is out of range')
+
+        else:
+            raise Exception('Unknown error')
+
+    """
+    "" Deletes one template from fingerprint database.
+    ""
+    "" @param integer positionNumber (2 bytes)
+    "" @return tuple (integer [1 byte])
+    """
+    def deleteTemplate(self, positionNumber):
+
+        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
+            raise ValueError('The given position number is not valid!')
+
+        ## Deletes only one template
+        count = 0x0001
+
+        packetPayload = (
+            FINGERPRINT_DELETETEMPLATE,
+            utilities.rightShift(positionNumber, 8),
+            utilities.rightShift(positionNumber, 0),
+            utilities.rightShift(count, 8),
+            utilities.rightShift(count, 0),
+        )
+
+        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
+        receivedPacket = self.__readPacket()
+
+        receivedPacketType = receivedPacket[0]
+        receivedPacketPayload = receivedPacket[1]
+
+        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
+            raise Exception('The received packet is no ack packet!')
+
+        ## DEBUG: Template deleted successful
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+            return True
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            raise Exception('Communication error')
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_DELETEERROR ):
+            raise Exception('Could not delete template')
+
+        else:
+            raise Exception('Unknown error')
+
+    """
+    "" Clears the complete template database.
+    ""
+    "" @return tuple (integer [1 byte])
+    """
+    def clearDatabase(self):
+
+        packetPayload = (
+            FINGERPRINT_CLEARDATABASE,
+        )
+
+        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
+        receivedPacket = self.__readPacket()
+
+        receivedPacketType = receivedPacket[0]
+        receivedPacketPayload = receivedPacket[1]
+
+        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
+            raise Exception('The received packet is no ack packet!')
+
+        ## DEBUG: Database cleared successful
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+            return True
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            raise Exception('Communication error')
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_CLEARERROR ):
+            raise Exception('Could not clear database')
+
+        else:
+            raise Exception('Unknown error')
+
+    """
+    "" Search the finger characteristiccs in CharBuffer in database.
+    ""
+    "" @return tuple (positionNumber, accuracyScore)
+    """
+    def searchTemplate(self):
+
+        ## CharBuffer1 and CharBuffer2 are the same in this case
+        charBufferNumber = 0x01
+
+        ## Begin search at page 0x0000 for 0x00A3 (means 163) templates
+        positionStart = 0x0000
+        templatesCount = 0x00A3
+
+        packetPayload = (
+            FINGERPRINT_SEARCHTEMPLATE,
+            charBufferNumber,
+            utilities.rightShift(positionStart, 8),
+            utilities.rightShift(positionStart, 0),
+            utilities.rightShift(templatesCount, 8),
+            utilities.rightShift(templatesCount, 0),
+        )
+
+        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
+        receivedPacket = self.__readPacket()
+
+        receivedPacketType = receivedPacket[0]
+        receivedPacketPayload = receivedPacket[1]
+
+        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
+            raise Exception('The received packet is no ack packet!')
+
+        ## DEBUG: Found template
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+
+            positionNumber = utilities.leftShift(receivedPacketPayload[1], 8)
+            positionNumber = positionNumber | utilities.leftShift(receivedPacketPayload[2], 0)
+
+            accuracyScore = utilities.leftShift(receivedPacketPayload[3], 8)
+            accuracyScore = accuracyScore | utilities.leftShift(receivedPacketPayload[4], 0)
+
+            return (positionNumber, accuracyScore)
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+            raise Exception('Communication error')
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_NOMATCHFOUND ):
+            return (-1, -1)
+
+        else:
+            raise Exception('Unknown error')
 
 
 
@@ -611,192 +863,6 @@ class PyFingerprintConnection(object):
 
 
 
-
-
-
-
-
-
-
-
-
-    """
-    "" Combines the fingerprint characteristics which are stored in CharBuffer1 and CharBuffer2 to a template.
-    "" The created template will be stored again in CharBuffer1 and CharBuffer2 as the same.
-    ""
-    "" @return tuple (integer [1 byte])
-    """
-    def createTemplate(self):
-
-        packetPayload = (
-            FINGERPRINT_CREATETEMPLATE,
-        )
-
-        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
-        receivedPacket = self.__readPacket()
-
-        receivedPacketType = receivedPacket[0]
-        receivedPacketPayload = receivedPacket[1]
-
-        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            raise Exception('The received packet is no ack packet!')
-
-        return receivedPacketPayload
-
-    """
-    "" Saves a template from the specified CharBuffer to the given position number.
-    ""
-    "" @param integer positionNumber (2 bytes)
-    "" @param integer charBufferNumber (1 byte)
-    "" @return tuple (integer [1 byte])
-    """
-    def storeTemplate(self, positionNumber, charBufferNumber = 0x01):
-
-        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
-            raise ValueError('The given position number is not valid!')
-
-        if ( charBufferNumber != 0x01 and charBufferNumber != 0x02 ):
-            raise ValueError('The given char buffer number is not valid!')
-
-        packetPayload = (
-            FINGERPRINT_STORETEMPLATE,
-            charBufferNumber,
-            utilities.rightShift(positionNumber, 8),
-            utilities.rightShift(positionNumber, 0),
-        )
-
-        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
-        receivedPacket = self.__readPacket()
-
-        receivedPacketType = receivedPacket[0]
-        receivedPacketPayload = receivedPacket[1]
-
-        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            raise Exception('The received packet is no ack packet!')
-
-        return receivedPacketPayload
-
-    """
-    "" Loads an existing template specified by position number to specified CharBuffer.
-    ""
-    "" @param integer positionNumber (2 bytes)
-    "" @param integer charBufferNumber (1 byte)
-    "" @return tuple (integer [1 byte])
-    """
-    def loadTemplate(self, positionNumber, charBufferNumber = 0x01):
-
-        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
-            raise ValueError('The given position number is not valid!')
-
-        if ( charBufferNumber != 0x01 and charBufferNumber != 0x02 ):
-            raise ValueError('The given char buffer number is not valid!')
-
-        packetPayload = (
-            FINGERPRINT_LOADTEMPLATE,
-            charBufferNumber,
-            utilities.rightShift(positionNumber, 8),
-            utilities.rightShift(positionNumber, 0),
-        )
-
-        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
-        receivedPacket = self.__readPacket()
-
-        receivedPacketType = receivedPacket[0]
-        receivedPacketPayload = receivedPacket[1]
-
-        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            raise Exception('The received packet is no ack packet!')
-
-        return receivedPacketPayload
-
-    """
-    "" Deletes one template from fingerprint database.
-    ""
-    "" @param integer positionNumber (2 bytes)
-    "" @return tuple (integer [1 byte])
-    """
-    def deleteTemplate(self, positionNumber):
-
-        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
-            raise ValueError('The given position number is not valid!')
-
-        ## Deletes only one template
-        count = 0x0001
-
-        packetPayload = (
-            FINGERPRINT_DELETETEMPLATE,
-            utilities.rightShift(positionNumber, 8),
-            utilities.rightShift(positionNumber, 0),
-            utilities.rightShift(count, 8),
-            utilities.rightShift(count, 0),
-        )
-
-        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
-        receivedPacket = self.__readPacket()
-
-        receivedPacketType = receivedPacket[0]
-        receivedPacketPayload = receivedPacket[1]
-
-        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            raise Exception('The received packet is no ack packet!')
-
-        return receivedPacketPayload
-
-    """
-    "" Clears the complete template database.
-    ""
-    "" @return tuple (integer [1 byte])
-    """
-    def clearDatabase(self):
-
-        packetPayload = (
-            FINGERPRINT_CLEARDATABASE,
-        )
-
-        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
-        receivedPacket = self.__readPacket()
-
-        receivedPacketType = receivedPacket[0]
-        receivedPacketPayload = receivedPacket[1]
-
-        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            raise Exception('The received packet is no ack packet!')
-
-        return receivedPacketPayload
-
-    """
-    "" Search the finger characteristiccs in CharBuffer in database.
-    ""
-    "" @return tuple (integer [5 bytes])
-    """
-    def searchTemplate(self):
-
-        ## CharBuffer1 and CharBuffer2 are the same in this case
-        charBufferNumber = 0x01
-
-        ## Begin search at page 0x0000 for 0x00A3 (means 163) templates
-        positionStart = 0x0000
-        templatesCount = 0x00A3
-
-        packetPayload = (
-            FINGERPRINT_SEARCHTEMPLATE,
-            charBufferNumber,
-            utilities.rightShift(positionStart, 8),
-            utilities.rightShift(positionStart, 0),
-            utilities.rightShift(templatesCount, 8),
-            utilities.rightShift(templatesCount, 0),
-        )
-
-        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
-        receivedPacket = self.__readPacket()
-
-        receivedPacketType = receivedPacket[0]
-        receivedPacketPayload = receivedPacket[1]
-
-        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            raise Exception('The received packet is no ack packet!')
-
-        return receivedPacketPayload
 
 ## Tests
 ##
