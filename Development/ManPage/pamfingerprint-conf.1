@@ -11,11 +11,10 @@
 .fi
 
 .SH DESCRIPTION
-\fBpamfingerprint\fR is a free/open-source Linux PAM module that allows biometric fingerprint authentication without entering a password. The standard Unix passwort authentication is set as fallback in case that no fingerprint sensor is connected. The module has to be configured by the \fBpamfingerprint-conf\fR program. This can add or remove users. Therefore it needs root permissions. To simulate an authentication process the \fBpamfingerprint-check\fR program has to be called. The check program needs no root permissions.
+\fBpamfingerprint\fR is a Python written Pluggable Authentication Module (PAM) which uses pam_python to work with operating system like a native C module. It allows biometric fingerprint authentication without entering a password. The standard Unix passwort authentication is set as fallback in case that no fingerprint sensor is connected. The module has to be configured by the \fBpamfingerprint-conf\fR program. This can add or remove users. Therefore it needs root permissions. To simulate an authentication process the \fBpamfingerprint-check\fR program has to be called. The check program needs no root permissions.
 .br
 
-\fBpamfingerprint\fR is totally written in python and uses a python framework called pam_python to allow writing PAM modules in python instead in C. Pyserial, a python written library for serial connections, is used for the connection between the sensor and a computer. The sensor is connected with a USB TTL converter. pamfingerprint works with any application supporting PAM, for example su, sudo, etc.
-
+\fIImportant\fR: \fBpamfingerprint\fR requires the ZFM-20 fingerprint sensor (e.g. sold by Adafruit) and a default USB TTL converter.
 .PP
 
 .SH OPTIONS
@@ -40,7 +39,7 @@ Removes an user.
 Prints version and exits.
 
 .SH "SEE ALSO"
-\fBUsed fingerprint sensor\fR: http://www.adafruit.com/products/751
+\fBFingerprint sensor\fR: http://www.adafruit.com/products/751
 .br
 \fBPyserial\fR: http://pyserial.sourceforge.net/
 .br
