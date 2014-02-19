@@ -1,46 +1,19 @@
 .TH pamfingerprint-check 1 "" "" "PAM Fingerprint"
 
 .SH NAME
-\fBpamfingerprint-check\fP - pamfingerprint simulation tool
+\fBpamfingerprint-check\fP - pamfingerprint simulation program
 
 .SH SYNOPSIS
 .nf
 .fam C
-\fBpamfingerprint-check\fP [\fB--help\fP | \fB--check-user\fP NAME | \fB--version\fP]
+\fBpamfingerprint-check\fP \fB--check-user\fP NAME | [\fB--version\fP | \fB--help\fP]
 .fam T
 .fi
 
 .SH DESCRIPTION
-\fBpamfingerprint-check\fP is a helper program of pamfingerprint which simulates fingerprint authentication. The --check-user option is required followed by a name that has to be checked. It can be run without root permissions.
-
-.SH EXAMPLE
-.SS Good case 
-$ pamfingerprint-check --check-user bob
-.br
-[INFO] Waiting for finger...
-.br
-[INFO] Check for user "bob" was successful!
-
-.SS Bad case 1
-$ pamfingerprint-check --check-user alice
-.br
-[INFO] Waiting for finger...
-.br
-[ERROR] Check for user "alice" failed: No match found!
-
-.SS Bad case 2
-$ pamfingerprint-check --check-user melory
-.br
-[INFO] Waiting for finger...
-.br
-[ERROR] Check for user "melory" failed: Match is not assigned to user!
+\fBpamfingerprint-check\fP can be used to simulate fingerprint authentication process for bind user.
 
 .SH OPTIONS
-
-.TP
-.B
-\fB--help\fR, \fB-h\fR
-Show summary of options.
 
 .TP
 .B
@@ -52,6 +25,33 @@ Checks fingerprint for an existing user.
 \fB--version\fR
 Prints version and exits.
 
+.TP
+.B
+\fB--help\fR, \fB-h\fR
+Show summary of options.
+
+.SH EXAMPLE
+.SS Good case 
+$ pamfingerprint-check --check-user bob
+.br
+Waiting for finger...
+.br
+Check for user "bob" was successful!
+
+.SS Bad case 1
+$ pamfingerprint-check --check-user alice
+.br
+Waiting for finger...
+.br
+[ERROR] Check for user "alice" failed: No match found!
+
+.SS Bad case 2
+$ pamfingerprint-check --check-user melory
+.br
+Waiting for finger...
+.br
+[ERROR] Check for user "melory" failed: Match is not assigned to user!
+
 .SH FILES
 /etc/pamfingerprint.conf
 
@@ -60,4 +60,4 @@ Philipp Meisberger <team@pm-codeworks.de>
 .br
 Bastian Raschke <bastian.raschke@posteo.de>
 
-Please send bug reports to one of those mail addresses. Visit www.pm-codeworks.de for more interesting projects.
+Please send bug reports to one of those mail addresses. Visit www.pm-codeworks.de and www.sicherheitskritisch.de for more interesting projects.

@@ -93,6 +93,11 @@ class PamFingerprint(object):
     """
     def addUser(self, userName):
 
+        ## Checks if user is root
+        if ( os.geteuid() != 0 ):
+            print 'You need to have root privileges to add a user!'
+            return False
+            
         ## Confirmation dialog
         if ( self.__showConfirmationDialog('Add user "' + userName + '"?') == False ):
             print 'Adding user canceled.'
@@ -162,6 +167,11 @@ class PamFingerprint(object):
     """
     def removeUser(self, userName):
 
+        ## Checks if user is root
+        if ( os.geteuid() != 0 ):
+            print 'You need to have root privileges to remove a user!'
+            return False
+        
         ## Tries to get fingerprint hash of user
         try:
             expectedFingerprintHash = self.__config.readString('Users', userName)
@@ -215,11 +225,6 @@ class PamFingerprint(object):
 
 if ( __name__ == '__main__' ):
 
-    ## Checks if user is root
-    if ( os.geteuid() != 0 ):
-        print 'You need to have root privileges to run pamfingerprint-conf!'
-        exit(1)
-
     parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')
     
     parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
@@ -227,7 +232,7 @@ if ( __name__ == '__main__' ):
     parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Print version and exit.')
 
     args = vars(parser.parse_args())
-        
+   
     if ( args['add_user'] ):
         PamFingerprint().addUser(args['add_user'])
     elif ( args['remove_user'] ):

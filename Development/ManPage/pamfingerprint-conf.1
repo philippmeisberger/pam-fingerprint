@@ -1,28 +1,19 @@
 .TH pamfingerprint-conf 1 "" "" "PAM Fingerprint"
 
 .SH NAME
-\fBpamfingerprint-conf\fP - pamfingerprint configuration tool
+\fBpamfingerprint-conf\fP - \fBpamfingerprint\fP configuration program
 
 .SH SYNOPSIS
 .nf
 .fam C
-\fBpamfingerprint-conf\fP [\fB--help\fP | \fB--add-user\fP NAME | \fB--remove-user\fP NAME | \fB--version\fP]
+\fBpamfingerprint-conf\fP [\fB--add-user\fP NAME | \fB--remove-user\fP NAME | \fB--version\fP | \fB--help\fP]
 .fam T
 .fi
 
 .SH DESCRIPTION
-\fBpamfingerprint\fR is a Python written Pluggable Authentication Module (PAM) which uses pam_python to work with operating system like a native C module. It allows biometric fingerprint authentication without entering a password. The standard Unix passwort authentication is set as fallback in case that no fingerprint sensor is connected. The module has to be configured by the \fBpamfingerprint-conf\fR program. This can add or remove users. Therefore it needs root permissions. To simulate an authentication process the \fBpamfingerprint-check\fR program has to be called. The check program needs no root permissions.
-.br
-
-\fIImportant\fR: \fBpamfingerprint\fR requires the ZFM-20 fingerprint sensor (e.g. sold by Adafruit) and a default USB TTL converter.
-.PP
+\fBpamfingerprint-conf\fP allows (as root) to bind or unbind users to \fBpamfingerprint\fR.
 
 .SH OPTIONS
-.TP
-.B
-\fB--help\fR, \fB-h\fR
-Show summary of options.
-
 .TP
 .B
 \fB--add-user\fR NAME
@@ -31,28 +22,28 @@ Adds a new user.
 .TP
 .B
 \fB--remove-user\fR NAME
-Removes an user.
+Removes a user.
 
 .TP
 .B
 \fB--version\fR
 Prints version and exits.
 
+.TP
+.B
+\fB--help\fR, \fB-h\fR
+Show summary of options.
+.PP
+
 .SH "SEE ALSO"
-\fBFingerprint sensor\fR: http://www.adafruit.com/products/751
-.br
-\fBPyserial\fR: http://pyserial.sourceforge.net/
-.br
-\fBpam_python\fR: http://ace-host.stuart.id.au/russell/files/pam_python/
+\fBpamfingerprint\fR(1), \fBpamfingerprint-check\fR(1)
 
 .SH FILES
 /etc/pamfingerprint.conf
-.br
-/var/log/pamfingerprint.log
 
 .SH AUTHORS
 Philipp Meisberger <team@pm-codeworks.de> 
 .br
 Bastian Raschke <bastian.raschke@posteo.de>
 
-Please send bug reports to one of those mail addresses. Visit www.pm-codeworks.de for more interesting projects.
+Please send bug reports to one of those mail addresses. Visit www.pm-codeworks.de and www.sicherheitskritisch.de for more interesting projects.
