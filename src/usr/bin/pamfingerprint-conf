@@ -143,7 +143,7 @@ class PamFingerprint(object):
             self.__config.writeString('Users', userName, fingerprintHash)
 
             if ( self.__config.save() == True ):
-                logger.info('The user "' + userName + '" has been added successfully!')
+                print 'The user "' + userName + '" has been added successfully!'
             else:
                 raise Exception('The configuration could not be written!')
 
@@ -198,7 +198,7 @@ class PamFingerprint(object):
 
                 ## Remove entries from configuration file
                 if ( ( self.__config.remove('Users', userName) == True ) and ( self.__config.save() == True ) ):
-                    logger.info('The user "' + userName + '" has been removed successfully!')
+                    print 'The user "' + userName + '" has been removed successfully!'
                 else:
                     raise Exception('The configuration file could not be written!')
                 
@@ -217,7 +217,7 @@ if ( __name__ == '__main__' ):
 
     ## Checks if user is root
     if ( os.geteuid() != 0 ):
-        logger.error('You need to have root privileges to run pamfingerprint-conf!')
+        print 'You need to have root privileges to run pamfingerprint-conf!'
         exit(1)
 
     parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')

@@ -9,7 +9,6 @@
 import sys 
 sys.path.append('/usr/lib')
 
-
 from pamfingerprint.version import VERSION
 from pamfingerprint.Config import *
 
@@ -42,25 +41,25 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     ## Tries to get user which is asking for permission
     try:
-        if ( pamh.ruser == None ):
-            user = pamh.get_user()
-        else:
-            user = pamh.ruser
+        user = pamh.ruser
+        
+        if ( user == None ):
+            user = pamh.get_user()            
 
-    except pamh.exception, e:
+        ## Be sure the user is set 
+        if ( user == None ):
+            logger.error('The user is not known!')
+            return pamh.PAM_USER_UNKNOWN
+
+    except (Exception, pamh.exception) as e:
         logger.error(e.message, exc_info=True)
-        return pamh.PAM_USER_UNKNOWN
-
-    ## Be sure the user is set 
-    if ( user == None ):
-        logger.error('The user is not known!')
         return pamh.PAM_USER_UNKNOWN
 
     ## Tries to init Config
     try:
         config = Config('/etc/pamfingerprint.conf')
 
-    except Exception, e:
+    except Exception as e:
         logger.error(e.message, exc_info=True)
         return pamh.PAM_IGNORE
 
@@ -129,7 +128,7 @@ def pam_sm_authenticate(pamh, flags, argv):
             pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
             return pamh.PAM_AUTH_ERR
 
-    except Exception, e:
+    except Exception as e:
         logger.error('Fingerprint read failed!', exc_info=True)
         return pamh.PAM_AUTH_ERR
 
