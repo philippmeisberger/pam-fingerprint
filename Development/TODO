@@ -1,9 +1,3 @@
-- CTRL+C while getImage()
-- in createTemplate(): check first if template already exists! If so: return tuple (True, <template id>)
 - UpChar implementieren
-- DownChar implementieren
-- Funtion 19 implementieren
-
-- UserId zu Hash ändern
 
 - Phil: MAN page

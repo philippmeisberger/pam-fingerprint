@@ -19,17 +19,6 @@ from PyFingerprint.PyFingerprintConnection import *
 
 import argparse
 import hashlib
-import logging
-
-## Configures logger
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-## Creates and adds an output handler to logger
-strmHandler = logging.StreamHandler()
-strmHandler.setLevel(logging.DEBUG)
-strmHandler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
-logger.addHandler(strmHandler)
 
 
 class PamFingerprintCheck(object):
@@ -51,8 +40,8 @@ class PamFingerprintCheck(object):
         try:
             self.__config = Config('/etc/pamfingerprint.conf')
 
-        except Exception, e:
-            logger.error(e.message, exc_info=True)
+        except Exception as e:
+            print '[Exception] ' + e.message
             exit(1)
 
         ## Gets connection values
@@ -69,27 +58,10 @@ class PamFingerprintCheck(object):
             if ( self.__fingerprint.verifyPassword() == False ):
                 raise ValueError('The given fingerprint sensor password is wrong!')
 
-        except:
-            logger.error('The fingerprint sensor could not be initialized!', exc_info=True)
+        except (Exception, ValueError) as e:
+            print '[Error] The fingerprint sensor could not be initialized!'
+            print '[Exception] ' + e.message
             exit(1)
-
-    """
-    "" Returns stored fingerprint hash for a given name.
-    ""
-    "" @param string userName
-    "" @return string
-    """
-    def getFingerprintHash(self, userName):
-
-        fingerprintHash = ''
-
-        try:
-            fingerprintHash = self.__config.readString('Users', userName)
-
-        except ConfigParser.NoOptionError:
-            logger.error('The user "'+ userName +'" does not exist!')
-
-        return fingerprintHash
 
     """
     "" Do a fingerprint check for a given user.
@@ -99,11 +71,12 @@ class PamFingerprintCheck(object):
     """
     def checkUser(self, userName):
 
-        ## Calculates fingerprint hash for a user
-        expectedFingerprintHash = self.getFingerprintHash(userName)
+        ## Tries to get fingerprint hash of user
+        try:
+            expectedFingerprintHash = self.__config.readString('Users', userName)
 
-        ## Checks for invalid hash
-        if ( expectedFingerprintHash == '' ):
+        except ConfigParser.NoOptionError:
+            print '[Error] The user "'+ userName +'" does not exist!'
             return False
         
         ## Tries to check fingerprint
