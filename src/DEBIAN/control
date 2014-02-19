@@ -1,14 +1,16 @@
 Package: pamfingerprint
-Version: 0.7
+Version: 0.8
 Section: admin
 Priority: extra
 Depends: python (>= 2.7), libpam-python, python-serial
 Architecture: all
 Installed-Size: 70
-Maintainer: PM Codeworks <team@pm-codeworks.de>
+Maintainer: Philipp Meisberger <team@pm-codeworks.de>
 Homepage: www.pm-codeworks.de/pamfingerprint.html
-Description: Biometric authentication PAM via UART fingerprint sensor.
+Description: PAM module for passwordless biometric authentication via UART
+ fingerprint sensor.
  pamfingerprint is a Python written Pluggable Authentication Module (PAM) which
  uses libpam-python to work with operating system like a native C module.
  .
- It is recommend to connect the sensor via a default USB TTL converter.
+ The ZFM-20 fingerprint sensor (e.g. sold by Adafruit) and a default USB TTL
+ converter are required.

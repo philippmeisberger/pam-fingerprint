@@ -158,7 +158,7 @@ class PamFingerprint(object):
             ## Creates new template
             self.__fingerprint.createTemplate()
 
-            ## Gets characteristics and hashes them
+            ## Gets characteristics and calculates hash
             characteristics = self.__fingerprint.downloadCharacteristics(0x02)
             fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
             
@@ -195,7 +195,7 @@ class PamFingerprint(object):
     """
     def removeUser(self, userName):
 
-        ## Gets fingerprint hash for a user
+        ## Calculates fingerprint hash for a user
         expectedFingerprintHash = self.getFingerprintHash(userName)             
         
         ## Checks for invalid hash
@@ -215,7 +215,7 @@ class PamFingerprint(object):
             for position in range(self.__fingerprint.getTemplateCount()):
                 self.__fingerprint.loadTemplate(position, 0x01)
 
-                ## Gets characteristics and hashes them
+                ## Gets characteristics and calculates hash
                 characteristics = self.__fingerprint.downloadCharacteristics(0x01)
                 fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
 
