@@ -481,7 +481,8 @@ class PyFingerprintConnection(object):
     """
     def convertImage(self, charBufferNumber = 0x01):
 
-        if ( charBufferNumber != 0x01 and charBufferNumber != 0x02 ):
+        ## PHIL: Changed "and" to "or"
+        if ( charBufferNumber != 0x01 or charBufferNumber != 0x02 ):
             raise ValueError('The given char buffer number is not valid!')
 
         packetPayload = (

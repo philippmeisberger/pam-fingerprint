@@ -225,11 +225,11 @@ class PamFingerprint(object):
 
 if ( __name__ == '__main__' ):
 
-    parser = argparse.ArgumentParser(description = 'pamfingerprint configuration:')
+    parser = argparse.ArgumentParser(description = 'pamfingerprint configuration program:')
     
     parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
-    parser.add_argument('--remove-user', metavar='NAME', help='Removes an user.')
-    parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Print version and exit.')
+    parser.add_argument('--remove-user', metavar='NAME', help='Removes a user.')
+    parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Prints version and exits.')
 
     args = vars(parser.parse_args())
    
