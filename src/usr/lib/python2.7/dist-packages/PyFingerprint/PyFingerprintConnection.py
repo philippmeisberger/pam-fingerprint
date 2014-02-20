@@ -215,10 +215,11 @@ class PyFingerprintConnection(object):
         if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
             return True
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_WRONGPASSWORD ):
+        ## DEBUG: Sensor password is wrong
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_WRONGPASSWORD ):
             return False
 
         else:
@@ -257,7 +258,7 @@ class PyFingerprintConnection(object):
         if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
             return True
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
 
         else:
@@ -296,7 +297,7 @@ class PyFingerprintConnection(object):
         if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
             return True
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
 
         else:
@@ -352,10 +353,10 @@ class PyFingerprintConnection(object):
         if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
             return True
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_INVALIDREGISTER ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_INVALIDREGISTER ):
             raise Exception('Invalid register number')
 
         else:
@@ -364,7 +365,7 @@ class PyFingerprintConnection(object):
     """
     "" Gets all system parameters of the fingerprint sensor.
     ""
-    "" @return
+    "" @return tuple (statusRegister, systemID, storageCapacity, securityLevel, deviceAddress, packetLength, baudRate)
     """
     def getSystemParameters(self):
 
@@ -394,7 +395,7 @@ class PyFingerprintConnection(object):
 
             return (statusRegister, systemID, storageCapacity, securityLevel, deviceAddress, packetLength, baudRate)
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
 
         else:
@@ -428,7 +429,7 @@ class PyFingerprintConnection(object):
             templateCount = templateCount | utilities.leftShift(receivedPacketPayload[2], 0)
             return templateCount
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
 
         else:
@@ -458,20 +459,34 @@ class PyFingerprintConnection(object):
         if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
             return True
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_NOFINGER ):
+        ## DEBUG: No finger found
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_NOFINGER ):
             return False
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_IMAGEERROR ):
-            raise Exception('Imaging error')
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_READIMAGE ):
+            raise Exception('Could not read image')
 
         else:
             raise Exception('Unknown error')
 
-    ## TODO: implement: uploadImage()
-    ## TODO: implement: downloadImage()
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ## TODO: implement uploadImage()
+    ## TODO: implement downloadImage()
 
     """
     "" Converts the image in ImageBuffer to finger characteristics and stores in CharBuffer1 or CharBuffer2.
@@ -502,7 +517,7 @@ class PyFingerprintConnection(object):
         if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
             return True
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
 
         elif ( receivedPacketPayload[0] == FINGERPRINT_MESSYIMAGE ):
@@ -521,7 +536,7 @@ class PyFingerprintConnection(object):
     "" Combines the fingerprint characteristics which are stored in CharBuffer1 and CharBuffer2 to a template.
     "" The created template will be stored again in CharBuffer1 and CharBuffer2 as the same.
     ""
-    "" @return tuple (integer [1 byte])
+    "" @return boolean
     """
     def createTemplate(self):
 
@@ -542,7 +557,7 @@ class PyFingerprintConnection(object):
         if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
             return True
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
 
         ## DEBUG: The images not matching
@@ -557,7 +572,7 @@ class PyFingerprintConnection(object):
     ""
     "" @param integer positionNumber (2 bytes)
     "" @param integer charBufferNumber (1 byte)
-    "" @return tuple (integer [1 byte])
+    "" @return boolean
     """
     def storeTemplate(self, positionNumber, charBufferNumber = 0x01):
 
@@ -587,7 +602,7 @@ class PyFingerprintConnection(object):
         if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
             return True
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
 
         elif ( receivedPacketPayload[0] == FINGERPRINT_BADLOCATION ):
@@ -595,130 +610,6 @@ class PyFingerprintConnection(object):
 
         elif ( receivedPacketPayload[0] == FINGERPRINT_FLASHERROR ):
             raise Exception('Error writing to flash')
-
-        else:
-            raise Exception('Unknown error')
-
-    """
-    "" Loads an existing template specified by position number to specified CharBuffer.
-    ""
-    "" @param integer positionNumber (2 bytes)
-    "" @param integer charBufferNumber (1 byte)
-    "" @return tuple (integer [1 byte])
-    """
-    def loadTemplate(self, positionNumber, charBufferNumber = 0x01):
-
-        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
-            raise ValueError('The given position number is not valid!')
-
-        if ( charBufferNumber != 0x01 and charBufferNumber != 0x02 ):
-            raise ValueError('The given char buffer number is not valid!')
-
-        packetPayload = (
-            FINGERPRINT_LOADTEMPLATE,
-            charBufferNumber,
-            utilities.rightShift(positionNumber, 8),
-            utilities.rightShift(positionNumber, 0),
-        )
-
-        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
-        receivedPacket = self.__readPacket()
-
-        receivedPacketType = receivedPacket[0]
-        receivedPacketPayload = receivedPacket[1]
-
-        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            raise Exception('The received packet is no ack packet!')
-
-        ## DEBUG: Template loaded successful
-        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
-            return True
-
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
-            raise Exception('Communication error')
-
-        elif ( receivedPacketPayload[0] == FINGERPRINT_READERROR ):
-            raise Exception('Template read error')
-
-        elif ( receivedPacketPayload[0] == FINGERPRINT_OUTOFRANGE ):
-            raise Exception('The template position is out of range')
-
-        else:
-            raise Exception('Unknown error')
-
-    """
-    "" Deletes one template from fingerprint database.
-    ""
-    "" @param integer positionNumber (2 bytes)
-    "" @return tuple (integer [1 byte])
-    """
-    def deleteTemplate(self, positionNumber):
-
-        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
-            raise ValueError('The given position number is not valid!')
-
-        ## Deletes only one template
-        count = 0x0001
-
-        packetPayload = (
-            FINGERPRINT_DELETETEMPLATE,
-            utilities.rightShift(positionNumber, 8),
-            utilities.rightShift(positionNumber, 0),
-            utilities.rightShift(count, 8),
-            utilities.rightShift(count, 0),
-        )
-
-        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
-        receivedPacket = self.__readPacket()
-
-        receivedPacketType = receivedPacket[0]
-        receivedPacketPayload = receivedPacket[1]
-
-        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            raise Exception('The received packet is no ack packet!')
-
-        ## DEBUG: Template deleted successful
-        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
-            return True
-
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
-            raise Exception('Communication error')
-
-        elif ( receivedPacketPayload[0] == FINGERPRINT_DELETEERROR ):
-            raise Exception('Could not delete template')
-
-        else:
-            raise Exception('Unknown error')
-
-    """
-    "" Clears the complete template database.
-    ""
-    "" @return tuple (integer [1 byte])
-    """
-    def clearDatabase(self):
-
-        packetPayload = (
-            FINGERPRINT_CLEARDATABASE,
-        )
-
-        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
-        receivedPacket = self.__readPacket()
-
-        receivedPacketType = receivedPacket[0]
-        receivedPacketPayload = receivedPacket[1]
-
-        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
-            raise Exception('The received packet is no ack packet!')
-
-        ## DEBUG: Database cleared successful
-        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
-            return True
-
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
-            raise Exception('Communication error')
-
-        elif ( receivedPacketPayload[0] == FINGERPRINT_CLEARERROR ):
-            raise Exception('Could not clear database')
 
         else:
             raise Exception('Unknown error')
@@ -734,6 +625,7 @@ class PyFingerprintConnection(object):
         charBufferNumber = 0x01
 
         ## Begin search at page 0x0000 for 0x00A3 (means 163) templates
+        ## TODO: end number
         positionStart = 0x0000
         templatesCount = 0x00A3
 
@@ -766,32 +658,144 @@ class PyFingerprintConnection(object):
 
             return (positionNumber, accuracyScore)
 
-        elif ( receivedPacketPayload[0] == FINGERPRINT_COMMUNICATIONERROR ):
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
 
+        ## DEBUG: Did not found template
         elif ( receivedPacketPayload[0] == FINGERPRINT_NOMATCHFOUND ):
             return (-1, -1)
 
         else:
             raise Exception('Unknown error')
 
+    """
+    "" Loads an existing template specified by position number to specified CharBuffer.
+    ""
+    "" @param integer positionNumber (2 bytes)
+    "" @param integer charBufferNumber (1 byte)
+    "" @return boolean
+    """
+    def loadTemplate(self, positionNumber, charBufferNumber = 0x01):
 
+        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
+            raise ValueError('The given position number is not valid!')
 
+        if ( charBufferNumber != 0x01 and charBufferNumber != 0x02 ):
+            raise ValueError('The given char buffer number is not valid!')
 
+        packetPayload = (
+            FINGERPRINT_LOADTEMPLATE,
+            charBufferNumber,
+            utilities.rightShift(positionNumber, 8),
+            utilities.rightShift(positionNumber, 0),
+        )
 
+        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
+        receivedPacket = self.__readPacket()
 
+        receivedPacketType = receivedPacket[0]
+        receivedPacketPayload = receivedPacket[1]
 
+        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
+            raise Exception('The received packet is no ack packet!')
 
+        ## DEBUG: Template loaded successful
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+            return True
 
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
+            raise Exception('Communication error')
 
+        elif ( receivedPacketPayload[0] == FINGERPRINT_READERROR ):
+            raise Exception('Template read error')
 
+        elif ( receivedPacketPayload[0] == FINGERPRINT_OUTOFRANGE ):
+            raise Exception('The template position is out of range')
 
+        else:
+            raise Exception('Unknown error')
 
+    """
+    "" Deletes one template from fingerprint database.
+    ""
+    "" @param integer positionNumber (2 bytes)
+    "" @return boolean
+    """
+    def deleteTemplate(self, positionNumber):
+
+        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
+            raise ValueError('The given position number is not valid!')
+
+        ## Deletes only one template
+        count = 0x0001
+
+        packetPayload = (
+            FINGERPRINT_DELETETEMPLATE,
+            utilities.rightShift(positionNumber, 8),
+            utilities.rightShift(positionNumber, 0),
+            utilities.rightShift(count, 8),
+            utilities.rightShift(count, 0),
+        )
+
+        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
+        receivedPacket = self.__readPacket()
+
+        receivedPacketType = receivedPacket[0]
+        receivedPacketPayload = receivedPacket[1]
+
+        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
+            raise Exception('The received packet is no ack packet!')
+
+        ## DEBUG: Template deleted successful
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+            return True
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
+            raise Exception('Communication error')
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_DELETEERROR ):
+            raise Exception('Could not delete template')
+
+        else:
+            raise Exception('Unknown error')
+
+    """
+    "" Clears the complete template database.
+    ""
+    "" @return boolean
+    """
+    def clearDatabase(self):
+
+        packetPayload = (
+            FINGERPRINT_CLEARDATABASE,
+        )
+
+        self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
+        receivedPacket = self.__readPacket()
+
+        receivedPacketType = receivedPacket[0]
+        receivedPacketPayload = receivedPacket[1]
+
+        if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
+            raise Exception('The received packet is no ack packet!')
+
+        ## DEBUG: Database cleared successful
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+            return True
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
+            raise Exception('Communication error')
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_CLEARDATABASE ):
+            return False
+
+        else:
+            raise Exception('Unknown error')
 
     """
     "" Compares the finger characteristics of CharBuffer1 with CharBuffer2 and returns the accuracy score.
     ""
-    "" @return tuple (integer [3 bytes])
+    "" @return integer
     """
     def compareCharacteristics(self):
 
@@ -808,7 +812,20 @@ class PyFingerprintConnection(object):
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
             raise Exception('The received packet is no ack packet!')
 
-        return receivedPacketPayload
+        ## DEBUG: Comparation successful
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+            accuracyScore = utilities.leftShift(receivedPacketPayload[1], 8)
+            accuracyScore = accuracyScore | utilities.leftShift(receivedPacketPayload[2], 0)
+            return accuracyScore
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
+            raise Exception('Communication error')
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_NOTMATCHING ):
+            return -1
+
+        else:
+            raise Exception('Unknown error')
 
     ## TODO: implement: uploadCharacteristics()
 
@@ -816,7 +833,7 @@ class PyFingerprintConnection(object):
     "" Downloads the finger characteristics of CharBuffer1 or CharBuffer2.
     ""
     "" @param integer charBufferNumber (1 byte)
-    "" @return tuple (integer [3 bytes])
+    "" @return list<integer (1 byte)> (512 bytes)
     """
     def downloadCharacteristics(self, charBufferNumber = 0x01):
 
@@ -839,9 +856,20 @@ class PyFingerprintConnection(object):
         if ( receivedPacketType != FINGERPRINT_ACKPACKET ):
             raise Exception('The received packet is no ack packet!')
 
-        completePacketData = [
-            receivedPacketPayload[0],
-        ]
+        ## DEBUG: The sensor will sent follow-up packets
+        if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+            pass
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
+            raise Exception('Communication error')
+
+        elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_DOWNLOADCHARACTERISTICS ):
+            raise Exception('Could not download characteristics')
+
+        else:
+            raise Exception('Unknown error')
+
+        completePacketData = []
 
         ## Gets follow-up data packets until the last data packet is received
         while ( receivedPacketType != FINGERPRINT_ENDDATAPACKET ):
@@ -858,10 +886,6 @@ class PyFingerprintConnection(object):
                 completePacketData.append(receivedPacketPayload[i])
 
         return completePacketData[1:]
-
-
-
-
 
 ## Tests
 ##
