@@ -88,25 +88,33 @@ class PamFingerprintCheck(object):
     
             self.__fingerprint.convertImage(0x01)
 
-            ## Gets position of template
+            ## Gets position and accuracy score of template
             result = self.__fingerprint.searchTemplate()
             positionNumber = result[0]
+            accuracyScore = result[1]
 
             ## Invalid position
             if ( positionNumber == -1 ):
                 raise Exception('No match found!')
+            else:
+                print 'Match found with accuracy score: '+ str(accuracyScore)
 
             self.__fingerprint.loadTemplate(positionNumber, 0x01)
             characterics = self.__fingerprint.downloadCharacteristics(0x01)
 
             ## Calculates hash of template
+            print 'Calculating hash...'
             fingerprintHash = hashlib.sha256(str(characterics)).hexdigest()
         
+            print 'Checking if calculated hash matches stored hash...'
+
             ## Checks if read hash matches stored hash
             if ( fingerprintHash == expectedFingerprintHash ):
+                print 'Hashes match!'
                 print 'Check for user "'+ userName +'" was successful!'
             else:
-                raise Exception('The found match is not assigned to user!')
+                print 'Hashes do not match!'
+                raise Exception('The found template is not assigned to user!')
             
         except Exception as e:
             print '[Error] Check for user "'+ userName +'" failed!'
@@ -118,10 +126,10 @@ class PamFingerprintCheck(object):
 
 if ( __name__ == '__main__' ):
 
-    parser = argparse.ArgumentParser(description = 'pamfingerprint configuration check:')
+    parser = argparse.ArgumentParser(description = 'pamfingerprint simulation program:')
 
     parser.add_argument('--check-user', metavar='NAME', help='Checks fingerprint for an existing user.')
-    parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Print version and exit.')
+    parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Prints version and exits.')
 
     args = vars(parser.parse_args())
         
