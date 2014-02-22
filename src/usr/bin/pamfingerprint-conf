@@ -140,9 +140,8 @@ class PamFingerprint(object):
             ## Creates new template
             self.__fingerprint.createTemplate()
             
-            ## Gets new position number for template
+            ## Gets new position number for template (the counting starts at 0, so we do not need to increment)
             positionNumber = self.__fingerprint.getTemplateCount()
-            positionNumber = positionNumber + 1
             
             ## Stores new template
             self.__fingerprint.storeTemplate(positionNumber)

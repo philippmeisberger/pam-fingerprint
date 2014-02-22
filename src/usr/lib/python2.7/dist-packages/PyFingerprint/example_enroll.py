@@ -53,9 +53,8 @@ try:
     ## Compares the char buffers and creates a template
     f.createTemplate()
 
-    ## Gets new position number
+    ## Gets new position number (the counting starts at 0, so we do not need to increment)
     positionNumber = f.getTemplateCount()
-    positionNumber = positionNumber + 1
 
     ## Saves template at new position number
     if ( f.storeTemplate(positionNumber) == True ):

@@ -439,6 +439,8 @@ class PyFingerprint(object):
 
         ## DEBUG: Read index table successfully
         if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
+
+
             ## TODO: Parse data
             return receivedPacketPayload[1:]
 
