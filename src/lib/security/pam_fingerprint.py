@@ -12,8 +12,7 @@ sys.path.append('/usr/lib')
 from pamfingerprint.version import VERSION
 from pamfingerprint.Config import *
 
-## TODO: Change PyFingerprintConnection to PyFingerprint
-from PyFingerprint.PyFingerprintConnection import *
+from PyFingerprint.PyFingerprint import *
 
 import hashlib
 import logging
@@ -81,8 +80,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     ## Tries to init PyFingerprint
     try:
-        ## TODO: Change PyFingerprintConnection to PyFingerprint
-        fingerprint = PyFingerprintConnection(port, baudRate, address, password)
+        fingerprint = PyFingerprint(port, baudRate, address, password)
 
         if ( fingerprint.verifyPassword() == False ):
             raise ValueError('The given fingerprint sensor password is wrong!')

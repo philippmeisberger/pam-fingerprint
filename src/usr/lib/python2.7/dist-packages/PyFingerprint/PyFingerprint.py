@@ -1,20 +1,19 @@
 """
-"" PyFingerprint
-"" A python written library for the ZhianTec ZFM-20 fingerprint sensor.
-"" This cheap sensor is better known as the "Arduino fingerprint sensor".
-""
-"" IMPORTANT: PySerial is required to use this library!
-"" On Debian for example you can install it with apt-get or aptitude as root:
-"" ~# apt-get install python-serial
-""
-"" This library is inspired by the C++ library from Adafruit Industries:
-"" https://github.com/adafruit/Adafruit-Fingerprint-Sensor-Library
-""
-"" @author Bastian Raschke <bastian.raschke@posteo.de>
-"" @copyright 2014 Bastian Raschke
-"" @license LGPL
-"" @link https://www.sicherheitskritisch.de
-""
+PyFingerprint
+A python written library for the ZhianTec ZFM-20 fingerprint sensor.
+This cheap sensor is better known as the "Arduino fingerprint sensor".
+
+IMPORTANT: PySerial is required to use this library!
+On Debian for example you can install it with apt-get or aptitude as root:
+~# apt-get install python-serial
+
+This library is inspired by the C++ library from Adafruit Industries:
+https://github.com/adafruit/Adafruit-Fingerprint-Sensor-Library
+
+@author Bastian Raschke <bastian.raschke@posteo.de>
+@copyright 2014 Bastian Raschke
+@license LGPL
+@link https://www.sicherheitskritisch.de
 """
 
 import serial
@@ -27,31 +26,32 @@ import includes.utilities as utilities
 class PyFingerprint(object):
 
     """
-    "" Address to connect to sensor
-    "" @var integer __address (32 bit)
+    Address to connect to sensor
+    @var integer __address (32 bit)
     """
     __address = None
 
     """
-    "" Password to connect to sensor
-    "" @var integer __password (32 bit)
+    Password to connect to sensor
+    @var integer __password (32 bit)
     """
     __password = None
 
     """
-    "" UART serial connection via PySerial
-    "" @var Serial __serial
+    UART serial connection via PySerial
+    @var Serial __serial
     """
     __serial = None
 
     """
-    "" Constructor
-    ""
-    "" @param string port
-    "" @param integer baudRate
-    "" @param integer<4 bytes> address
-    "" @param integer<4 bytes> password
-    "" @return void
+    Constructor
+
+    :param string port
+    @param integer baudRate
+    @param integer<4 bytes> address
+    @param integer<4 bytes> password
+  
+    @return void
     """
     def __init__(self, port = '/dev/ttyUSB0', baudRate = 57600, address = 0xFFFFFFFF, password = 0x00000000):
 
@@ -131,7 +131,7 @@ class PyFingerprint(object):
     """
     "" Receives a packet from fingerprint sensor.
     ""
-    "" @return tuple (integer<1 byte> packetType, integer<n bytes> packetPayload)
+    "" @return tuple (integer<1 byte> packetType, integer<N bytes> packetPayload)
     """
     def __readPacket(self):
 

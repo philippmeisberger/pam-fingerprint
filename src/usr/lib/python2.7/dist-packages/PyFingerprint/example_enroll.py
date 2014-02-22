@@ -35,7 +35,7 @@ try:
     result = f.searchTemplate()
     positionNumber = result[0]
 
-    if ( positionNumber > 0 ):
+    if ( positionNumber >= 0 ):
         print 'Template already exists at position #' + str(positionNumber)
         exit(0)
 
