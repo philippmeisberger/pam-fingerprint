@@ -107,7 +107,7 @@ class PamFingerprintCheck(object):
             
             ## Checks if read hash matches stored hash
             if ( fingerprintHash == expectedFingerprintHash ):
-                print 'Hash matching!'
+                print 'Hashes match!'
                 print 'Check for user "' + userName + '" was successful!'
             else:
                 print 'Hashes do not match!'

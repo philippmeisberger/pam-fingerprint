@@ -147,14 +147,25 @@ class Config(object):
         return int(self.readString(section, name), 16)
 
     """
-    "" Checks if a section exists.
+    "" Checks if a given section exists.
     ""
+    "" @param string section
+    "" @return boolean
+    """
+    def sectionExists(self, section):
+
+        return self.__configParser.has_section(section)
+
+    """
+    "" Checks if an item in a given section exists.
+    ""
+    "" @param string section
     "" @param string name
     "" @return boolean
     """
-    def sectionExists(self, name):
-    
-        return (name in self.__configParser)
+    def itemExists(self, section, name):
+
+        return self.__configParser.has_option(section, name)
 
     """
     "" Returns all sections as an array.
