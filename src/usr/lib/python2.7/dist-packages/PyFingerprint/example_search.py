@@ -34,12 +34,12 @@ try:
     positionNumber = result[0]
     accuracyScore = result[1]
 
-    if ( positionNumber > 0 ):
-        print 'Found template #' + str(positionNumber)
-        print 'The accuracy score is: ' + str(accuracyScore)
-    else:
+    if ( positionNumber == -1 ):
         print 'No match found!'
         exit(0)
+    else:
+        print 'Found template #' + str(positionNumber)
+        print 'The accuracy score is: ' + str(accuracyScore)
 
     ## Loads the found template to char buffer 1
     f.loadTemplate(positionNumber, 0x01)
@@ -48,7 +48,7 @@ try:
     characterics = f.downloadCharacteristics(0x01)
 
     ## Hashes characteristics of template
-    print 'SHA2 hash: ' + hashlib.sha256(str(characterics)).hexdigest()
+    print 'SHA2 hash of template: ' + hashlib.sha256(str(characterics)).hexdigest()
 
 except Exception as e:
     print 'Fingerprint read failed!'
