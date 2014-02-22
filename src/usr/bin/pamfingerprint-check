@@ -59,8 +59,7 @@ class PamFingerprintCheck(object):
                 raise ValueError('The given fingerprint sensor password is wrong!')
 
         except (Exception, ValueError) as e:
-            print '[Error] The fingerprint sensor could not be initialized!'
-            print '[Exception] ' + e.message
+            print '[Error] The fingerprint sensor could not be initialized: ' + e.message
             exit(1)
 
     """
@@ -76,7 +75,7 @@ class PamFingerprintCheck(object):
             expectedFingerprintHash = self.__config.readString('Users', userName)
 
         except ConfigParser.NoOptionError:
-            print '[Error] The user "'+ userName +'" does not exist!'
+            print '[Error] The user "' + userName + '" does not exist!'
             return False
         
         ## Tries to check fingerprint
@@ -107,7 +106,7 @@ class PamFingerprintCheck(object):
             fingerprintHash = hashlib.sha256(str(characterics)).hexdigest()
         
             print 'Checking if calculated hash matches stored hash...'
-
+            
             ## Checks if read hash matches stored hash
             if ( fingerprintHash == expectedFingerprintHash ):
                 print 'Hashes match!'
@@ -117,8 +116,7 @@ class PamFingerprintCheck(object):
                 raise Exception('The found template is not assigned to user!')
             
         except Exception as e:
-            print '[Error] Check for user "'+ userName +'" failed!'
-            print '[Exception] '+ e.message
+            print '[Error] Check for user "' + userName + '" failed: ' + e.message
             return False
 
         return True
