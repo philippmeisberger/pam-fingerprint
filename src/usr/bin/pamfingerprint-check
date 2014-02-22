@@ -57,7 +57,7 @@ class PamFingerprintCheck(object):
                 raise ValueError('The given fingerprint sensor password is wrong!')
 
         except (Exception, ValueError) as e:
-            print '[Error] The fingerprint sensor could not be initialized: ' + e.message
+            print '[Exception] The fingerprint sensor could not be initialized: ' + e.message
             exit(1)
 
     """
@@ -108,13 +108,13 @@ class PamFingerprintCheck(object):
             ## Checks if read hash matches stored hash
             if ( fingerprintHash == expectedFingerprintHash ):
                 print 'Hash matching!'
-                print 'Check for user "'+ userName +'" was successful!'
+                print 'Check for user "' + userName + '" was successful!'
             else:
                 print 'Hashes do not match!'
                 raise Exception('The found template is not assigned to user!')
             
         except Exception as e:
-            print '[Error] Check for user "' + userName + '" failed: ' + e.message
+            print '[Exception] Check for user "' + userName + '" failed: ' + e.message
             return False
 
         return True
@@ -125,7 +125,7 @@ if ( __name__ == '__main__' ):
     parser = argparse.ArgumentParser(description = 'pamfingerprint simulation program:')
 
     parser.add_argument('--check-user', metavar='NAME', help='Checks fingerprint for an existing user.')
-    parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Prints version and exits.')
+    parser.add_argument('--version', '-v', action='version', version='pamfingerprint ' + VERSION, help='Prints version and exits.')
 
     args = vars(parser.parse_args())
         

@@ -76,7 +76,7 @@ class PamFingerprint(object):
     """
     def __showConfirmationDialog(self, question = ''):
 
-        answer = raw_input(question +' (Y/n)')
+        answer = raw_input(question + ' (Y/n)')
 
         if ( answer not in ['y', 'Y', ''] ):
             return False
@@ -161,7 +161,7 @@ class PamFingerprint(object):
                 raise Exception('The configuration could not be written!')
 
         except (Exception, ValueError) as e:
-            print '[Error] Error while adding user "' + userName + '": ' + e.message
+            print '[Exception] Error while adding user "' + userName + '": ' + e.message
             return False
 
         return True
@@ -223,7 +223,7 @@ class PamFingerprint(object):
                 raise Exception('Template could not be found!')
             
         except (Exception, ValueError) as e:
-            print '[Error] Error while removing user "' + userName + '": ' + e.message
+            print '[Exception] Error while removing user "' + userName + '": ' + e.message
             return False
 
         return True
