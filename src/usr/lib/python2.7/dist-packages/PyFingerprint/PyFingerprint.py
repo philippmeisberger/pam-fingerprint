@@ -415,17 +415,17 @@ class PyFingerprint(object):
     """
     "" Gets the index of stored templates.
     ""
-    "" @param integer<1 byte> tablePage
-    "" @return integer<32 bytes>
+    "" @param integer<1 byte> page
+    "" @return list
     """
-    def getTemplateIndex(self, tablePage):
+    def getTemplateIndex(self, page):
 
-        if ( tablePage < 0 or tablePage > 3 ):
+        if ( page < 0 or page > 3 ):
             raise ValueError('The given table page is not valid!')
 
         packetPayload = (
             FINGERPRINT_TEMPLATEINDEX,
-            tablePage,
+            page,
         )
 
         self.__writePacket(FINGERPRINT_COMMANDPACKET, packetPayload)
@@ -440,9 +440,18 @@ class PyFingerprint(object):
         ## DEBUG: Read index table successfully
         if ( receivedPacketPayload[0] == FINGERPRINT_OK ):
 
+            tablePageIndex = []
 
-            ## TODO: Parse data
-            return receivedPacketPayload[1:]
+            ## Contains the table page bytes (skips the first status byte)
+            tablePageElements = receivedPacketPayload[1:]
+
+            for tablePageElement in tablePageElements:
+                ## Tests every bit (bit = template position is used indicator) of a table page element
+                for p in range(0, 7 + 1):
+                    positionIsUsed = (utilities.bitAtPosition(tablePageElement, p) == 1)
+                    tablePageIndex.append(positionIsUsed)
+
+            return tablePageIndex
 
         elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_COMMUNICATION ):
             raise Exception('Communication error')
@@ -744,7 +753,7 @@ class PyFingerprint(object):
             raise Exception('The template could not be read')
 
         elif ( receivedPacketPayload[0] == FINGERPRINT_ERROR_INVALIDPOSITION ):
-            raise Exception('Could not load template in that position')
+            raise Exception('Could not load template from that position')
 
         else:
             raise Exception('Unknown error')

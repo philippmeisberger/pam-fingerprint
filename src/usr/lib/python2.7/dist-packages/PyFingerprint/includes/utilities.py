@@ -11,24 +11,41 @@ import struct
 """
 "" Shifts a byte.
 ""
-"" @param byte byte (n byte)
+"" @param integer n
 "" @param integer x
-"" @return byte
+"" @return integer
 """
-def rightShift(byte, x):
+def rightShift(n, x):
 
-    return (byte >> x & 0xFF)
+    return (n >> x & 0xFF)
 
 """
 "" Shifts a byte.
 ""
-"" @param byte byte (n byte)
+"" @param integer n
 "" @param integer x
-"" @return byte
+"" @return integer
 """
-def leftShift(byte, x):
+def leftShift(n, x):
 
-    return (byte << x)
+    return (n << x)
+
+"""
+"" Gets the bit at place p of number n.
+""
+"" @param integer n
+"" @param integer p
+"" @return integer
+"""
+def bitAtPosition(n, p):
+
+    ## A bitshift 2 ^ p
+    twoP = 1 << p
+
+    ## Binary AND composition (on both position must be a 1)
+    ## This can only happen at position p
+    result = n & twoP
+    return int(result > 0)
 
 """
 "" Converts a byte to string.

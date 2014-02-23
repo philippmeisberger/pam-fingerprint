@@ -25,9 +25,12 @@ try:
     tablePage = raw_input('Please enter the table page (0, 1, 2, 3) you want to see: ')
     tablePage = int(tablePage)
 
-    print f.getTemplateIndex(tablePage)
+    tableIndex = f.getTemplateIndex(tablePage)
+
+    for i in range(0, len(tableIndex)):
+        print 'Template at position #' + str(i) + ' is used: ' + str(tableIndex[i])
 
 except Exception as e:
-    print 'Delete template failed!'
+    print 'Read out table index failed!'
     print 'Exception: ' + e.message
     exit(1)
