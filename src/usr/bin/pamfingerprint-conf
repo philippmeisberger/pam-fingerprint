@@ -116,14 +116,16 @@ class PamFingerprint(object):
 
         ## Tries to create new template for user
         try:
-            ## TODO: Write better method!
+            ## Gets a boolean list for templates 0-255 indicating the valid status
+            templates = self.__fingerprint.getTemplateIndex(0)
+            
             ## Tries to find free position for storing template
-            for position in range(self.__fingerprint.getTemplateCount() + 1):                
-                try:
-                    self.__fingerprint.loadTemplate(position, 0x01)
-                    
-                except Exception:
-                    freePositionNumber = position
+            for i in range(len(templates)):
+                if ( templates[i] == False ):
+                    freePositionNumber = i
+
+            if ( freePositionNumber != None ):
+                raise ValueError('Could not find a free position for storing template!')
             
             print 'Waiting for finger...'
 
