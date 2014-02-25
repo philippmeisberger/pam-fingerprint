@@ -90,7 +90,7 @@ class PamFingerprint(object):
     """
     def templateCount(self):
 
-        print 'Current template count: ' + str(self.__fingerprint.getTemplateCount())
+        print 'Current number of stored templates: ' + str(self.__fingerprint.getTemplateCount())
 
     """
     "" Enrolls new fingerprint template and adds user to pamfingerprint.
@@ -106,11 +106,11 @@ class PamFingerprint(object):
             return False
 
         if ( self.__config.itemExists('Users', userName) ):
-            print '[Error] User "' + userName + '" already exists!'
+            print '[Error] The user "' + userName + '" already exists!'
             return False
         
         ## Confirmation dialog
-        if ( self.__showConfirmationDialog('Add user "' + userName + '"?') == False ):
+        if ( self.__showConfirmationDialog('Are you sure you want to add the user "' + userName + '"?') == False ):
             print 'Adding user canceled.'
             return False
 
@@ -137,7 +137,7 @@ class PamFingerprint(object):
             positionNumber = result[0]
 
             if ( positionNumber >= 0 ):
-                print '[Error] Template already exists at position ' + str(positionNumber) + '!'
+                print '[Error] The finger already exists at template position #' + str(positionNumber) + '!'
                 return False
     
             print 'Remove finger...'
@@ -158,7 +158,7 @@ class PamFingerprint(object):
             
             ## Stores new template on free position
             self.__fingerprint.storeTemplate(freePositionNumber)
-            print 'Stored new template on position: '+ str(freePositionNumber)
+            print 'Stored new template on position #' + str(freePositionNumber)
 
             ## Gets characteristics and calculates hash
             self.__fingerprint.loadTemplate(freePositionNumber, 0x01)
@@ -201,7 +201,7 @@ class PamFingerprint(object):
             return False
 
         ## Confirmation dialog
-        if ( self.__showConfirmationDialog('Remove user "' + userName + '"?') == False ):
+        if ( self.__showConfirmationDialog('Are you sure you want to remove the user "' + userName + '"?') == False ):
             print 'Removing user canceled.'
             return False
             

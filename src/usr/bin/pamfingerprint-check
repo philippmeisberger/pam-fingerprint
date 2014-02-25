@@ -94,7 +94,7 @@ class PamFingerprintCheck(object):
             if ( positionNumber == -1 ):
                 raise Exception('No match found!')
             else:
-                print 'Match found with accuracy score: ' + str(accuracyScore)
+                print 'A match was found on template position #' + str(positionNumber) + ' with accuracy score: ' + str(accuracyScore)
 
             self.__fingerprint.loadTemplate(positionNumber, 0x01)
             characterics = self.__fingerprint.downloadCharacteristics(0x01)
@@ -106,13 +106,12 @@ class PamFingerprintCheck(object):
             print 'Checking if calculated hash matches stored hash...'
             
             ## Checks if read hash matches stored hash
-            if ( fingerprintHash == expectedFingerprintHash ):
-                print 'Hashes match!'
-                print 'Check for user "' + userName + '" was successful!'
-            else:
-                print 'Hashes do not match!'
-                raise Exception('The found template is not assigned to user!')
-            
+            if ( fingerprintHash != expectedFingerprintHash ):
+                raise Exception('The found template is not assigned to user (the hash does not match)!')
+
+            print 'Hash matches!'
+            print 'Check for user "' + userName + '" was successful!'
+
         except Exception as e:
             print '[Exception] Check for user "' + userName + '" failed: ' + e.message
             return False

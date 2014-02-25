@@ -1,5 +1,6 @@
 """
 PyFingerprint
+
 A python written library for the ZhianTec ZFM-20 fingerprint sensor.
 This cheap sensor is better known as the "Arduino fingerprint sensor".
 
@@ -11,7 +12,7 @@ This library is inspired by the C++ library from Adafruit Industries:
 https://github.com/adafruit/Adafruit-Fingerprint-Sensor-Library
 
 @author Bastian Raschke <bastian.raschke@posteo.de>
-@copyright 2014 Bastian Raschke
+@copyright 2014, Bastian Raschke
 @license LGPL
 @link https://www.sicherheitskritisch.de
 """
@@ -48,8 +49,8 @@ class PyFingerprint(object):
 
     :param string port
     @param integer baudRate
-    @param integer<4 bytes> address
-    @param integer<4 bytes> password
+    @param integer(4 bytes) address
+    @param integer(4 bytes) password
   
     @return void
     """
