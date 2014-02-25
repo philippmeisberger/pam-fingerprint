@@ -27,27 +27,27 @@ import includes.utilities as utilities
 class PyFingerprint(object):
 
     """
-    Address to connect to sensor
-    @var integer __address (32 bit)
+    Address to connect to sensor.
+    @var integer(4 bytes)
     """
     __address = None
 
     """
-    Password to connect to sensor
-    @var integer __password (32 bit)
+    Password to connect to sensor.
+    @var integer(4 bytes)
     """
     __password = None
 
     """
-    UART serial connection via PySerial
-    @var Serial __serial
+    UART serial connection via PySerial.
+    @var Serial
     """
     __serial = None
 
     """
     Constructor
 
-    :param string port
+    @param string port
     @param integer baudRate
     @param integer(4 bytes) address
     @param integer(4 bytes) password
