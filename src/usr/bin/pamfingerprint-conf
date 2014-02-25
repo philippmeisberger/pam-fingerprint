@@ -88,9 +88,11 @@ class PamFingerprint(object):
     ""
     "" @return void
     """
+    """
     def templateCount(self):
 
         print 'Current number of stored templates: ' + str(self.__fingerprint.getTemplateCount())
+    """
 
     """
     "" Enrolls new fingerprint template and adds user to pamfingerprint.
@@ -116,24 +118,26 @@ class PamFingerprint(object):
 
         ## Tries to create new template for user
         try:
+            freePositionNumber = -1
+
             ## Gets a boolean list for templates 0-255 indicating the valid status
             templates = self.__fingerprint.getTemplateIndex(0)
-            
+
             ## Tries to find free position for storing template
             for i in range(len(templates)):
                 if ( templates[i] == False ):
                     freePositionNumber = i
 
-            if ( freePositionNumber != None ):
+            if ( freePositionNumber != -1 ):
                 raise ValueError('Could not find a free position for storing template!')
-            
+
             print 'Waiting for finger...'
 
             while ( self.__fingerprint.readImage() == False ):
                 pass
 
             self.__fingerprint.convertImage(0x01)
-            
+
             ## Checks if template of read finger already exist
             result = self.__fingerprint.searchTemplate()
             positionNumber = result[0]
@@ -154,19 +158,17 @@ class PamFingerprint(object):
 
             ## Creates new template
             self.__fingerprint.createTemplate()
-            
-            ## Gets new position number for template (the counting starts at 0, so we do not need to increment)
-            #positionNumber = self.__fingerprint.getTemplateCount()
-            
+
             ## Stores new template on free position
             self.__fingerprint.storeTemplate(freePositionNumber)
-            print 'Stored new template on position #' + str(freePositionNumber)
+            ## print 'Stored new template on position #' + str(freePositionNumber)
 
             ## Gets characteristics and calculates hash
             self.__fingerprint.loadTemplate(freePositionNumber, 0x01)
             characteristics = self.__fingerprint.downloadCharacteristics(0x01)
+
             fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
-            
+
             ## Appends data to config
             self.__config.writeString('Users', userName, fingerprintHash)
 
@@ -193,7 +195,7 @@ class PamFingerprint(object):
         if ( os.geteuid() != 0 ):
             print '[Error] You need to have root privileges to add a user!'
             return False
-        
+
         ## Tries to get fingerprint hash of user
         try:
             expectedFingerprintHash = self.__config.readString('Users', userName)
@@ -206,12 +208,12 @@ class PamFingerprint(object):
         if ( self.__showConfirmationDialog('Are you sure you want to remove the user "' + userName + '"?') == False ):
             print 'Removing user canceled.'
             return False
-            
+
         ## Tries to delete template
         try:
             found = False
             templateCount = self.__fingerprint.getTemplateCount()
-            
+
             ## Searches for template hash matches stored hash
             for positionNumber in range(0, templateCount + 1):
 
@@ -220,7 +222,7 @@ class PamFingerprint(object):
                     self.__fingerprint.loadTemplate(positionNumber, 0x01)
                     characteristics = self.__fingerprint.downloadCharacteristics(0x01)
                     fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
-                
+
                     ## Checks if template hash matches saved hash
                     if ( fingerprintHash == expectedFingerprintHash ):
                         self.__fingerprint.deleteTemplate(positionNumber)
@@ -228,9 +230,9 @@ class PamFingerprint(object):
                         print 'There are actual ' + str(templateCount - 1) +' templates stored on sensor.'
                         found = True
                         break
-                        
+
                 except Exception as e:
-                    print '[Exception] ' + e.message + ' (Position: ' + str(positionNumber) + ')'
+                    print '[Exception] ' + e.message + ' (Position #' + str(positionNumber) + ')'
 
             ## Checks if template was found
             if ( found == True ):
@@ -240,10 +242,10 @@ class PamFingerprint(object):
                     print 'The user "' + userName + '" has been removed successfully!'
                 else:
                     raise Exception('The configuration file could not be written!')
-                
+
             else:
                 raise Exception('Template could not be found!')
-            
+
         except (Exception, ValueError) as e:
             print '[Exception] Error while removing user "' + userName + '": ' + e.message
             return False
@@ -254,13 +256,13 @@ class PamFingerprint(object):
 if ( __name__ == '__main__' ):
 
     parser = argparse.ArgumentParser(description = 'pamfingerprint configuration program:')
-    
+
     parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
     parser.add_argument('--remove-user', metavar='NAME', help='Removes a user.')
     parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Prints version and exits.')
 
     args = vars(parser.parse_args())
-   
+
     if ( args['add_user'] ):
         PamFingerprint().addUser(args['add_user'])
     elif ( args['remove_user'] ):

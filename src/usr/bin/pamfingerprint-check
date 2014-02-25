@@ -21,7 +21,7 @@ import hashlib
 
 
 class PamFingerprintCheck(object):
-    
+
     """
     "" The PyFingerprint instance
     "" @var PyFingerprint __fingerprint
@@ -75,14 +75,14 @@ class PamFingerprintCheck(object):
         except ConfigParser.NoOptionError:
             print '[Error] The user "' + userName + '" does not exist!'
             return False
-        
+
         ## Tries to check fingerprint
         try:
             print 'Waiting for finger...'
 
             while ( self.__fingerprint.readImage() == False ):
                 pass
-    
+
             self.__fingerprint.convertImage(0x01)
 
             ## Gets position and accuracy score of template
@@ -102,9 +102,9 @@ class PamFingerprintCheck(object):
             ## Calculates hash of template
             print 'Calculating hash...'
             fingerprintHash = hashlib.sha256(str(characterics)).hexdigest()
-        
+
             print 'Checking if calculated hash matches stored hash...'
-            
+
             ## Checks if read hash matches stored hash
             if ( fingerprintHash != expectedFingerprintHash ):
                 raise Exception('The found template is not assigned to user (the hash does not match)!')
