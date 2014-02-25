@@ -127,8 +127,9 @@ class PamFingerprint(object):
             for i in range(len(templates)):
                 if ( templates[i] == False ):
                     freePositionNumber = i
+                    break
 
-            if ( freePositionNumber != -1 ):
+            if ( freePositionNumber == -1 ):
                 raise ValueError('Could not find a free position for storing template!')
 
             print 'Waiting for finger...'
