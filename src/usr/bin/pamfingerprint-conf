@@ -84,17 +84,6 @@ class PamFingerprint(object):
             return True
 
     """
-    "" Prints current template count.
-    ""
-    "" @return void
-    """
-    """
-    def templateCount(self):
-
-        print 'Current number of stored templates: ' + str(self.__fingerprint.getTemplateCount())
-    """
-
-    """
     "" Enrolls new fingerprint template and adds user to pamfingerprint.
     ""
     "" @param string userName
@@ -107,10 +96,11 @@ class PamFingerprint(object):
             print '[Error] You need to have root privileges to add a user!'
             return False
 
-        if ( self.__config.itemExists('Users', userName) ):
-            print '[Error] The user "' + userName + '" already exists!'
+        ## Checks if the the user is not already added
+        if ( self.__config.itemExists('Users', userName) == True ):
+            print '[Error] The user "' + userName + '" is already added!'
             return False
-        
+
         ## Confirmation dialog
         if ( self.__showConfirmationDialog('Are you sure you want to add the user "' + userName + '"?') == False ):
             print 'Adding user canceled.'
@@ -120,7 +110,7 @@ class PamFingerprint(object):
         try:
             freePositionNumber = -1
 
-            ## Gets a boolean list for templates 0-255 indicating the valid status
+            ## Gets a boolean list for templates 0-255 indicating the used status
             templates = self.__fingerprint.getTemplateIndex(0)
 
             ## Tries to find free position for storing template
@@ -169,12 +159,13 @@ class PamFingerprint(object):
             characteristics = self.__fingerprint.downloadCharacteristics(0x01)
             fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
 
-            ## Builds user data tuple (position, hash)
-            userData = []
-            userData.append(str(freePositionNumber))
-            userData.append(fingerprintHash)
+            ## The new user information list
+            userData = (
+                str(freePositionNumber),
+                fingerprintHash,
+            )
 
-            ## Appends user data to config
+            ## Adds user to configuration file
             self.__config.writeList('Users', userName, userData)
 
             if ( self.__config.save() == True ):
@@ -201,22 +192,22 @@ class PamFingerprint(object):
             print '[Error] You need to have root privileges to add a user!'
             return False
 
-        ## Tries to get position and fingerprint hash of user
+        ## Checks if the the user was already added
+        if ( self.__config.itemExists('Users', userName) == False ):
+            print '[Error] The user "' + userName + '" was not added!'
+            return False
+
+        ## Tries to get user information (template position, fingerprint hash)
         try:
-            ## Checks if user exists
-            if ( self.__config.itemExists('Users', userName) ):
+            userData = self.__config.readList('Users', userName)
 
-                ## Gets user authentication tuple (position, hash)
-                userData = self.__config.readList('Users', userName)
+            ## Validates user information
+            if ( len(userData) != 2 ):
+                raise ValueError('The user information of "' + userName + '" is invalid!')
 
-                if ( len(userData) != 2 ):
-                    raise ValueError('Invalid tuple: Missing position or hash!')
-                    
-                positionNumber = userData[0]
-                expectedFingerprintHash = userData[1]
-            else:
-                raise ValueError('The user "' + userName + '" does not exist!')
-            
+            positionNumber = userData[0]
+            expectedFingerprintHash = userData[1]
+
         except ValueError as e:
             print '[Exception] ' + e.message
             return False
@@ -228,24 +219,22 @@ class PamFingerprint(object):
 
         ## Tries to delete template
         try:
-            ## Counts all templates
-            templateCount = self.__fingerprint.getTemplateCount()
-
-            ## Gets characteristics and calculates hash
+            ## Gets characteristics
             self.__fingerprint.loadTemplate(positionNumber, 0x01)
             characteristics = self.__fingerprint.downloadCharacteristics(0x01)
+
+            ## Calculates hash of template
             fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
 
-            ## Checks if template hash matches saved hash
+            ## Checks if template hash matches stored hash
             if ( fingerprintHash == expectedFingerprintHash ):
                 self.__fingerprint.deleteTemplate(positionNumber)
-                print 'Removed template on position: ' + str(positionNumber)
-                print 'There are actual ' + str(templateCount - 1) +' templates stored on sensor.'
+                print 'Removed template on position #' + str(positionNumber) + '.'
             else:
-                raise Exception('Template could not be found!')
+                raise Exception('The template could not be found!')
 
-            ## Remove entries from configuration file
-            if ( ( self.__config.remove('Users', userName) == True ) and ( self.__config.save() == True ) ):
+            ## Removes entries from configuration file
+            if ( self.__config.remove('Users', userName) == True and self.__config.save() == True ):
                 print 'The user "' + userName + '" has been removed successfully!'
             else:
                 raise Exception('The configuration file could not be written!')

@@ -64,24 +64,24 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     logger.info('The user "' + user + '" is asking for permission for service "' + str(pamh.service) + '".')
 
-    ## Tries to get position and fingerprint hash of user
+    ## Checks if the the user was added in configuration
+    if ( self.__config.itemExists('Users', userName) == False ):
+        logger.error('The user was not added!')
+        return pamh.PAM_IGNORE ## TODO: other flag?
+
+    ## Tries to get user information (template position, fingerprint hash)
     try:
-        ## Checks if user exists
-        if ( self.__config.itemExists('Users', userName) ):
+        userData = self.__config.readList('Users', userName)
 
-            ## Gets user authentication tuple (position, hash)
-            userData = self.__config.readList('Users', userName)
+        ## Validates user information
+        if ( len(userData) != 2 ):
+            raise ValueError('The user information of "' + userName + '" is invalid!')
 
-            if ( len(userData) != 2 ):
-                raise ValueError('Invalid tuple: Missing position or hash!')
-                
-            expectedPositionNumber = userData[0]
-            expectedFingerprintHash = userData[1]
-        else:
-            raise ValueError('The user "' + userName + '" does not exist!')
+        expectedPositionNumber = userData[0]
+        expectedFingerprintHash = userData[1]
 
     except ValueError as e:
-        logger.error('[Exception] ' + e.message, exc_info=False)
+        logger.error(e.message, exc_info=False)
         return pamh.PAM_AUTH_ERR
 
     ## Gets sensor connection values
@@ -116,13 +116,15 @@ def pam_sm_authenticate(pamh, flags, argv):
         result = fingerprint.searchTemplate()
         positionNumber = result[0]
 
-        ## Invalid positions
+        ## Checks if the template position is invalid
         if ( positionNumber == -1 ):
             raise Exception('No match found!')
-        else:
-            if ( expectedPositionNumber != positionNumber ):
-                raise Exception('A match was found but does not match the given position in config!')
 
+        ## Checks if the template position is correct
+        if ( positionNumber != expectedPositionNumber ):
+            raise Exception('The template position of the found match is not equal to the stored one!')
+
+        ## Gets characteristics
         fingerprint.loadTemplate(positionNumber, 0x01)
         characterics = fingerprint.downloadCharacteristics(0x01)
 

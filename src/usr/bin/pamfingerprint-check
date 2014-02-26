@@ -68,22 +68,22 @@ class PamFingerprintCheck(object):
     """
     def checkUser(self, userName):
 
-        ## Tries to get position and fingerprint hash of user
+        ## Checks if the the user was already added
+        if ( self.__config.itemExists('Users', userName) == False ):
+            print '[Error] The user "' + userName + '" was not added!'
+            return False
+
+        ## Tries to get user information (template position, fingerprint hash)
         try:
-            ## Checks if user exists
-            if ( self.__config.itemExists('Users', userName) ):
+            userData = self.__config.readList('Users', userName)
 
-                ## Gets user authentication tuple (position, hash)
-                userData = self.__config.readList('Users', userName)
+            ## Validates user information
+            if ( len(userData) != 2 ):
+                raise ValueError('The user information of "' + userName + '" is invalid!')
 
-                if ( len(userData) != 2 ):
-                    raise ValueError('Invalid tuple: Missing position or hash!')
-                    
-                expectedPositionNumber = userData[0]
-                expectedFingerprintHash = userData[1]
-            else:
-                raise ValueError('The user "' + userName + '" does not exist!')
-            
+            expectedPositionNumber = userData[0]
+            expectedFingerprintHash = userData[1]
+
         except ValueError as e:
             print '[Exception] ' + e.message
             return False
@@ -102,15 +102,17 @@ class PamFingerprintCheck(object):
             positionNumber = result[0]
             accuracyScore = result[1]
 
-            ## Invalid position
+            ## Checks if the template position is invalid
             if ( positionNumber == -1 ):
                 raise Exception('No match found!')
-            else:
-                if ( expectedPositionNumber == positionNumber ):
-                    print 'A match was found on template position #' + str(positionNumber) + ' with accuracy score: ' + str(accuracyScore)
-                else:
-                    raise Exception('A match was found but does not match the given position in config!')
 
+            ## Checks if the template position is correct
+            if ( positionNumber == expectedPositionNumber ):
+                print 'A match was found on template position #' + str(positionNumber) + ' with accuracy score ' + str(accuracyScore) + '.'
+            else:
+                raise Exception('The template position of the found match (#' + positionNumber + ') is not equal to the stored one (#' + expectedPositionNumber + ')!')
+
+            ## Gets characteristics
             self.__fingerprint.loadTemplate(positionNumber, 0x01)
             characterics = self.__fingerprint.downloadCharacteristics(0x01)
 
@@ -121,11 +123,11 @@ class PamFingerprintCheck(object):
             print 'Checking if calculated hash matches stored hash...'
 
             ## Checks if read hash matches stored hash
-            if ( fingerprintHash != expectedFingerprintHash ):
+            if ( fingerprintHash == expectedFingerprintHash ):
+                print 'Hashes match!'
+                print 'Check for user "' + userName + '" was successful!'
+            else:
                 raise Exception('The found template is not assigned to user (the hash does not match)!')
-
-            print 'Hashes match!'
-            print 'Check for user "' + userName + '" was successful!'
 
         except Exception as e:
             print '[Exception] Check for user "' + userName + '" failed: ' + e.message
