@@ -1,0 +1,34 @@
+found = False
+
+## Searches for template hash matches stored hash
+for positionNumber in range(0, templateCount + 1):
+
+try:
+    ## Gets characteristics and calculates hash
+    self.__fingerprint.loadTemplate(positionNumber, 0x01)
+    characteristics = self.__fingerprint.downloadCharacteristics(0x01)
+    fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
+
+    ## Checks if template hash matches saved hash
+    if ( fingerprintHash == expectedFingerprintHash ):
+        self.__fingerprint.deleteTemplate(positionNumber)
+        print 'Removed template on position: ' + str(positionNumber)
+        print 'There are actual ' + str(templateCount - 1) +' templates stored on sensor.'
+        found = True
+        break
+
+except Exception as e:
+    print '[Exception] ' + e.message + ' (Position #' + str(positionNumber) + ')'
+
+## Checks if template was found
+if ( found == True ):
+
+## Remove entries from configuration file
+if ( ( self.__config.remove('Users', userName) == True ) and ( self.__config.save() == True ) ):
+    print 'The user "' + userName + '" has been removed successfully!'
+else:
+    raise Exception('The configuration file could not be written!')
+
+else:
+    raise Exception('Template could not be found!')
+            

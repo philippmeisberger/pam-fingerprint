@@ -64,12 +64,24 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     logger.info('The user "' + user + '" is asking for permission for service "' + str(pamh.service) + '".')
 
-    ## Checks if the user is assigned to any hash
+    ## Tries to get position and fingerprint hash of user
     try:
-        expectedFingerprintHash = config.readString('Users', user)
+        ## Checks if user exists
+        if ( self.__config.itemExists('Users', userName) ):
 
-    except ConfigParser.NoOptionError:
-        logger.error('The user "' + user + '" is not assigned!', exc_info=False)
+            ## Gets user authentication tuple (position, hash)
+            userData = self.__config.readList('Users', userName)
+
+            if ( len(userData) != 2 ):
+                raise ValueError('Invalid tuple: Missing position or hash!')
+                
+            expectedPositionNumber = userData[0]
+            expectedFingerprintHash = userData[1]
+        else:
+            raise ValueError('The user "' + userName + '" does not exist!')
+
+    except ValueError as e:
+        logger.error('[Exception] ' + e.message, exc_info=False)
         return pamh.PAM_AUTH_ERR
 
     ## Gets sensor connection values
@@ -104,11 +116,12 @@ def pam_sm_authenticate(pamh, flags, argv):
         result = fingerprint.searchTemplate()
         positionNumber = result[0]
 
-        ## Invalid position
+        ## Invalid positions
         if ( positionNumber == -1 ):
-            logger.info('No match found!')
-            pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
-            return pamh.PAM_AUTH_ERR
+            raise Exception('No match found!')
+        else:
+            if ( expectedPositionNumber != positionNumber ):
+                raise Exception('A match was found but does not match the given position in config!')
 
         fingerprint.loadTemplate(positionNumber, 0x01)
         characterics = fingerprint.downloadCharacteristics(0x01)
@@ -127,7 +140,8 @@ def pam_sm_authenticate(pamh, flags, argv):
             return pamh.PAM_AUTH_ERR
 
     except Exception as e:
-        logger.error('Fingerprint read failed!', exc_info=True)
+        logger.error('Fingerprint read failed: ' + e.message, exc_info=False)
+        pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
         return pamh.PAM_AUTH_ERR
 
     ## Denies for default

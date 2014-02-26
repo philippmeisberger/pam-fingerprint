@@ -15,4 +15,8 @@ oder selbst:
 
 sind die installierten Dateien (alle) dem Eigentümer #1000 zugeordnet und nicht root!
 
+Phil: ist 1000 nicht root?
+
 2) Resultierenden *.pyc-Dateien werden vom Paketmanager natürlich nicht entfernt :/
+
+Phil: *.pyc mit ausliefern?
