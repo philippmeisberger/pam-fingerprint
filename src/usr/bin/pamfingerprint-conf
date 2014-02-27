@@ -205,7 +205,7 @@ class PamFingerprint(object):
             if ( len(userData) != 2 ):
                 raise ValueError('The user information of "' + userName + '" is invalid!')
 
-            positionNumber = userData[0]
+            positionNumber = int(userData[0])
             expectedFingerprintHash = userData[1]
 
         except ValueError as e:

@@ -40,13 +40,13 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     ## Tries to get user which is asking for permission
     try:
-        user = pamh.ruser
+        userName = pamh.ruser
         
-        if ( user == None ):
-            user = pamh.get_user()            
+        if ( userName == None ):
+            userName = pamh.get_user()            
 
         ## Be sure the user is set 
-        if ( user == None ):
+        if ( userName == None ):
             logger.error('The user is not known!')
             return pamh.PAM_USER_UNKNOWN
 
@@ -62,22 +62,22 @@ def pam_sm_authenticate(pamh, flags, argv):
         logger.error(e.message, exc_info=True)
         return pamh.PAM_IGNORE
 
-    logger.info('The user "' + user + '" is asking for permission for service "' + str(pamh.service) + '".')
+    logger.info('The user "' + userName + '" is asking for permission for service "' + str(pamh.service) + '".')
 
     ## Checks if the the user was added in configuration
-    if ( self.__config.itemExists('Users', userName) == False ):
+    if ( config.itemExists('Users', userName) == False ):
         logger.error('The user was not added!')
         return pamh.PAM_IGNORE ## TODO: other flag?
 
     ## Tries to get user information (template position, fingerprint hash)
     try:
-        userData = self.__config.readList('Users', userName)
-
+        userData = config.readList('Users', userName)
+        
         ## Validates user information
         if ( len(userData) != 2 ):
             raise ValueError('The user information of "' + userName + '" is invalid!')
 
-        expectedPositionNumber = userData[0]
+        expectedPositionNumber = int(userData[0])
         expectedFingerprintHash = userData[1]
 
     except ValueError as e:
