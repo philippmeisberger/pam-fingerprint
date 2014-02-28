@@ -1,7 +1,9 @@
+#!/usr/bin/env python
+
 ## Shows the template index table
 ##
 
-import time
+import sys
 
 from PyFingerprint import *
 
@@ -12,9 +14,10 @@ try:
     if ( f.verifyPassword() == False ):
         raise ValueError('The given fingerprint sensor password is wrong!')
 
-except (Exception, ValueError) as e:
+except:
+    e = sys.exc_info()[1]
     print 'The fingerprint sensor could not be initialized!'
-    print 'Exception: ' + e.message
+    print 'Exception message: ' + e.message
     exit(1)
 
 ## Gets some sensor information
@@ -30,7 +33,8 @@ try:
     for i in range(0, len(tableIndex)):
         print 'Template at position #' + str(i) + ' is used: ' + str(tableIndex[i])
 
-except Exception as e:
+except:
+    e = sys.exc_info()[1]
     print 'Read out table index failed!'
-    print 'Exception: ' + e.message
+    print 'Exception message: ' + e.message
     exit(1)

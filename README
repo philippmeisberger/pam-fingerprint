@@ -7,8 +7,9 @@
 ## Add PM Codeworks key:
 ~# wget -O - http://apt.pm-codeworks.de/pm-codeworks.de.gpg.key | apt-key add -
 
-## Install the package:
 ~# apt-get update
+
+## Install the package:
 ~# apt-get install pamfingerprint
 
 ## Install "PyFingerprint":
@@ -17,3 +18,6 @@
 ## Add group "dialout" for each user which should be able to use pamfingerprint:
 ~# usermod -a -G dialout username
 ~# reboot
+
+## Setup user
+~# pamfingerprint-conf --add-user alice

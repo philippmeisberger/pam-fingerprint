@@ -41,7 +41,8 @@ def pam_sm_authenticate(pamh, flags, argv):
     ## Tries to get user which is asking for permission
     try:
         userName = pamh.ruser
-        
+
+        ## Fallback
         if ( userName == None ):
             userName = pamh.get_user()            
 
@@ -50,7 +51,8 @@ def pam_sm_authenticate(pamh, flags, argv):
             logger.error('The user is not known!')
             return pamh.PAM_USER_UNKNOWN
 
-    except (Exception, pamh.exception) as e:
+    except:
+        e = sys.exc_info()[1]
         logger.error(e.message, exc_info=True)
         return pamh.PAM_USER_UNKNOWN
 
@@ -58,7 +60,8 @@ def pam_sm_authenticate(pamh, flags, argv):
     try:
         config = Config('/etc/pamfingerprint.conf')
 
-    except Exception as e:
+    except:
+        e = sys.exc_info()[1]
         logger.error(e.message, exc_info=True)
         return pamh.PAM_IGNORE
 
@@ -67,7 +70,7 @@ def pam_sm_authenticate(pamh, flags, argv):
     ## Checks if the the user was added in configuration
     if ( config.itemExists('Users', userName) == False ):
         logger.error('The user was not added!')
-        return pamh.PAM_IGNORE ## TODO: other flag?
+        return pamh.PAM_IGNORE
 
     ## Tries to get user information (template position, fingerprint hash)
     try:
@@ -75,12 +78,13 @@ def pam_sm_authenticate(pamh, flags, argv):
         
         ## Validates user information
         if ( len(userData) != 2 ):
-            raise ValueError('The user information of "' + userName + '" is invalid!')
+            raise Exception('The user information of "' + userName + '" is invalid!')
 
         expectedPositionNumber = int(userData[0])
         expectedFingerprintHash = userData[1]
 
-    except ValueError as e:
+    except:
+        e = sys.exc_info()[1]
         logger.error(e.message, exc_info=False)
         return pamh.PAM_AUTH_ERR
 
@@ -97,7 +101,7 @@ def pam_sm_authenticate(pamh, flags, argv):
         if ( fingerprint.verifyPassword() == False ):
             raise ValueError('The given fingerprint sensor password is wrong!')
 
-    except (Exception, ValueError) as e:
+    except:
         logger.error('The fingerprint sensor could not be initialized!', exc_info=True)
         pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Sensor initialization failed!'))
         return pamh.PAM_IGNORE
@@ -141,8 +145,9 @@ def pam_sm_authenticate(pamh, flags, argv):
             pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
             return pamh.PAM_AUTH_ERR
 
-    except Exception as e:
-        logger.error('Fingerprint read failed: ' + e.message, exc_info=False)
+    except:
+        e = sys.exc_info()[1]
+        logger.error('Fingerprint read failed!', exc_info=True)
         pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
         return pamh.PAM_AUTH_ERR
 

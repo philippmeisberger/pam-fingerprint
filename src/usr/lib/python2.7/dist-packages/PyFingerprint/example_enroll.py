@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+
 ## Enrolls new finger
 ##
 
+import sys
 import time
 
 from PyFingerprint import *
@@ -12,9 +15,10 @@ try:
     if ( f.verifyPassword() == False ):
         raise ValueError('The given fingerprint sensor password is wrong!')
 
-except (Exception, ValueError) as e:
+except:
+    e = sys.exc_info()[1]
     print 'The fingerprint sensor could not be initialized!'
-    print 'Exception: ' + e.message
+    print 'Exception message: ' + e.message
     exit(1)
 
 ## Gets some sensor information
@@ -59,9 +63,10 @@ try:
     ## Saves template at new position number
     if ( f.storeTemplate(positionNumber) == True ):
         print 'Finger enrolled successfully!'
-        print 'New position number #' + str(positionNumber)
+        print 'New template position #' + str(positionNumber)
 
-except Exception as e:
+except:
+    e = sys.exc_info()[1]
     print 'Fingerprint enroll failed!'
-    print 'Exception: ' + e.message
+    print 'Exception message: ' + e.message
     exit(1)

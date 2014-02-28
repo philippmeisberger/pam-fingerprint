@@ -1,0 +1,3 @@
+#!/bin/sh
+
+dpkg --build ./src/ ./pamfingerprint_0.9.deb

@@ -1,7 +1,9 @@
+#!/usr/bin/env python
+
 ## Deletes a finger from sensor
 ##
 
-import time
+import sys
 
 from PyFingerprint import *
 
@@ -12,9 +14,10 @@ try:
     if ( f.verifyPassword() == False ):
         raise ValueError('The given fingerprint sensor password is wrong!')
 
-except (Exception, ValueError) as e:
+except:
+    e = sys.exc_info()[1]
     print 'The fingerprint sensor could not be initialized!'
-    print 'Exception: ' + e.message
+    print 'Exception message: ' + e.message
     exit(1)
 
 ## Gets some sensor information
@@ -28,7 +31,8 @@ try:
     if ( f.deleteTemplate(positionNumber) == True ):
         print 'Template deleted!'
 
-except Exception as e:
+except:
+    e = sys.exc_info()[1]
     print 'Delete template failed!'
-    print 'Exception: ' + e.message
+    print 'Exception message: ' + e.message
     exit(1)

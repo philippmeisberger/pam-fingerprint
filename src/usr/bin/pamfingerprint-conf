@@ -47,7 +47,8 @@ class PamFingerprint(object):
         try:
             self.__config = Config('/etc/pamfingerprint.conf')
 
-        except Exception as e:
+        except:
+            e = sys.exc_info()[1]
             print '[Exception] ' + e.message
             exit(1)
 
@@ -64,7 +65,8 @@ class PamFingerprint(object):
             if ( self.__fingerprint.verifyPassword() == False ):
                 raise ValueError('The given fingerprint sensor password is wrong!')
 
-        except (Exception, ValueError) as e:
+        except:
+            e = sys.exc_info()[1]
             print '[Exception] The fingerprint sensor could not be initialized: ' + e.message
             exit(1)
     
@@ -120,7 +122,7 @@ class PamFingerprint(object):
                     break
 
             if ( freePositionNumber == -1 ):
-                raise ValueError('Could not find a free position for storing template!')
+                raise Exception('Could not find a free position for storing template!')
 
             print 'Waiting for finger...'
 
@@ -152,7 +154,7 @@ class PamFingerprint(object):
 
             ## Stores new template on free position
             self.__fingerprint.storeTemplate(freePositionNumber)
-            print 'Stored new template on position #' + str(freePositionNumber)
+            print 'Stored new template on position #' + str(freePositionNumber) + '.'
 
             ## Gets characteristics and calculates hash
             self.__fingerprint.loadTemplate(freePositionNumber, 0x01)
@@ -173,8 +175,9 @@ class PamFingerprint(object):
             else:
                 raise Exception('The configuration could not be written!')
 
-        except (Exception, ValueError) as e:
-            print '[Exception] Error while adding user "' + userName + '": ' + e.message
+        except:
+            e = sys.exc_info()[1]
+            print '[Exception] Error while adding user: ' + e.message
             return False
 
         return True
@@ -194,7 +197,7 @@ class PamFingerprint(object):
 
         ## Checks if the the user was already added
         if ( self.__config.itemExists('Users', userName) == False ):
-            print '[Error] The user "' + userName + '" was not added!'
+            print '[Error] The user "' + userName + '" is not added!'
             return False
 
         ## Tries to get user information (template position, fingerprint hash)
@@ -203,12 +206,13 @@ class PamFingerprint(object):
 
             ## Validates user information
             if ( len(userData) != 2 ):
-                raise ValueError('The user information of "' + userName + '" is invalid!')
+                raise Exception('The user information of "' + userName + '" is invalid!')
 
             positionNumber = int(userData[0])
             expectedFingerprintHash = userData[1]
 
-        except ValueError as e:
+        except:
+            e = sys.exc_info()[1]
             print '[Exception] ' + e.message
             return False
 
@@ -239,8 +243,9 @@ class PamFingerprint(object):
             else:
                 raise Exception('The configuration file could not be written!')
 
-        except (Exception, ValueError) as e:
-            print '[Exception] Error while removing user "' + userName + '": ' + e.message
+        except:
+            e = sys.exc_info()[1]
+            print '[Exception] Error while removing user: ' + e.message
             return False
 
         return True

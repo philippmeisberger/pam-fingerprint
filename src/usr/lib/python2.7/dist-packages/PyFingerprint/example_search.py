@@ -1,8 +1,10 @@
+#!/usr/bin/env python
+
 ## Search for a finger
 ##
 
-import time
 import hashlib
+import sys
 
 from PyFingerprint import *
 
@@ -13,9 +15,10 @@ try:
     if ( f.verifyPassword() == False ):
         raise ValueError('The given fingerprint sensor password is wrong!')
 
-except (Exception, ValueError) as e:
+except:
+    e = sys.exc_info()[1]
     print 'The fingerprint sensor could not be initialized!'
-    print 'Exception: ' + e.message
+    print 'Exception message: ' + e.message
     exit(1)
 
 ## Gets some sensor information
@@ -38,7 +41,7 @@ try:
         print 'No match found!'
         exit(0)
     else:
-        print 'Found template #' + str(positionNumber)
+        print 'Found template at position #' + str(positionNumber)
         print 'The accuracy score is: ' + str(accuracyScore)
 
     ## Loads the found template to char buffer 1
@@ -50,7 +53,8 @@ try:
     ## Hashes characteristics of template
     print 'SHA2 hash of template: ' + hashlib.sha256(str(characterics)).hexdigest()
 
-except Exception as e:
+except:
+    e = sys.exc_info()[1]
     print 'Fingerprint read failed!'
-    print 'Exception: ' + e.message
+    print 'Exception message: ' + e.message
     exit(1)

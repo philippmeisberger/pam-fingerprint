@@ -39,7 +39,8 @@ class PamFingerprintCheck(object):
         try:
             self.__config = Config('/etc/pamfingerprint.conf')
 
-        except Exception as e:
+        except:
+            e = sys.exc_info()[1]
             print '[Exception] ' + e.message
             exit(1)
 
@@ -56,7 +57,8 @@ class PamFingerprintCheck(object):
             if ( self.__fingerprint.verifyPassword() == False ):
                 raise ValueError('The given fingerprint sensor password is wrong!')
 
-        except (Exception, ValueError) as e:
+        except:
+            e = sys.exc_info()[1]
             print '[Exception] The fingerprint sensor could not be initialized: ' + e.message
             exit(1)
 
@@ -70,7 +72,7 @@ class PamFingerprintCheck(object):
 
         ## Checks if the the user was already added
         if ( self.__config.itemExists('Users', userName) == False ):
-            print '[Error] The user "' + userName + '" was not added!'
+            print '[Error] The user "' + userName + '" is not added!'
             return False
 
         ## Tries to get user information (template position, fingerprint hash)
@@ -79,12 +81,13 @@ class PamFingerprintCheck(object):
 
             ## Validates user information
             if ( len(userData) != 2 ):
-                raise ValueError('The user information of "' + userName + '" is invalid!')
+                raise Exception('The user information of "' + userName + '" is invalid!')
 
             expectedPositionNumber = int(userData[0])
             expectedFingerprintHash = userData[1]
 
-        except ValueError as e:
+        except:
+            e = sys.exc_info()[1]
             print '[Exception] ' + e.message
             return False
 
@@ -129,7 +132,8 @@ class PamFingerprintCheck(object):
             else:
                 raise Exception('The found template is not assigned to user (the hash does not match)!')
 
-        except Exception as e:
+        except:
+            e = sys.exc_info()[1]
             print '[Exception] Check for user "' + userName + '" failed: ' + e.message
             return False
 
