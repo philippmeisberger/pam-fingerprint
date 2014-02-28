@@ -1,3 +1,13 @@
 #!/bin/sh
 
-dpkg --build ./src/ ./pamfingerprint_0.9.deb
+if ( test "$USER" != "root" ); then
+    echo "This script must executed as root!"
+    exit 1
+fi
+
+cp -r src/ src_temp/
+dpkg --build src_temp/ pamfingerprint_0.9.deb
+
+rm -R src_temp/
+
+chown 1000:1000 pamfingerprint_0.9.deb

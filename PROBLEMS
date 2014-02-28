@@ -1,24 +1,2 @@
-1) Wenn Paket gebaut via:
-
-~$ dpkg --build src/ pamfingerprint_0.8.deb
-~# dpkg -i pamfingerprint_0.8.deb
-
-oder:
-
-~# dpkg --build src/ pamfingerprint_0.8.deb
-~# dpkg -i pamfingerprint_0.8.deb
-
-oder selbst:
-
-~# cp -R src/ src_root/ && dpkg --build src_root/ pamfingerprint_0.8.deb && rm -R src_root/
-~# dpkg -i pamfingerprint_0.8.deb
-
-sind die installierten Dateien (alle) dem Eigentümer #1000 zugeordnet und nicht root!
-
-Phil: ist 1000 nicht root?
-Basti: nein, root = 0
-
---
-
 2) Bash completition geht nicht als root
 3) CTRL+C/D wieder nicht möglich beimn einlesen :/
