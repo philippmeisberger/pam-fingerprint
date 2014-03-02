@@ -5,9 +5,11 @@ if ( test "$USER" != "root" ); then
     exit 1
 fi
 
-cp -r src/ src_temp/
-dpkg --build src_temp/ pamfingerprint_0.9.deb
+cp -r ./src/ ./src_temp/
+chown 1000:1000 ./src_temp/var/log/pamfingerprint.log
 
-rm -R src_temp/
+dpkg --build ./src_temp/ ./pamfingerprint_0.9.deb
 
-chown 1000:1000 pamfingerprint_0.9.deb
+rm -R ./src_temp/
+
+chown 1000:1000 ./pamfingerprint_0.9.deb
