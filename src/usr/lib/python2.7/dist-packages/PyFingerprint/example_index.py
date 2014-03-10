@@ -17,7 +17,7 @@ try:
 except:
     e = sys.exc_info()[1]
     print 'The fingerprint sensor could not be initialized!'
-    print 'Exception message: ' + e.message
+    print 'Exception message: ' + str(e.message)
     exit(1)
 
 ## Gets some sensor information
@@ -36,5 +36,5 @@ try:
 except:
     e = sys.exc_info()[1]
     print 'Read out table index failed!'
-    print 'Exception message: ' + e.message
+    print 'Exception message: ' + str(e.message)
     exit(1)

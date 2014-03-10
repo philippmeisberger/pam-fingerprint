@@ -12,10 +12,9 @@ This library is inspired by the C++ library from Adafruit Industries:
 https://github.com/adafruit/Adafruit-Fingerprint-Sensor-Library
 
 @author Bastian Raschke <bastian.raschke@posteo.de>
-@copyright 2014, Bastian Raschke
-@license LGPL
+@copyright Bastian Raschke
+@license LGPL (GNU Lesser General Public License)
 @link https://www.sicherheitskritisch.de
-
 """
 
 import serial
@@ -38,11 +37,9 @@ class PyFingerprint(object):
     @attribute Serial __serial
     UART serial connection via PySerial.
     """
-
     __address = None
     __password = None
     __serial = None
-
 
     def __init__(self, port = '/dev/ttyUSB0', baudRate = 57600, address = 0xFFFFFFFF, password = 0x00000000):
         """
@@ -80,6 +77,7 @@ class PyFingerprint(object):
     def __del__(self):
         """
         Destructor
+
         """
 
         ## Closes connection if still established
@@ -129,7 +127,11 @@ class PyFingerprint(object):
         """
         Receives a packet from fingerprint sensor.
 
-        @return tuple (integer(1 byte) packetType, integer(N bytes) packetPayload)
+        Returns a tuble that contains the following information:
+        0: integer(1 byte) The packet type.
+        1: integer(n bytes) The packet payload.
+
+        @return tuple
         """
 
         receivedPacketData = []
@@ -368,13 +370,13 @@ class PyFingerprint(object):
         Gets all available system information of the sensor.
 
         Returns a tuble that contains the following information:
-        - integer(2 bytes) The status register.
-        - integer(2 bytes) The system id.
-        - integer(2 bytes) The storage capacity.
-        - integer(2 bytes) The security level.
-        - integer(4 bytes) The sensor address.
-        - integer(2 bytes) The packet length.
-        - integer(2 bytes) The baudrate.
+        0: integer(2 bytes) The status register.
+        1: integer(2 bytes) The system id.
+        2: integer(2 bytes) The storage capacity.
+        3: integer(2 bytes) The security level.
+        4: integer(4 bytes) The sensor address.
+        5: integer(2 bytes) The packet length.
+        6: integer(2 bytes) The baudrate.
 
         @return tuple
         """
@@ -411,22 +413,13 @@ class PyFingerprint(object):
         else:
             raise Exception('Unknown error')
 
-
-
-
-
-
-
-
-
-
-    """
-    "" Gets a list of the template positions with usage indicator.
-    ""
-    "" @param integer(1 byte) page
-    "" @return list
-    """
     def getTemplateIndex(self, page):
+        """
+        Gets a list of the template positions with usage indicator.
+
+        @param integer(1 byte) page
+        @return list
+        """
 
         if ( page < 0 or page > 3 ):
             raise ValueError('The given index page is invalid!')
@@ -467,12 +460,12 @@ class PyFingerprint(object):
         else:
             raise Exception('Unknown error')
 
-    """
-    "" Gets the number of stored templates.
-    ""
-    "" @return integer(2 bytes)
-    """
     def getTemplateCount(self):
+        """
+        Gets the number of stored templates.
+
+        @return integer(2 bytes)
+        """
 
         packetPayload = (
             FINGERPRINT_TEMPLATECOUNT,
@@ -499,12 +492,12 @@ class PyFingerprint(object):
         else:
             raise Exception('Unknown error')
 
-    """
-    "" Reads the image of a finger and stores it in ImageBuffer.
-    ""
-    "" @return boolean
-    """
     def readImage(self):
+        """
+        Reads the image of a finger and stores it in ImageBuffer.
+
+        @return boolean
+        """
 
         packetPayload = (
             FINGERPRINT_READIMAGE,
@@ -539,17 +532,16 @@ class PyFingerprint(object):
     ## TODO: implement uploadImage()
     ## TODO: implement downloadImage()
 
-    """
-    "" Converts the image in ImageBuffer to finger characteristics and stores in CharBuffer1 or CharBuffer2.
-    ""
-    "" @param integer(1 byte) charBufferNumber
-    "" @return boolean
-    """
     def convertImage(self, charBufferNumber = 0x01):
+        """
+        Converts the image in ImageBuffer to finger characteristics and stores in CharBuffer1 or CharBuffer2.
 
-        ## TODO: @Phil: Do not change my correct code ;)
+        @param integer(1 byte) charBufferNumber
+        @return boolean
+        """
+
         if ( charBufferNumber != 0x01 and charBufferNumber != 0x02 ):
-            raise ValueError('The given char buffer number is invalid!')
+            raise ValueError('The given charbuffer number is invalid!')
 
         packetPayload = (
             FINGERPRINT_CONVERTIMAGE,
@@ -584,13 +576,13 @@ class PyFingerprint(object):
         else:
             raise Exception('Unknown error')
 
-    """
-    "" Combines the fingerprint characteristics which are stored in CharBuffer1 and CharBuffer2 to a template.
-    "" The created template will be stored again in CharBuffer1 and CharBuffer2 as the same.
-    ""
-    "" @return boolean
-    """
     def createTemplate(self):
+        """
+        Combines the characteristics which are stored in CharBuffer1 and CharBuffer2 to a template.
+        The created template will be stored again in CharBuffer1 and CharBuffer2 as the same.
+
+        @return boolean
+        """
 
         packetPayload = (
             FINGERPRINT_CREATETEMPLATE,
@@ -619,20 +611,20 @@ class PyFingerprint(object):
         else:
             raise Exception('Unknown error')
 
-    """
-    "" Saves a template from the specified CharBuffer to the given position number.
-    ""
-    "" @param integer(2 bytes) positionNumber
-    "" @param integer(1 byte) charBufferNumber
-    "" @return boolean
-    """
     def storeTemplate(self, positionNumber, charBufferNumber = 0x01):
+        """
+        Saves a template from the specified CharBuffer to the given position number.
 
-        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
+        @param integer(2 bytes) positionNumber
+        @param integer(1 byte) charBufferNumber
+        @return boolean
+        """
+
+        if ( positionNumber < 0x0000 or positionNumber > 0x0400 ):
             raise ValueError('The given position number is invalid!')
 
         if ( charBufferNumber != 0x01 and charBufferNumber != 0x02 ):
-            raise ValueError('The given char buffer number is invalid!')
+            raise ValueError('The given charbuffer number is invalid!')
 
         packetPayload = (
             FINGERPRINT_STORETEMPLATE,
@@ -666,19 +658,23 @@ class PyFingerprint(object):
         else:
             raise Exception('Unknown error')
 
-    """
-    "" Search the finger characteristiccs in CharBuffer in database.
-    ""
-    "" @return tuple (integer(2 bytes) positionNumber, integer(2 bytes) accuracyScore)
-    """
     def searchTemplate(self):
+        """
+        Search the finger characteristiccs in CharBuffer in database.
+
+        Returns a tuble that contains the following information:
+        0: integer(2 bytes) The position number of found template.
+        1: integer(2 bytes) The accuracy score of found template.
+
+        @return tuple
+        """
 
         ## CharBuffer1 and CharBuffer2 are the same in this case
         charBufferNumber = 0x01
 
-        ## Begin search at page 0x0000 for 0x00A3 (means 163) templates
+        ## Begin search at page 0x0000 for 0x0400 (means 1024) templates
         positionStart = 0x0000
-        templatesCount = 0x00A3 ## TODO: real end number
+        templatesCount = 0x0400
 
         packetPayload = (
             FINGERPRINT_SEARCHTEMPLATE,
@@ -719,20 +715,20 @@ class PyFingerprint(object):
         else:
             raise Exception('Unknown error')
 
-    """
-    "" Loads an existing template specified by position number to specified CharBuffer.
-    ""
-    "" @param integer(2 bytes) positionNumber
-    "" @param integer(1 byte) charBufferNumber
-    "" @return boolean
-    """
     def loadTemplate(self, positionNumber, charBufferNumber = 0x01):
+        """
+        Loads an existing template specified by position number to specified CharBuffer.
 
-        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
+        @param integer(2 bytes) positionNumber
+        @param integer(1 byte) charBufferNumber
+        @return boolean
+        """
+
+        if ( positionNumber < 0x0000 or positionNumber > 0x0400 ):
             raise ValueError('The given position number is invalid!')
 
         if ( charBufferNumber != 0x01 and charBufferNumber != 0x02 ):
-            raise ValueError('The given char buffer number is invalid!')
+            raise ValueError('The given charbuffer number is invalid!')
 
         packetPayload = (
             FINGERPRINT_LOADTEMPLATE,
@@ -766,15 +762,15 @@ class PyFingerprint(object):
         else:
             raise Exception('Unknown error')
 
-    """
-    "" Deletes one template from fingerprint database.
-    ""
-    "" @param integer(2 bytes) positionNumber
-    "" @return boolean
-    """
     def deleteTemplate(self, positionNumber):
+        """
+        Deletes one template from fingerprint database.
 
-        if ( positionNumber < 0x0000 or positionNumber > 0x00A3 ):
+        @param integer(2 bytes) positionNumber
+        @return boolean
+        """
+
+        if ( positionNumber < 0x0000 or positionNumber > 0x0400 ):
             raise ValueError('The given position number is invalid!')
 
         ## Deletes only one template
@@ -811,12 +807,12 @@ class PyFingerprint(object):
         else:
             raise Exception('Unknown error')
 
-    """
-    "" Clears the complete template database.
-    ""
-    "" @return boolean
-    """
     def clearDatabase(self):
+        """
+        Clears the complete template database.
+
+        @return boolean
+        """
 
         packetPayload = (
             FINGERPRINT_CLEARDATABASE,
@@ -845,12 +841,12 @@ class PyFingerprint(object):
         else:
             raise Exception('Unknown error')
 
-    """
-    "" Compares the finger characteristics of CharBuffer1 with CharBuffer2 and returns the accuracy score.
-    ""
-    "" @return integer(2 bytes)
-    """
     def compareCharacteristics(self):
+        """
+        Compares the finger characteristics of CharBuffer1 with CharBuffer2 and returns the accuracy score.
+
+        @return integer(2 bytes)
+        """
 
         packetPayload = (
             FINGERPRINT_COMPARECHARACTERISTICS,
@@ -883,16 +879,18 @@ class PyFingerprint(object):
 
     ## TODO: implement: uploadCharacteristics()
 
-    """
-    "" Downloads the finger characteristics of CharBuffer1 or CharBuffer2.
-    ""
-    "" @param integer(1 byte) charBufferNumber
-    "" @return list contains 512 integer(1 byte) elements
-    """
     def downloadCharacteristics(self, charBufferNumber = 0x01):
+        """
+        Downloads the finger characteristics of CharBuffer1 or CharBuffer2.
+
+        @param integer(1 byte) charBufferNumber
+
+        Returns a list that contains 512 integer(1 byte) elements of the characteristic.
+        @return list
+        """
 
         if ( charBufferNumber != 0x01 and charBufferNumber != 0x02 ):
-            raise ValueError('The given char buffer number is invalid!')
+            raise ValueError('The given charbuffer number is invalid!')
 
         packetPayload = (
             FINGERPRINT_DOWNLOADCHARACTERISTICS,

@@ -1,9 +1,12 @@
 """
-"" PyFingerprint
-""
-"" Copyright 2014 Bastian Raschke.
-"" All rights reserved.
+PyFingerprint
+
+@author Bastian Raschke <bastian.raschke@posteo.de>
+@copyright Bastian Raschke
+@license LGPL (GNU Lesser General Public License)
+@link https://www.sicherheitskritisch.de
 """
+
 
 ## Baotou start byte
 FINGERPRINT_STARTCODE = 0xEF01
@@ -42,10 +45,10 @@ FINGERPRINT_CLEARDATABASE = 0x0D
 
 FINGERPRINT_COMPARECHARACTERISTICS = 0x03
 
-## Note: The documentation means "download from host computer"!
+## Note: The documentation means download from host computer.
 FINGERPRINT_UPLOADCHARACTERISTICS = 0x09
 
-## Note: The documentation means "upload to host computer"!
+## Note: The documentation means upload to host computer.
 FINGERPRINT_DOWNLOADCHARACTERISTICS = 0x08
 
 

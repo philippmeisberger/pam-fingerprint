@@ -18,7 +18,7 @@ try:
 except:
     e = sys.exc_info()[1]
     print 'The fingerprint sensor could not be initialized!'
-    print 'Exception message: ' + e.message
+    print 'Exception message: ' + str(e.message)
     exit(1)
 
 ## Gets some sensor information
@@ -32,7 +32,7 @@ try:
     while ( f.readImage() == False ):
         pass
 
-    ## Converts image to characteristics and stores it in char buffer 1
+    ## Converts read image to characteristics and stores it in charbuffer 1
     f.convertImage(0x01)
 
     ## Checks if finger is already enrolled
@@ -48,13 +48,14 @@ try:
 
     print 'Waiting for same finger again...'
 
+    ## Wait that finger is read again
     while ( f.readImage() == False ):
         pass
 
-    ## Converts image to characteristics and stores it in char buffer 2
+    ## Converts read image to characteristics and stores it in charbuffer 2
     f.convertImage(0x02)
 
-    ## Compares the char buffers and creates a template
+    ## Compares the charbuffers and creates a template
     f.createTemplate()
 
     ## Gets new position number (the counting starts at 0, so we do not need to increment)
@@ -68,5 +69,5 @@ try:
 except:
     e = sys.exc_info()[1]
     print 'Fingerprint enroll failed!'
-    print 'Exception message: ' + e.message
+    print 'Exception message: ' + str(e.message)
     exit(1)

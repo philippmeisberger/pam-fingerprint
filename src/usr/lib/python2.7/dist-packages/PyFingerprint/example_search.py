@@ -18,7 +18,7 @@ try:
 except:
     e = sys.exc_info()[1]
     print 'The fingerprint sensor could not be initialized!'
-    print 'Exception message: ' + e.message
+    print 'Exception message: ' + str(e.message)
     exit(1)
 
 ## Gets some sensor information
@@ -28,11 +28,14 @@ print 'Currently stored templates: ' + str(f.getTemplateCount())
 try:
     print 'Waiting for finger...'
 
+    ## Wait that finger is read
     while ( f.readImage() == False ):
         pass
 
+    ## Converts read image to characteristics and stores it in charbuffer 1
     f.convertImage(0x01)
 
+    ## Searchs template
     result = f.searchTemplate()
     positionNumber = result[0]
     accuracyScore = result[1]
@@ -44,10 +47,13 @@ try:
         print 'Found template at position #' + str(positionNumber)
         print 'The accuracy score is: ' + str(accuracyScore)
 
-    ## Loads the found template to char buffer 1
+    ## OPTIONAL stuff
+    ##
+
+    ## Loads the found template to charbuffer 1
     f.loadTemplate(positionNumber, 0x01)
 
-    ## Downloads the characteristics of template loaded in char buffer 1
+    ## Downloads the characteristics of template loaded in charbuffer 1
     characterics = f.downloadCharacteristics(0x01)
 
     ## Hashes characteristics of template
@@ -56,5 +62,5 @@ try:
 except:
     e = sys.exc_info()[1]
     print 'Fingerprint read failed!'
-    print 'Exception message: ' + e.message
+    print 'Exception message: ' + str(e.message)
     exit(1)

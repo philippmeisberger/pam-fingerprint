@@ -1,0 +1,26 @@
+## Installation on Debian Wheezy
+##
+
+
+## 1) Install PySerial (http://pyserial.sourceforge.net)
+~# apt-get install python-serial
+
+## 2) Optional: Allow non-root user "username" using the serial port
+~# usermod -a -G dialout username
+~# reboot
+
+## 3) Unpack
+~# tar xvzf '/path/to/PyFingerprint.tar.gz' -C /
+
+
+## Tests
+##
+
+## Enroll finger:
+~$ python /usr/lib/python2.7/dist-packages/PyFingerprint/example_enroll.py
+
+## Search enrolled finger:
+~$ python /usr/lib/python2.7/dist-packages/PyFingerprint/example_search.py
+
+## Delete finger:
+~$ python /usr/lib/python2.7/dist-packages/PyFingerprint/example_delete.py
