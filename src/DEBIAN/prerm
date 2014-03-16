@@ -1,8 +1,6 @@
 #!/bin/sh
 
 if ( test "$1" = "remove" || test "$1" = "purge" ); then
-
     ## Deletes compiled Python files before removing package
     find /usr/lib/pamfingerprint/ -type f -name *.pyc -exec rm {} \;
-
 fi
