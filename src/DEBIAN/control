@@ -1,10 +1,10 @@
 Package: pamfingerprint
-Version: 0.9
+Version: 1.0
 Section: admin
 Priority: extra
 Depends: python (>= 2.7), libpam-python, python-serial
 Architecture: all
-Installed-Size: 70
+Installed-Size: 30
 Maintainer: Philipp Meisberger <team@pm-codeworks.de>
 Homepage: www.pm-codeworks.de/pamfingerprint.html
 Description: Pluggable Authentication Module for biometric authentication.

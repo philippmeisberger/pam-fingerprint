@@ -1,4 +1,4 @@
-.TH pamfingerprint-check 1 "" "" "PAM Fingerprint"
+.TH pamfingerprint-check 1 "March 2014" "" "PAM Fingerprint"
 
 .SH NAME
 \fBpamfingerprint-check\fP - pamfingerprint simulation program
@@ -29,28 +29,6 @@ Prints version and exits.
 .B
 \fB--help\fR, \fB-h\fR
 Show summary of options.
-
-.SH EXAMPLE
-.SS Good case 
-$ pamfingerprint-check --check-user bob
-.br
-Waiting for finger...
-.br
-Check for user "bob" was successful!
-
-.SS Bad case 1
-$ pamfingerprint-check --check-user alice
-.br
-Waiting for finger...
-.br
-[ERROR] Check for user "alice" failed: No match found!
-
-.SS Bad case 2
-$ pamfingerprint-check --check-user melory
-.br
-Waiting for finger...
-.br
-[ERROR] Check for user "melory" failed: Match is not assigned to user!
 
 .SH FILES
 /etc/pamfingerprint.conf
