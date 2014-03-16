@@ -13,7 +13,7 @@
 ~# apt-get install pamfingerprint
 
 ## Install "PyFingerprint":
-~# wget -O - https://sicherheitskritisch.de/PyFingerprint.tar.gz | tar xvzf -C /
+~# wget -O - https://sicherheitskritisch.de/PyFingerprint.tar.gz | tar xvzf - -C /
 
 ## Add group "dialout" for each user which should be able to use pamfingerprint:
 ~# usermod -a -G dialout username
