@@ -113,7 +113,7 @@ class PamFingerprintCheck(object):
             if ( positionNumber == expectedPositionNumber ):
                 print 'A match was found on template position #' + str(positionNumber) + ' with accuracy score ' + str(accuracyScore) + '.'
             else:
-                raise Exception('The template position of the found match (#' + positionNumber + ') is not equal to the stored one (#' + expectedPositionNumber + ')!')
+                raise Exception('The template position of the found match (#' + str(positionNumber) + ') is not equal to the stored one (#' + str(expectedPositionNumber) + ')!')
 
             ## Gets characteristics
             self.__fingerprint.loadTemplate(positionNumber, 0x01)
