@@ -152,13 +152,15 @@ class PamFingerprint(object):
 
                 ## Stores new template on free position
                 self.__fingerprint.storeTemplate(freePositionNumber)
-                print 'Stored new template on position ' + str(freePositionNumber) + '.'
+                print 'Stored new template on position #' + str(freePositionNumber) + '.'
             else:
-                print '[Warning] The finger already exists at template position ' + str(positionNumber) + '!'
+                print '[Warning] The finger already exists at template position #' + str(positionNumber) + '!'
 
                 if ( self.__showConfirmationDialog('Bind this template to the user "' + userName + '" ?') == False ):                    
                     print 'Adding user canceled.'
                     return False
+                else:
+                    freePositionNumber = positionNumber
                 
             ## Gets characteristics and calculates hash
             self.__fingerprint.loadTemplate(freePositionNumber, 0x01)
