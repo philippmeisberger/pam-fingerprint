@@ -8,8 +8,8 @@ fi
 cp -r ./src/ ./src_temp/
 chown 1000:1000 ./src_temp/var/log/pamfingerprint.log
 
-dpkg --build ./src_temp/ ./pamfingerprint_1.0.deb
+dpkg --build ./src_temp/ ./pamfingerprint_1.0.1.deb
 
 rm -R ./src_temp/
 
-chown 1000:1000 ./pamfingerprint_1.0.deb
+chown 1000:1000 ./pamfingerprint_1.0.1.deb

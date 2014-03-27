@@ -48,8 +48,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
         ## Be sure the user is set 
         if ( userName == None ):
-            logger.error('The user is not known!')
-            return pamh.PAM_USER_UNKNOWN
+            raise Exception('The user is not known!')
 
     except:
         e = sys.exc_info()[1]
