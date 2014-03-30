@@ -1,0 +1,155 @@
+#!/usr/bin/env python
+
+"""
+"" pamfingerprint
+"" Configuration check program.
+""
+"" Copyright 2014 Philipp Meisberger, Bastian Raschke.
+"" All rights reserved.
+"""
+
+import sys 
+sys.path.append('/usr/lib')
+
+from pamfingerprint.version import VERSION
+from pamfingerprint.Config import *
+
+from PyFingerprint.PyFingerprint import *
+
+import argparse
+import hashlib
+
+
+class PamFingerprintCheck(object):
+
+    """
+    "" The PyFingerprint instance
+    "" @var PyFingerprint __fingerprint
+    """
+    __fingerprint = None
+
+    """
+    "" Constructor
+    ""
+    "" @return void
+    """
+    def __init__(self):
+
+        ## Tries to init config instance
+        try:
+            self.__config = Config('/etc/pamfingerprint.conf')
+
+        except:
+            e = sys.exc_info()[1]
+            print '[Exception] ' + e.message
+            exit(1)
+
+        ## Gets connection values
+        port = self.__config.readString('PyFingerprint', 'port')
+        baudRate = self.__config.readInteger('PyFingerprint', 'baudRate')
+        address = self.__config.readHex('PyFingerprint', 'address')
+        password = self.__config.readHex('PyFingerprint', 'password')
+
+        ## Tries to establish connection
+        try:
+            self.__fingerprint = PyFingerprint(port, baudRate, address, password)
+
+            if ( self.__fingerprint.verifyPassword() == False ):
+                raise ValueError('The given fingerprint sensor password is wrong!')
+
+        except:
+            e = sys.exc_info()[1]
+            print '[Exception] The fingerprint sensor could not be initialized: ' + e.message
+            exit(1)
+
+    """
+    "" Do a fingerprint check for a given user.
+    ""
+    "" @param string userName
+    "" @return boolean
+    """
+    def checkUser(self, userName):
+
+        ## Checks if the the user was already added
+        if ( self.__config.itemExists('Users', userName) == False ):
+            print '[Error] The user "' + userName + '" is not added!'
+            return False
+
+        ## Tries to get user information (template position, fingerprint hash)
+        try:
+            userData = self.__config.readList('Users', userName)
+
+            ## Validates user information
+            if ( len(userData) != 2 ):
+                raise Exception('The user information of "' + userName + '" is invalid!')
+
+            expectedPositionNumber = int(userData[0])
+            expectedFingerprintHash = userData[1]
+
+        except:
+            e = sys.exc_info()[1]
+            print '[Exception] ' + e.message
+            return False
+
+        ## Tries to check fingerprint
+        try:
+            print 'Waiting for finger...'
+
+            while ( self.__fingerprint.readImage() == False ):
+                pass
+
+            self.__fingerprint.convertImage(0x01)
+
+            ## Gets position and accuracy score of template
+            result = self.__fingerprint.searchTemplate()
+            positionNumber = result[0]
+            accuracyScore = result[1]
+
+            ## Checks if the template position is invalid
+            if ( positionNumber == -1 ):
+                raise Exception('No match found!')
+
+            ## Checks if the template position is correct
+            if ( positionNumber == expectedPositionNumber ):
+                print 'A match was found on template position #' + str(positionNumber) + ' with accuracy score ' + str(accuracyScore) + '.'
+            else:
+                raise Exception('The template position of the found match (#' + str(positionNumber) + ') is not equal to the stored one (#' + str(expectedPositionNumber) + ')!')
+
+            ## Gets characteristics
+            self.__fingerprint.loadTemplate(positionNumber, 0x01)
+            characterics = self.__fingerprint.downloadCharacteristics(0x01)
+
+            ## Calculates hash of template
+            print 'Calculating hash...'
+            fingerprintHash = hashlib.sha256(str(characterics)).hexdigest()
+
+            print 'Checking if calculated hash matches stored hash...'
+
+            ## Checks if read hash matches stored hash
+            if ( fingerprintHash == expectedFingerprintHash ):
+                print 'Hashes match!'
+                print 'Check for user "' + userName + '" was successful!'
+            else:
+                raise Exception('The found template is not assigned to user (the hash does not match)!')
+
+        except:
+            e = sys.exc_info()[1]
+            print '[Exception] Check for user "' + userName + '" failed: ' + e.message
+            return False
+
+        return True
+
+
+if ( __name__ == '__main__' ):
+
+    parser = argparse.ArgumentParser(description = 'pamfingerprint simulation program:')
+
+    parser.add_argument('--check-user', metavar='NAME', help='Checks fingerprint for an existing user.')
+    parser.add_argument('--version', '-v', action='version', version='pamfingerprint ' + VERSION, help='Prints version and exits.')
+
+    args = vars(parser.parse_args())
+        
+    if ( args['check_user'] ):
+        PamFingerprintCheck().checkUser(args['check_user'])
+    else:
+        parser.print_help()

@@ -1,0 +1,12 @@
+Package: pamfingerprint
+Version: 1.0.1
+Section: admin
+Priority: extra
+Depends: python (>= 2.7), libpam-python, python-serial
+Architecture: all
+Installed-Size: 30
+Maintainer: Philipp Meisberger <team@pm-codeworks.de>
+Homepage: www.pm-codeworks.de/pamfingerprint.html
+Description: Pluggable Authentication Module for biometric authentication.
+ The ZhianTec ZFM-20 fingerprint sensor (known as "Arduino fingerprint sensor")
+ is required for this module.
