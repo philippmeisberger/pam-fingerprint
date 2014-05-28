@@ -1,9 +1,9 @@
 """
-"" pamfingerprint
-"" PAM implementation.
-""
-"" Copyright 2014 Philipp Meisberger, Bastian Raschke.
-"" All rights reserved. 
+pamfingerprint
+PAM implementation.
+
+Copyright 2014 Philipp Meisberger, Bastian Raschke.
+All rights reserved. 
 """
 
 import sys 
@@ -28,15 +28,15 @@ fileHandler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(messag
 logger.addHandler(fileHandler)
 
 
-"""
-"" PAM service function for user authentication.
-""
-"" @param pamh
-"" @param flags
-"" @param argv
-"" @return integer
-"""
 def pam_sm_authenticate(pamh, flags, argv):
+    """
+    PAM service function for user authentication.
+
+    @param pamh
+    @param flags
+    @param argv
+    @return integer
+    """
 
     ## Tries to get user which is asking for permission
     try:
@@ -153,14 +153,15 @@ def pam_sm_authenticate(pamh, flags, argv):
     ## Denies for default
     return pamh.PAM_AUTH_ERR
 
-"""
-"" PAM service function to alter credentials.
-""
-"" @param pamh
-"" @param flags
-"" @param argv
-"" @return integer
-"""
+
 def pam_sm_setcred(pamh, flags, argv):
+    """
+    PAM service function to alter credentials.
+
+    @param pamh
+    @param flags
+    @param argv
+    @return integer
+    """    
 
     return pamh.PAM_SUCCESS

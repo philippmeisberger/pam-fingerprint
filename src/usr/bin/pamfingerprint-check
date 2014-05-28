@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 """
-"" pamfingerprint
-"" Configuration check program.
-""
-"" Copyright 2014 Philipp Meisberger, Bastian Raschke.
-"" All rights reserved.
+PAM Fingerprint
+
+Copyright 2014 Philipp Meisberger, Bastian Raschke.
+All rights reserved.
 """
 
 import sys 
@@ -21,19 +20,20 @@ import hashlib
 
 
 class PamFingerprintCheck(object):
-
     """
-    "" The PyFingerprint instance
-    "" @var PyFingerprint __fingerprint
+    Configuration check program.
+    
+    The PyFingerprint instance
+    @var PyFingerprint __fingerprint
     """
     __fingerprint = None
 
-    """
-    "" Constructor
-    ""
-    "" @return void
-    """
+    
     def __init__(self):
+        """
+        Constructor
+        
+        """
 
         ## Tries to init config instance
         try:
@@ -62,14 +62,14 @@ class PamFingerprintCheck(object):
             print '[Exception] The fingerprint sensor could not be initialized: ' + e.message
             exit(1)
 
-    """
-    "" Do a fingerprint check for a given user.
-    ""
-    "" @param string userName
-    "" @return boolean
-    """
     def checkUser(self, userName):
-
+        """
+        Executes a fingerprint check for a given user.
+        
+        @param string userName
+        @return boolean
+        """
+        
         ## Checks if the the user was already added
         if ( self.__config.itemExists('Users', userName) == False ):
             print '[Error] The user "' + userName + '" is not added!'
