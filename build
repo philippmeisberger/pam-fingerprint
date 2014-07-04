@@ -13,3 +13,4 @@ dpkg --build ./src_temp/ ./pamfingerprint_1.0.1.deb
 rm -R ./src_temp/
 
 chown 1000:1000 ./pamfingerprint_1.0.1.deb
+exit "${?}"

@@ -1,5 +1,0 @@
-* 1.0.1
-- If template exists already on a position the user is asked to bind this template to the specified user after --add-user. 
-
-* 1.0
-- Initial release

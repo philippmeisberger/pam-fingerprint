@@ -1,0 +1,11 @@
+2014-03-30  Philipp Meisberger <team@pm-codeworks.de>
+
+  * Release 1.0.1
+  * If template exists already on a position the user is asked to bind this template to the specified user after --add-user. 
+
+
+2014-03-16  Philipp Meisberger <team@pm-codeworks.de>
+
+  * Initial release (1.0)
+
+ -- Philipp Meisberger <team@pm-codeworks.de>, Bastian Rascke <bastian.raschke@posteo.de>
