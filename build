@@ -1,16 +1,11 @@
 #!/bin/sh
 
-if ( test "$USER" != "root" ); then
-    echo "This script must executed as root!"
-    exit 1
-fi
-
 cp -r ./src/ ./src_temp/
 chown 1000:1000 ./src_temp/var/log/pamfingerprint.log
 
-dpkg --build ./src_temp/ ./pamfingerprint_1.0.1.deb
+dpkg --build ./src_temp/ ./pamfingerprint.deb
 
 rm -R ./src_temp/
 
-chown 1000:1000 ./pamfingerprint_1.0.1.deb
+chown 1000:1000 ./pamfingerprint.deb
 exit "${?}"

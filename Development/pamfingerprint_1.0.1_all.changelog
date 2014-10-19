@@ -1,0 +1,12 @@
+pamfingerprint (1.0.1) unstable; urgency=high
+
+  * New maintenance release
+  * If template exists already on a position the user is asked to bind this template to the specified user after --add-user. 
+
+ -- Philipp Meisberger <team@pm-codeworks.de>  Sun, 30 Mar 2014 15:19:22 +0200
+
+pamfingerprint (1.0) unstable; urgency=low
+
+  * Initial release
+
+ -- Philipp Meisberger <team@pm-codeworks.de>  Sun, 16 Mar 2014 11:12:09 +0200

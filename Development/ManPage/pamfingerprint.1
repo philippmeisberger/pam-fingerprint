@@ -7,7 +7,7 @@
 \fBpamfingerprint\fR is a Python written Pluggable Authentication Module (PAM) which uses pam_python to work with operating system like a native C module. It allows biometric (passwordless) authentication with the ZFM-20 fingerprint sensor manufactored by ZhianTec (known as "Arduino fingerprint sensor"). The connection to the UART fingerprint sensor will be established via Pyserial. A default USB TTL converter can be used to connect the device.
 .br
 
-For default the standard passwort authentication is set as fallback in case no fingerprint sensor is connected. The module has to be configured by the \fBpamfingerprint-conf\fR program. It allows (as root) to bind or unbind users to \fBpamfingerprint\fR. To simulate an authentication process the \fBpamfingerprint-check\fR program can be used.
+For default the standard password authentication is set as fallback in case no fingerprint sensor is connected. The module has to be configured by the \fBpamfingerprint-conf\fR program. It allows (as root) to bind or unbind users to \fBpamfingerprint\fR. To simulate an authentication process the \fBpamfingerprint-check\fR program can be used.
 
 .SH "SEE ALSO"
 \fBpamfingerprint-conf\fR(1), \fBpamfingerprint-check\fR(1)
