@@ -3,10 +3,10 @@ pamfingerprint
 PAM implementation.
 
 Copyright 2014 Philipp Meisberger, Bastian Raschke.
-All rights reserved. 
+All rights reserved.
 """
 
-import sys 
+import sys
 sys.path.append('/usr/lib')
 
 from pamfingerprint.version import VERSION
@@ -15,17 +15,7 @@ from pamfingerprint.Config import *
 from PyFingerprint.PyFingerprint import *
 
 import hashlib
-import logging
-
-## Configures logger
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-## Creates and adds a file handler to logger
-fileHandler = logging.FileHandler('/var/log/pamfingerprint.log')
-fileHandler.setLevel(logging.INFO)
-fileHandler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
-logger.addHandler(fileHandler)
+import syslog
 
 
 def pam_sm_authenticate(pamh, flags, argv):
@@ -44,15 +34,15 @@ def pam_sm_authenticate(pamh, flags, argv):
 
         ## Fallback
         if ( userName == None ):
-            userName = pamh.get_user()            
+            userName = pamh.get_user()
 
-        ## Be sure the user is set 
+        ## Be sure the user is set
         if ( userName == None ):
             raise Exception('The user is not known!')
 
     except:
         e = sys.exc_info()[1]
-        logger.error(e.message, exc_info=True)
+        syslog.syslog(syslog.LOG_ERR, e.message)
         return pamh.PAM_USER_UNKNOWN
 
     ## Tries to init Config
@@ -61,20 +51,20 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except:
         e = sys.exc_info()[1]
-        logger.error(e.message, exc_info=True)
+        syslog.syslog(syslog.LOG_ERR, e.message)
         return pamh.PAM_IGNORE
 
-    logger.info('The user "' + userName + '" is asking for permission for service "' + str(pamh.service) + '".')
+    syslog.syslog(syslog.LOG_INFO, 'The user "' + userName + '" is asking for permission for service "' + str(pamh.service) + '".')
 
     ## Checks if the the user was added in configuration
     if ( config.itemExists('Users', userName) == False ):
-        logger.error('The user was not added!')
+        syslog.syslog(syslog.LOG_ERR, 'The user was not added!')
         return pamh.PAM_IGNORE
 
     ## Tries to get user information (template position, fingerprint hash)
     try:
         userData = config.readList('Users', userName)
-        
+
         ## Validates user information
         if ( len(userData) != 2 ):
             raise Exception('The user information of "' + userName + '" is invalid!')
@@ -84,7 +74,7 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except:
         e = sys.exc_info()[1]
-        logger.error(e.message, exc_info=False)
+        syslog.syslog(syslog.LOG_ERR, e.message)
         return pamh.PAM_AUTH_ERR
 
     ## Gets sensor connection values
@@ -101,7 +91,7 @@ def pam_sm_authenticate(pamh, flags, argv):
             raise ValueError('The given fingerprint sensor password is wrong!')
 
     except:
-        logger.error('The fingerprint sensor could not be initialized!', exc_info=True)
+        syslog.syslog(syslog.LOG_ERR, 'The fingerprint sensor could not be initialized!')
         pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Sensor initialization failed!'))
         return pamh.PAM_IGNORE
 
@@ -136,17 +126,17 @@ def pam_sm_authenticate(pamh, flags, argv):
 
         ## Checks if the calculated hash is equal to expected hash from user
         if ( fingerprintHash == expectedFingerprintHash ):
-            logger.info('Access granted!')
+            syslog.syslog(syslog.LOG_INFO, 'Access granted!')
             pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access granted!'))
             return pamh.PAM_SUCCESS
         else:
-            logger.info('The found match is not assigned to user!')
+            syslog.syslog(syslog.LOG_WARNING, 'The found match is not assigned to user!')
             pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
             return pamh.PAM_AUTH_ERR
 
     except:
         e = sys.exc_info()[1]
-        logger.error('Fingerprint read failed!', exc_info=True)
+        syslog.syslog(syslog.LOG_ERR, 'Fingerprint read failed!')
         pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
         return pamh.PAM_AUTH_ERR
 
@@ -162,6 +152,6 @@ def pam_sm_setcred(pamh, flags, argv):
     @param flags
     @param argv
     @return integer
-    """    
+    """
 
     return pamh.PAM_SUCCESS
