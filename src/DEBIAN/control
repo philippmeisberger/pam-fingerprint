@@ -2,6 +2,7 @@ Package: libpam-fingerprint
 Version: 1.1
 Section: admin
 Priority: extra
+provides: pamfingerprint
 Depends: python (>= 2.7), libpam-python, python-serial, python-fingerprint
 Architecture: all
 Installed-Size: 30

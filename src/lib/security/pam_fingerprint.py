@@ -18,6 +18,20 @@ import hashlib
 import syslog
 
 
+def auth_log(message, priority=syslog.LOG_INFO):
+    """
+    Sends errors to default authentication log
+
+    @param message
+    @param priority
+    @return void
+    """
+
+    syslog.openlog(facility=syslog.LOG_AUTH)
+    syslog.syslog(priority, 'pamfingerprint: ' + message)
+    syslog.closelog()
+
+
 def pam_sm_authenticate(pamh, flags, argv):
     """
     PAM service function for user authentication.
@@ -40,25 +54,23 @@ def pam_sm_authenticate(pamh, flags, argv):
         if ( userName == None ):
             raise Exception('The user is not known!')
 
-    except:
-        e = sys.exc_info()[1]
-        syslog.syslog(syslog.LOG_ERR, e.message)
+    except Exception as e:
+        auth_log(e.message, syslog.LOG_CRIT)
         return pamh.PAM_USER_UNKNOWN
 
     ## Tries to init Config
     try:
         config = Config('/etc/pamfingerprint.conf')
 
-    except:
-        e = sys.exc_info()[1]
-        syslog.syslog(syslog.LOG_ERR, e.message)
+    except Exception as e:
+        auth_log(e.message, syslog.LOG_CRIT)
         return pamh.PAM_IGNORE
 
-    syslog.syslog(syslog.LOG_INFO, 'The user "' + userName + '" is asking for permission for service "' + str(pamh.service) + '".')
+    auth_log('The user "' + userName + '" is asking for permission for service "' + str(pamh.service) + '".', syslog.LOG_DEBUG)
 
     ## Checks if the the user was added in configuration
     if ( config.itemExists('Users', userName) == False ):
-        syslog.syslog(syslog.LOG_ERR, 'The user was not added!')
+        auth_log('The user was not added!', syslog.LOG_ERR)
         return pamh.PAM_IGNORE
 
     ## Tries to get user information (template position, fingerprint hash)
@@ -72,9 +84,8 @@ def pam_sm_authenticate(pamh, flags, argv):
         expectedPositionNumber = int(userData[0])
         expectedFingerprintHash = userData[1]
 
-    except:
-        e = sys.exc_info()[1]
-        syslog.syslog(syslog.LOG_ERR, e.message)
+    except Exception as e:
+        auth_log(e.message, syslog.LOG_CRIT)
         return pamh.PAM_AUTH_ERR
 
     ## Gets sensor connection values
@@ -90,8 +101,8 @@ def pam_sm_authenticate(pamh, flags, argv):
         if ( fingerprint.verifyPassword() == False ):
             raise ValueError('The given fingerprint sensor password is wrong!')
 
-    except:
-        syslog.syslog(syslog.LOG_ERR, 'The fingerprint sensor could not be initialized!')
+    except Exception as e:
+        auth_log('The fingerprint sensor could not be initialized: ' + e.message, syslog.LOG_ERR)
         pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Sensor initialization failed!'))
         return pamh.PAM_IGNORE
 
@@ -126,17 +137,16 @@ def pam_sm_authenticate(pamh, flags, argv):
 
         ## Checks if the calculated hash is equal to expected hash from user
         if ( fingerprintHash == expectedFingerprintHash ):
-            syslog.syslog(syslog.LOG_INFO, 'Access granted!')
+            auth_log('Access granted!')
             pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access granted!'))
             return pamh.PAM_SUCCESS
         else:
-            syslog.syslog(syslog.LOG_WARNING, 'The found match is not assigned to user!')
+            auth_log('The found match is not assigned to user!', syslog.LOG_WARNING)
             pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
             return pamh.PAM_AUTH_ERR
 
-    except:
-        e = sys.exc_info()[1]
-        syslog.syslog(syslog.LOG_ERR, 'Fingerprint read failed!')
+    except Exception as e:
+        auth_log('Fingerprint read failed: ' + e.message, syslog.LOG_CRIT)
         pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
         return pamh.PAM_AUTH_ERR
 
@@ -147,6 +157,58 @@ def pam_sm_authenticate(pamh, flags, argv):
 def pam_sm_setcred(pamh, flags, argv):
     """
     PAM service function to alter credentials.
+
+    @param pamh
+    @param flags
+    @param argv
+    @return integer
+    """
+
+    return pamh.PAM_SUCCESS
+
+
+def pam_sm_acct_mgmt(pamh, flags, argv):
+    """
+    PAM service function for account management.
+
+    @param pamh
+    @param flags
+    @param argv
+    @return integer
+    """
+
+    return pamh.PAM_SUCCESS
+
+
+def pam_sm_open_session(pamh, flags, argv):
+    """
+    PAM service function to start session.
+
+    @param pamh
+    @param flags
+    @param argv
+    @return integer
+    """
+
+    return pamh.PAM_SUCCESS
+
+
+def pam_sm_close_session(pamh, flags, argv):
+    """
+    PAM service function to terminate session.
+
+    @param pamh
+    @param flags
+    @param argv
+    @return integer
+    """
+
+    return pamh.PAM_SUCCESS
+
+
+def pam_sm_chauthtok(pamh, flags, argv):
+    """
+    PAM service function for authentication token management.
 
     @param pamh
     @param flags
