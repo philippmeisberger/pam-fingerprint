@@ -1,5 +1,5 @@
 #!/bin/sh
 
 ## Adds PAM configuration to "/etc/pam.d/common-auth":
-pam-auth-update --package pamfingerprint
+pam-auth-update --package fingerprint
 exit "${?}"
