@@ -5,7 +5,7 @@ Priority: extra
 Provides: pamfingerprint
 Replaces: pamfingerprint
 Conflicts: pamfingerprint
-Depends: python (>= 2.7), libpam-python, python-serial, python-fingerprint
+Depends: python (>= 2.7), libpam-python, python-fingerprint
 Architecture: all
 Installed-Size: 30
 Maintainer: Philipp Meisberger <team@pm-codeworks.de>

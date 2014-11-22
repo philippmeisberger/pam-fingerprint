@@ -1,4 +1,4 @@
-3acc96a4a251f273977f974be07edcd0  lib/security/pam_fingerprint.py
+b4278cf04adfff79342ff1135efe3122  lib/security/pam_fingerprint.py
 6a1fbbf762b7dbb7faf79f9e6a17db9c  etc/pamfingerprint.conf
 c68048dcb0315d0a36eef20495fa98b6  etc/bash_completion.d/pamfingerprint
 d41d8cd98f00b204e9800998ecf8427e  usr/lib/pamfingerprint/__init__.py
@@ -12,5 +12,5 @@ c47db20a0050d1530f55e9e64059175b  usr/share/doc/pamfingerprint/authors
 be4194e55e3efd3741013fcedccbc9cb  usr/share/man/man1/pamfingerprint-conf.1.gz
 4096c61e5e04de6b4581e68e0a5d8f1b  usr/share/man/man1/pamfingerprint-check.1.gz
 74d6d6c123985e8a2821016333dc7878  usr/share/pam-configs/fingerprint
-8ccf9086aa40a4d659740ab11c52bc40  usr/bin/pamfingerprint-conf
-8db223ee9eaa8fbff4aeb23b539073c0  usr/bin/pamfingerprint-check
+c89bdc4c6e32fd69faa73a2e196c6875  usr/bin/pamfingerprint-conf
+a2cbb4d27b061c2002c7660314bf59c0  usr/bin/pamfingerprint-check
