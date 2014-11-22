@@ -22,8 +22,8 @@ def auth_log(message, priority=syslog.LOG_INFO):
     """
     Sends errors to default authentication log
 
-    @param message
-    @param priority
+    @param string message
+    @param integer priority
     @return void
     """
 

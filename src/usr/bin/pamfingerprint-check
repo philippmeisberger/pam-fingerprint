@@ -7,7 +7,7 @@ Copyright 2014 Philipp Meisberger, Bastian Raschke.
 All rights reserved.
 """
 
-import sys 
+import sys
 sys.path.append('/usr/lib')
 
 from pamfingerprint.version import VERSION
@@ -22,25 +22,24 @@ import hashlib
 class PamFingerprintCheck(object):
     """
     Configuration check program.
-    
+
     The PyFingerprint instance
     @var PyFingerprint __fingerprint
     """
     __fingerprint = None
 
-    
+
     def __init__(self):
         """
         Constructor
-        
+
         """
 
         ## Tries to init config instance
         try:
             self.__config = Config('/etc/pamfingerprint.conf')
 
-        except:
-            e = sys.exc_info()[1]
+        except Exception as e:
             print '[Exception] ' + e.message
             exit(1)
 
@@ -57,19 +56,18 @@ class PamFingerprintCheck(object):
             if ( self.__fingerprint.verifyPassword() == False ):
                 raise ValueError('The given fingerprint sensor password is wrong!')
 
-        except:
-            e = sys.exc_info()[1]
+        except Exception as e:
             print '[Exception] The fingerprint sensor could not be initialized: ' + e.message
             exit(1)
 
     def checkUser(self, userName):
         """
         Executes a fingerprint check for a given user.
-        
+
         @param string userName
         @return boolean
         """
-        
+
         ## Checks if the the user was already added
         if ( self.__config.itemExists('Users', userName) == False ):
             print '[Error] The user "' + userName + '" is not added!'
@@ -86,8 +84,7 @@ class PamFingerprintCheck(object):
             expectedPositionNumber = int(userData[0])
             expectedFingerprintHash = userData[1]
 
-        except:
-            e = sys.exc_info()[1]
+        except Exception as e:
             print '[Exception] ' + e.message
             return False
 
@@ -132,8 +129,7 @@ class PamFingerprintCheck(object):
             else:
                 raise Exception('The found template is not assigned to user (the hash does not match)!')
 
-        except:
-            e = sys.exc_info()[1]
+        except Exception as e:
             print '[Exception] Check for user "' + userName + '" failed: ' + e.message
             return False
 
@@ -142,13 +138,13 @@ class PamFingerprintCheck(object):
 
 if ( __name__ == '__main__' ):
 
-    parser = argparse.ArgumentParser(description = 'pamfingerprint simulation program:')
+    parser = argparse.ArgumentParser(description='pamfingerprint simulation program:')
 
     parser.add_argument('--check-user', metavar='NAME', help='Checks fingerprint for an existing user.')
     parser.add_argument('--version', '-v', action='version', version='pamfingerprint ' + VERSION, help='Prints version and exits.')
 
     args = vars(parser.parse_args())
-        
+
     if ( args['check_user'] ):
         PamFingerprintCheck().checkUser(args['check_user'])
     else:

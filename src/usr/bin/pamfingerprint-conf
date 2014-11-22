@@ -7,7 +7,7 @@ Copyright 2014 Philipp Meisberger, Bastian Raschke.
 All rights reserved.
 """
 
-import sys 
+import sys
 sys.path.append('/usr/lib')
 
 from pamfingerprint.version import VERSION
@@ -24,7 +24,7 @@ import os
 class PamFingerprint(object):
     """
     Configuration program.
-    
+
     The PyFingerprint instance
     @var PyFingerprint __fingerprint
 
@@ -33,19 +33,18 @@ class PamFingerprint(object):
     """
     __fingerprint = None
     __config = None
-    
+
     def __init__(self):
         """
         Constructor
-        
+
         """
 
         ## Tries to init config instance
         try:
             self.__config = Config('/etc/pamfingerprint.conf')
 
-        except:
-            e = sys.exc_info()[1]
+        except Exception as e:
             print '[Exception] ' + e.message
             exit(1)
 
@@ -62,19 +61,18 @@ class PamFingerprint(object):
             if ( self.__fingerprint.verifyPassword() == False ):
                 raise ValueError('The given fingerprint sensor password is wrong!')
 
-        except:
-            e = sys.exc_info()[1]
+        except Exception as e:
             print '[Exception] The fingerprint sensor could not be initialized: ' + e.message
             exit(1)
 
     def __showConfirmationDialog(self, question = ''):
         """
         Shows confirmation dialog.
-    
+
         @param string question
         @return boolean
         """
-    
+
         answer = raw_input(question + ' (Y/n)')
 
         if ( answer not in ['y', 'Y', ''] ):
@@ -85,11 +83,11 @@ class PamFingerprint(object):
     def addUser(self, userName):
         """
         Enrolls new fingerprint template and adds user to pamfingerprint.
-        
+
         @param string userName
         @return boolean
         """
-        
+
         ## Checks if user is root
         if ( os.geteuid() != 0 ):
             print '[Error] You need to have root privileges to add a user!'
@@ -153,12 +151,12 @@ class PamFingerprint(object):
             else:
                 print '[Warning] The finger already exists at template position #' + str(positionNumber) + '!'
 
-                if ( self.__showConfirmationDialog('Bind this template to the user "' + userName + '" ?') == False ):                    
+                if ( self.__showConfirmationDialog('Bind this template to the user "' + userName + '" ?') == False ):
                     print 'Adding user canceled.'
                     return False
                 else:
                     freePositionNumber = positionNumber
-                
+
             ## Gets characteristics and calculates hash
             self.__fingerprint.loadTemplate(freePositionNumber, 0x01)
             characteristics = self.__fingerprint.downloadCharacteristics(0x01)
@@ -178,8 +176,7 @@ class PamFingerprint(object):
             else:
                 raise Exception('The configuration could not be written!')
 
-        except:
-            e = sys.exc_info()[1]
+        except Exception as e:
             print '[Exception] Error while adding user: ' + e.message
             return False
 
@@ -188,11 +185,11 @@ class PamFingerprint(object):
     def removeUser(self, userName):
         """
         Removes fingerprint template from sensor and removes user from configuration.
-        
+
         @param string userName
         @return boolean
         """
-        
+
         ## Checks if user is root
         if ( os.geteuid() != 0 ):
             print '[Error] You need to have root privileges to add a user!'
@@ -214,8 +211,7 @@ class PamFingerprint(object):
             positionNumber = int(userData[0])
             expectedFingerprintHash = userData[1]
 
-        except:
-            e = sys.exc_info()[1]
+        except Exception as e:
             print '[Exception] ' + e.message
             return False
 
@@ -246,8 +242,7 @@ class PamFingerprint(object):
             else:
                 raise Exception('The configuration file could not be written!')
 
-        except:
-            e = sys.exc_info()[1]
+        except Exception as e:
             print '[Exception] Error while removing user: ' + e.message
             return False
 
@@ -256,7 +251,7 @@ class PamFingerprint(object):
 
 if ( __name__ == '__main__' ):
 
-    parser = argparse.ArgumentParser(description = 'pamfingerprint configuration program:')
+    parser = argparse.ArgumentParser(description='pamfingerprint configuration program:')
 
     parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
     parser.add_argument('--remove-user', metavar='NAME', help='Removes a user.')
