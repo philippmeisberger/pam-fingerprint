@@ -1,9 +1,0 @@
-#!/bin/sh
-
-if ( test "$1" = "remove" || test "$1" = "purge" ); then
-    ## Removes PAM configuration in "/etc/pam.d/common-auth":
-    pam-auth-update --package --remove pamfingerprint
-else
-    ## Adds PAM configuration to "/etc/pam.d/common-auth":
-    pam-auth-update --package pamfingerprint
-fi

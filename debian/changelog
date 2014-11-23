@@ -1,4 +1,4 @@
-pamfingerprint (1.1) stable; urgency=low
+libpam-fingerprint (1.1) stable; urgency=low
 
   * Minor Release
   * Renamed package to libpam-fingerprint
@@ -6,16 +6,16 @@ pamfingerprint (1.1) stable; urgency=low
   * Removed logging to /var/log/pamfingerprint.log
     - Now logging to default authentication log
 
- -- Philipp Meisberger <team@pm-codeworks.de>  Fr, 21 Nov 2014 18:22:12 +0200
+ -- Philipp Meisberger <team@pm-codeworks.de>  Fri, 21 Nov 2014 18:22:12 +0200
    
-pamfingerprint (1.0.1) unstable; urgency=high
+libpam-fingerprint (1.0.1) unstable; urgency=high
 
   * New maintenance release
   * If template exists already on a position the user is asked to bind this template to the specified user after --add-user. 
 
  -- Philipp Meisberger <team@pm-codeworks.de>  Sun, 30 Mar 2014 15:19:22 +0200
 
-pamfingerprint (1.0) unstable; urgency=low
+libpam-fingerprint (1.0) unstable; urgency=low
 
   * Initial release
 

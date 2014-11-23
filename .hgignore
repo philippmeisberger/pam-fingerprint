@@ -1,5 +1,6 @@
 ## Uses glob syntax, regex sucks ;)
 syntax: glob
 
+debian/libpam-fingerprint/*
 **.pyc
 **.out

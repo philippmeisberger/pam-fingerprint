@@ -1,8 +1,0 @@
-pamfingerprint (1.0.1) precise; urgency=low
-
-* 1.0.1
-  If template exists already on a position the user is asked to bind this template to the specified user after --add-user. 
-
-* Initial release
-
- -- Philipp Meisberger <team@pm-codeworks.de>  Sun, 30 Mar 2014 11:48:09 +0200
