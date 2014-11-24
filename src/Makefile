@@ -6,9 +6,9 @@ clean:
 
 install:
 	mkdir -p $(LIBDIR)
-	cp -r src/etc/ $(DESTDIR)/
-	cp -r src/lib/ $(DESTDIR)/
-	cp -r src/usr/ $(DESTDIR)/
+	cp -r files/etc/ $(DESTDIR)/
+	cp -r files/lib/ $(DESTDIR)/
+	cp -r files/usr/ $(DESTDIR)/
 
 uninstall:
 	rm -rf $(LIBDIR)
