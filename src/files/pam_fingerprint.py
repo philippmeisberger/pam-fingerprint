@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 pamfingerprint
 PAM implementation.
@@ -6,16 +9,10 @@ Copyright 2014 Philipp Meisberger, Bastian Raschke.
 All rights reserved.
 """
 
-import sys
-sys.path.append('/usr/lib')
-
-from pamfingerprint.version import VERSION
-from pamfingerprint.Config import *
-
-from PyFingerprint.PyFingerprint import *
-
-import hashlib
 import syslog
+import hashlib
+import pamfingerprint.Config as Config
+import PyFingerprint.PyFingerprint as PyFingerprint
 
 
 def auth_log(message, priority=syslog.LOG_INFO):

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 PAM Fingerprint
@@ -7,16 +8,12 @@ Copyright 2014 Philipp Meisberger, Bastian Raschke.
 All rights reserved.
 """
 
-import sys
-sys.path.append('/usr/lib')
-
-from pamfingerprint.version import VERSION
-from pamfingerprint.Config import *
-
-from PyFingerprint.PyFingerprint import *
-
 import argparse
 import hashlib
+
+import pamfingerprint.Config as Config
+import pamfingerprint.__version__ as VERSION
+import PyFingerprint.PyFingerprint as PyFingerprint
 
 
 class PamFingerprintCheck(object):
