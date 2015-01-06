@@ -1,9 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 from distutils.core import setup
 
 setup(
-    name            = 'libpam-fingerprint',
+    name            = 'PAM Fingerprint',
     version         = '1.1',
     description     = 'Pluggable Authentication Module for biometric authentication.',
     author          = 'Philipp Meisberger',

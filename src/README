@@ -9,10 +9,7 @@ Install instructions for Debian 7
     * `~# apt-get update`
 
 * Install the package:
-    * `~# apt-get install pamfingerprint`
-
-* Install "PyFingerprint":
-    * `~# wget -O - https://sicherheitskritisch.de/PyFingerprint.tar.gz | tar xvzf - -C /`
+    * `~# apt-get install libpam-fingerprint`
 
 * Add group "dialout" for each user which should be able to use pamfingerprint:
     * `~# usermod -a -G dialout <username>`
