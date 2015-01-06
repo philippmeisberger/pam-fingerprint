@@ -3,13 +3,21 @@ Maintainer: Philipp Meisberger <team@pm-codeworks.de>
 Section: admin
 Priority: optional
 Standards-Version: 3.9.4
-Build-Depends: debhelper (>= 9), python (>= 2.7), python-setuptools
-
+Build-Depends: debhelper (>= 9),
+               python (>= 2.7),
+               python-setuptools,
+               bash-completion
 Package: libpam-fingerprint
 Provides: pamfingerprint
 Replaces: pamfingerprint
 Conflicts: pamfingerprint
-Depends: python (>= 2.7), libpam-python, python-fingerprint, ${python:Depends}, ${misc:Depends}
+Depends: python (>= 2.7),
+         python-argparse,
+         libpam-python,
+         python-fingerprint,
+         bash-completion,
+         ${python:Depends},
+         ${misc:Depends}
 Architecture: all
 Homepage: http://www.pm-codeworks.de/pamfingerprint.html
 Description: Pluggable Authentication Module for biometric authentication.
