@@ -70,7 +70,7 @@ def pam_sm_authenticate(pamh, flags, argv):
             raise Exception('The user is not known!')
 
     except Exception as e:
-        auth_log(e.message, syslog.LOG_CRIT)
+        auth_log(str(e), syslog.LOG_CRIT)
         return pamh.PAM_USER_UNKNOWN
 
     ## Tries to init Config
@@ -78,7 +78,7 @@ def pam_sm_authenticate(pamh, flags, argv):
         config = Config('/etc/pamfingerprint.conf')
 
     except Exception as e:
-        auth_log(e.message, syslog.LOG_CRIT)
+        auth_log(str(e), syslog.LOG_CRIT)
         return pamh.PAM_IGNORE
 
     auth_log('The user "' + userName + '" is asking for permission for service "' + str(pamh.service) + '".', syslog.LOG_DEBUG)
@@ -100,7 +100,7 @@ def pam_sm_authenticate(pamh, flags, argv):
         expectedFingerprintHash = userData[1]
 
     except Exception as e:
-        auth_log(e.message, syslog.LOG_CRIT)
+        auth_log(str(e), syslog.LOG_CRIT)
         return pamh.PAM_AUTH_ERR
 
     ## Gets sensor connection values
@@ -117,7 +117,7 @@ def pam_sm_authenticate(pamh, flags, argv):
             raise ValueError('The given fingerprint sensor password is wrong!')
 
     except Exception as e:
-        auth_log('The fingerprint sensor could not be initialized: ' + e.message, syslog.LOG_ERR)
+        auth_log('The fingerprint sensor could not be initialized: ' + str(e), syslog.LOG_ERR)
         showPAMTextMessage(pamh, 'Sensor initialization failed!')
         return pamh.PAM_IGNORE
 
@@ -160,7 +160,7 @@ def pam_sm_authenticate(pamh, flags, argv):
             return pamh.PAM_AUTH_ERR
 
     except Exception as e:
-        auth_log('Fingerprint read failed: ' + e.message, syslog.LOG_CRIT)
+        auth_log('Fingerprint read failed: ' + str(e), syslog.LOG_CRIT)
         showPAMTextMessage(pamh, 'Access denied!')
         return pamh.PAM_AUTH_ERR
 

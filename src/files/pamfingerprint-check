@@ -36,7 +36,7 @@ class PamFingerprintCheck(object):
             self.__config = Config('/etc/pamfingerprint.conf')
 
         except Exception as e:
-            print('[Exception] ' + e)
+            print('[Exception] ' + str(e))
             exit(1)
 
         ## Gets connection values
@@ -53,7 +53,7 @@ class PamFingerprintCheck(object):
                 raise ValueError('The given fingerprint sensor password is wrong!')
 
         except Exception as e:
-            print('[Exception] The fingerprint sensor could not be initialized: ' + e)
+            print('[Exception] The fingerprint sensor could not be initialized: ' + str(e))
             exit(1)
 
     def checkUser(self, userName):
@@ -81,7 +81,7 @@ class PamFingerprintCheck(object):
             expectedFingerprintHash = userData[1]
 
         except Exception as e:
-            print('[Exception] ' + e)
+            print('[Exception] ' + str(e))
             return False
 
         ## Tries to check fingerprint
@@ -126,7 +126,7 @@ class PamFingerprintCheck(object):
                 raise Exception('The found template is not assigned to user (the hash does not match)!')
 
         except Exception as e:
-            print('[Exception] Check for user "' + userName + '" failed: ' + e)
+            print('[Exception] Check for user "' + userName + '" failed: ' + str(e))
             return False
 
         return True

@@ -41,7 +41,7 @@ class PamFingerprint(object):
             self.__config = Config('/etc/pamfingerprint.conf')
 
         except Exception as e:
-            print('[Exception] ' + e)
+            print('[Exception] ' + str(e))
             exit(1)
 
         ## Gets connection values
@@ -58,7 +58,7 @@ class PamFingerprint(object):
                 raise ValueError('The given fingerprint sensor password is wrong!')
 
         except Exception as e:
-            print('[Exception] The fingerprint sensor could not be initialized: ' + e)
+            print('[Exception] The fingerprint sensor could not be initialized: ' + str(e))
             exit(1)
 
     def __showConfirmationDialog(self, question = ''):
@@ -173,7 +173,7 @@ class PamFingerprint(object):
                 raise Exception('The configuration could not be written!')
 
         except Exception as e:
-            print('[Exception] Error while adding user: ' + e)
+            print('[Exception] Error while adding user: ' + str(e))
             return False
 
         return True
@@ -208,7 +208,7 @@ class PamFingerprint(object):
             expectedFingerprintHash = userData[1]
 
         except Exception as e:
-            print('[Exception] ' + e)
+            print('[Exception] ' + str(e))
             return False
 
         ## Confirmation dialog
@@ -239,7 +239,7 @@ class PamFingerprint(object):
                 raise Exception('The configuration file could not be written!')
 
         except Exception as e:
-            print('[Exception] Error while removing user: ' + e)
+            print('[Exception] Error while removing user: ' + str(e))
             return False
 
         return True
