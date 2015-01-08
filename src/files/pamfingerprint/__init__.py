@@ -9,8 +9,8 @@ Copyright 2014 Philipp Meisberger, Bastian Raschke
 All rights reserved.
 """
 
-__version__ = '1.1'
+__version__ = '1.2'
 __copyright__ = 'Philipp Meisberger, Bastian Raschke'
 __organization__ = 'PM Code Works'
-__license__ = 'BSD 3 License'
+__license__ = 'Simplified BSD'
 __authors__ = ['Philipp Meisberger, Bastian Raschke']

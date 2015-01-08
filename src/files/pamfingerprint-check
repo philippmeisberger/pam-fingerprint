@@ -4,16 +4,15 @@
 """
 PAM Fingerprint
 
-Copyright 2014 Philipp Meisberger, Bastian Raschke.
+Copyright 2015 Philipp Meisberger, Bastian Raschke.
 All rights reserved.
 """
 
 import argparse
 import hashlib
-
-import pamfingerprint.Config as Config
-import pamfingerprint.__version__ as VERSION
-import PyFingerprint.PyFingerprint as PyFingerprint
+from pamfingerprint import __version__ as VERSION
+from pamfingerprint.Config import Config
+from pyfingerprint.pyfingerprint import PyFingerprint
 
 
 class PamFingerprintCheck(object):
@@ -37,7 +36,7 @@ class PamFingerprintCheck(object):
             self.__config = Config('/etc/pamfingerprint.conf')
 
         except Exception as e:
-            print '[Exception] ' + e.message
+            print('[Exception] ' + e)
             exit(1)
 
         ## Gets connection values
@@ -54,7 +53,7 @@ class PamFingerprintCheck(object):
                 raise ValueError('The given fingerprint sensor password is wrong!')
 
         except Exception as e:
-            print '[Exception] The fingerprint sensor could not be initialized: ' + e.message
+            print('[Exception] The fingerprint sensor could not be initialized: ' + e)
             exit(1)
 
     def checkUser(self, userName):
@@ -67,7 +66,7 @@ class PamFingerprintCheck(object):
 
         ## Checks if the the user was already added
         if ( self.__config.itemExists('Users', userName) == False ):
-            print '[Error] The user "' + userName + '" is not added!'
+            print('[Error] The user "' + userName + '" is not added!')
             return False
 
         ## Tries to get user information (template position, fingerprint hash)
@@ -82,12 +81,12 @@ class PamFingerprintCheck(object):
             expectedFingerprintHash = userData[1]
 
         except Exception as e:
-            print '[Exception] ' + e.message
+            print('[Exception] ' + e)
             return False
 
         ## Tries to check fingerprint
         try:
-            print 'Waiting for finger...'
+            print('Waiting for finger...')
 
             while ( self.__fingerprint.readImage() == False ):
                 pass
@@ -105,7 +104,7 @@ class PamFingerprintCheck(object):
 
             ## Checks if the template position is correct
             if ( positionNumber == expectedPositionNumber ):
-                print 'A match was found on template position #' + str(positionNumber) + ' with accuracy score ' + str(accuracyScore) + '.'
+                print('A match was found on template position #' + str(positionNumber) + ' with accuracy score ' + str(accuracyScore) + '.')
             else:
                 raise Exception('The template position of the found match (#' + str(positionNumber) + ') is not equal to the stored one (#' + str(expectedPositionNumber) + ')!')
 
@@ -114,20 +113,20 @@ class PamFingerprintCheck(object):
             characterics = self.__fingerprint.downloadCharacteristics(0x01)
 
             ## Calculates hash of template
-            print 'Calculating hash...'
+            print('Calculating hash...')
             fingerprintHash = hashlib.sha256(str(characterics)).hexdigest()
 
-            print 'Checking if calculated hash matches stored hash...'
+            print('Checking if calculated hash matches stored hash...')
 
             ## Checks if read hash matches stored hash
             if ( fingerprintHash == expectedFingerprintHash ):
-                print 'Hashes match!'
-                print 'Check for user "' + userName + '" was successful!'
+                print('Hashes match!')
+                print('Check for user "' + userName + '" was successful!')
             else:
                 raise Exception('The found template is not assigned to user (the hash does not match)!')
 
         except Exception as e:
-            print '[Exception] Check for user "' + userName + '" failed: ' + e.message
+            print('[Exception] Check for user "' + userName + '" failed: ' + e)
             return False
 
         return True

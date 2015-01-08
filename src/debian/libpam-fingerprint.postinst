@@ -6,3 +6,4 @@ set -e
 pam-auth-update --package fingerprint
 
 #DEBHELPER#
+exit 0

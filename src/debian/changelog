@@ -1,6 +1,15 @@
+libpam-fingerprint (1.2) stable; urgency=low
+
+  * Minor release
+  * Some style improvements
+  * Added missing dependencies
+  * Improved Debian package style
+
+ -- Philipp Meisberger <team@pm-codeworks.de>  Thu, 08 Jan 2015 20:18:59 +0100
+
 libpam-fingerprint (1.1) stable; urgency=low
 
-  * Minor Release
+  * Minor release
   * Renamed package to libpam-fingerprint
   * Improved exception handling
   * Removed logging to /var/log/pamfingerprint.log

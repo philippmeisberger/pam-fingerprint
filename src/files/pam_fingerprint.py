@@ -5,14 +5,32 @@
 pamfingerprint
 PAM implementation.
 
-Copyright 2014 Philipp Meisberger, Bastian Raschke.
+Copyright 2015 Philipp Meisberger, Bastian Raschke.
 All rights reserved.
 """
 
 import syslog
 import hashlib
-import pamfingerprint.Config as Config
-import PyFingerprint.PyFingerprint as PyFingerprint
+from pamfingerprint import __version__ as VERSION
+from pamfingerprint.Config import Config
+from pyfingerprint.pyfingerprint import PyFingerprint
+
+
+def showPAMTextMessage(pamh, message):
+    """
+    Shows a PAM conversation text info.
+
+    @param pamh
+    @param string message
+
+    @return void
+    """
+
+    if ( type(message) != str ):
+        raise ValueError('The given parameter is not a string!')
+
+    msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': '+ message)
+    pamh.conversation(msg)
 
 
 def auth_log(message, priority=syslog.LOG_INFO):
@@ -100,11 +118,10 @@ def pam_sm_authenticate(pamh, flags, argv):
 
     except Exception as e:
         auth_log('The fingerprint sensor could not be initialized: ' + e.message, syslog.LOG_ERR)
-        pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Sensor initialization failed!'))
+        showPAMTextMessage(pamh, 'Sensor initialization failed!')
         return pamh.PAM_IGNORE
 
-    msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Waiting for finger...')
-    pamh.conversation(msg)
+    showPAMTextMessage(pamh, 'Waiting for finger...')
 
     ## Tries to read fingerprint
     try:
@@ -135,16 +152,16 @@ def pam_sm_authenticate(pamh, flags, argv):
         ## Checks if the calculated hash is equal to expected hash from user
         if ( fingerprintHash == expectedFingerprintHash ):
             auth_log('Access granted!')
-            pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access granted!'))
+            showPAMTextMessage(pamh, 'Access granted!')
             return pamh.PAM_SUCCESS
         else:
             auth_log('The found match is not assigned to user!', syslog.LOG_WARNING)
-            pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
+            showPAMTextMessage(pamh, 'Access denied!')
             return pamh.PAM_AUTH_ERR
 
     except Exception as e:
         auth_log('Fingerprint read failed: ' + e.message, syslog.LOG_CRIT)
-        pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': Access denied!'))
+        showPAMTextMessage(pamh, 'Access denied!')
         return pamh.PAM_AUTH_ERR
 
     ## Denies for default

@@ -4,7 +4,7 @@
 """
 PAM Fingerprint
 
-Copyright 2014 Philipp Meisberger, Bastian Raschke.
+Copyright 2015 Philipp Meisberger, Bastian Raschke.
 All rights reserved.
 """
 
@@ -12,9 +12,9 @@ import hashlib
 import time
 import argparse
 import os
-import pamfingerprint.Config as Config
-import pamfingerprint.__version__ as VERSION
-import PyFingerprint.PyFingerprint as PyFingerprint
+from pamfingerprint import __version__ as VERSION
+from pamfingerprint.Config import Config
+from pyfingerprint.pyfingerprint import PyFingerprint
 
 
 class PamFingerprint(object):
@@ -41,7 +41,7 @@ class PamFingerprint(object):
             self.__config = Config('/etc/pamfingerprint.conf')
 
         except Exception as e:
-            print '[Exception] ' + e.message
+            print('[Exception] ' + e)
             exit(1)
 
         ## Gets connection values
@@ -58,7 +58,7 @@ class PamFingerprint(object):
                 raise ValueError('The given fingerprint sensor password is wrong!')
 
         except Exception as e:
-            print '[Exception] The fingerprint sensor could not be initialized: ' + e.message
+            print('[Exception] The fingerprint sensor could not be initialized: ' + e)
             exit(1)
 
     def __showConfirmationDialog(self, question = ''):
@@ -86,17 +86,17 @@ class PamFingerprint(object):
 
         ## Checks if user is root
         if ( os.geteuid() != 0 ):
-            print '[Error] You need to have root privileges to add a user!'
+            print('[Error] You need to have root privileges to add a user!')
             return False
 
         ## Checks if the the user is not already added
         if ( self.__config.itemExists('Users', userName) == True ):
-            print '[Error] The user "' + userName + '" is already added!'
+            print('[Error] The user "' + userName + '" is already added!')
             return False
 
         ## Confirmation dialog
         if ( self.__showConfirmationDialog('Are you sure you want to add the user "' + userName + '"?') == False ):
-            print 'Adding user canceled.'
+            print('Adding user canceled.')
             return False
 
         ## Tries to create new template for user
@@ -115,7 +115,7 @@ class PamFingerprint(object):
             if ( freePositionNumber == -1 ):
                 raise Exception('Could not find a free position for storing template!')
 
-            print 'Waiting for finger...'
+            print('Waiting for finger...')
 
             while ( self.__fingerprint.readImage() == False ):
                 pass
@@ -128,10 +128,10 @@ class PamFingerprint(object):
 
             ## Template does not exist
             if ( positionNumber == -1 ):
-                print 'Remove finger...'
+                print('Remove finger...')
                 time.sleep(2)
 
-                print 'Waiting for same finger again...'
+                print('Waiting for same finger again...')
 
                 while ( self.__fingerprint.readImage() == False ):
                     pass
@@ -143,12 +143,12 @@ class PamFingerprint(object):
 
                 ## Stores new template on free position
                 self.__fingerprint.storeTemplate(freePositionNumber)
-                print 'Stored new template on position #' + str(freePositionNumber) + '.'
+                print('Stored new template on position #' + str(freePositionNumber) + '.')
             else:
-                print '[Warning] The finger already exists at template position #' + str(positionNumber) + '!'
+                print('[Warning] The finger already exists at template position #' + str(positionNumber) + '!')
 
                 if ( self.__showConfirmationDialog('Bind this template to the user "' + userName + '" ?') == False ):
-                    print 'Adding user canceled.'
+                    print('Adding user canceled.')
                     return False
                 else:
                     freePositionNumber = positionNumber
@@ -168,12 +168,12 @@ class PamFingerprint(object):
             self.__config.writeList('Users', userName, userData)
 
             if ( self.__config.save() == True ):
-                print 'The user "' + userName + '" has been added successfully!'
+                print('The user "' + userName + '" has been added successfully!')
             else:
                 raise Exception('The configuration could not be written!')
 
         except Exception as e:
-            print '[Exception] Error while adding user: ' + e.message
+            print('[Exception] Error while adding user: ' + e)
             return False
 
         return True
@@ -188,12 +188,12 @@ class PamFingerprint(object):
 
         ## Checks if user is root
         if ( os.geteuid() != 0 ):
-            print '[Error] You need to have root privileges to add a user!'
+            print('[Error] You need to have root privileges to add a user!')
             return False
 
         ## Checks if the the user was already added
         if ( self.__config.itemExists('Users', userName) == False ):
-            print '[Error] The user "' + userName + '" is not added!'
+            print('[Error] The user "' + userName + '" is not added!')
             return False
 
         ## Tries to get user information (template position, fingerprint hash)
@@ -208,12 +208,12 @@ class PamFingerprint(object):
             expectedFingerprintHash = userData[1]
 
         except Exception as e:
-            print '[Exception] ' + e.message
+            print('[Exception] ' + e)
             return False
 
         ## Confirmation dialog
         if ( self.__showConfirmationDialog('Are you sure you want to remove the user "' + userName + '"?') == False ):
-            print 'Removing user canceled.'
+            print('Removing user canceled.')
             return False
 
         ## Tries to delete template
@@ -228,18 +228,18 @@ class PamFingerprint(object):
             ## Checks if template hash matches stored hash
             if ( fingerprintHash == expectedFingerprintHash ):
                 self.__fingerprint.deleteTemplate(positionNumber)
-                print 'Removed template on position #' + str(positionNumber) + '.'
+                print('Removed template on position #' + str(positionNumber) + '.')
             else:
                 raise Exception('The template could not be found!')
 
             ## Removes entries from configuration file
             if ( self.__config.remove('Users', userName) == True and self.__config.save() == True ):
-                print 'The user "' + userName + '" has been removed successfully!'
+                print('The user "' + userName + '" has been removed successfully!')
             else:
                 raise Exception('The configuration file could not be written!')
 
         except Exception as e:
-            print '[Exception] Error while removing user: ' + e.message
+            print('[Exception] Error while removing user: ' + e)
             return False
 
         return True

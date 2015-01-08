@@ -7,6 +7,7 @@ Build-Depends: debhelper (>= 9),
                python (>= 2.7),
                python-setuptools,
                bash-completion
+
 Package: libpam-fingerprint
 Provides: pamfingerprint
 Replaces: pamfingerprint
