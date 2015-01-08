@@ -4,12 +4,12 @@ from distutils.core import setup
 
 setup(
     name            = 'PAM Fingerprint',
-    version         = '1.1',
+    version         = '1.2',
     description     = 'Pluggable Authentication Module for biometric authentication.',
     author          = 'Philipp Meisberger',
     author_email    = 'team@pm-codeworks.de',
     url             = 'http://www.pm-codeworks.de/pamfingerprint.html',
-    license         = 'BSD 3 License',
+    license         = 'Simplified BSD 3 license',
     package_dir     = {'': 'files'},
     packages        = ['pamfingerprint'],
 )
