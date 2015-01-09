@@ -4,12 +4,12 @@
 """
 PAM Fingerprint
 
-Copyright 2014 Philipp Meisberger, Bastian Raschke.
+Copyright 2015 Philipp Meisberger, Bastian Raschke.
 All rights reserved.
 """
 
 ## Documentation: @see http://docs.python.org/3/library/configparser.html
-import ConfigParser
+from ConfigParser import ConfigParser
 import os
 
 
@@ -45,7 +45,7 @@ class Config(object):
         self.__configFile = configFile
         self.__readOnly = readOnly
 
-        self.__configParser = ConfigParser.ConfigParser()
+        self.__configParser = ConfigParser()
         self.__configParser.read(configFile)
 
     def __del__(self):

@@ -188,7 +188,7 @@ class PamFingerprint(object):
 
         ## Checks if user is root
         if ( os.geteuid() != 0 ):
-            print('[Error] You need to have root privileges to add a user!')
+            print('[Error] You need to have root privileges to remove a user!')
             return False
 
         ## Checks if the the user was already added
