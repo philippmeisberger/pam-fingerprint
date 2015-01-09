@@ -15,11 +15,12 @@ Conflicts: pamfingerprint
 Depends: python (>= 2.7),
          python-argparse,
          libpam-python,
-         python-fingerprint,
+         python-fingerprint (>= 1.2),
          bash-completion,
          ${python:Depends},
          ${misc:Depends}
 Architecture: all
 Homepage: http://www.pm-codeworks.de/pamfingerprint.html
 Description: Pluggable Authentication Module for biometric authentication.
- The ZhianTec ZFM-20 fingerprint sensor (known as "Arduino fingerprint sensor") is required for this module.
+ The ZhianTec ZFM-20 fingerprint sensor (known as "Arduino fingerprint sensor")
+ is required for this module.
