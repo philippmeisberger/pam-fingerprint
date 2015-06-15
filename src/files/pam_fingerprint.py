@@ -2,15 +2,16 @@
 # -*- coding: utf-8 -*-
 
 """
-pamfingerprint
-PAM implementation.
+PAM Fingerprint implementation
 
-Copyright 2015 Philipp Meisberger, Bastian Raschke.
+Copyright 2015 Philipp Meisberger <team@pm-codeworks.de>,
+               Bastian Raschke <bastian.raschke@posteo.de>
 All rights reserved.
 """
 
 import syslog
 import hashlib
+
 from pamfingerprint import __version__ as VERSION
 from pamfingerprint.Config import Config
 from pyfingerprint.pyfingerprint import PyFingerprint

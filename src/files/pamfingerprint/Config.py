@@ -4,7 +4,8 @@
 """
 PAM Fingerprint
 
-Copyright 2015 Philipp Meisberger, Bastian Raschke.
+Copyright 2015 Philipp Meisberger <team@pm-codeworks.de>,
+               Bastian Raschke <bastian.raschke@posteo.de>
 All rights reserved.
 """
 

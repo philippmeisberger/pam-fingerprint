@@ -4,10 +4,10 @@ Upstream-Contact: Philipp Meisberger <team@pm-codeworks.de>
 Source: http://apt.pm-codeworks.de/pool/main/libp/libpam-fingerprint/libpam-fingerprint_1.1.tar.gz
 
 Files: *
-Copyright: Copyright (C) 2015 Philipp Meisberger <team@pm-codeworks.de>,
- Bastian Raschke <bastian.raschke@posteo.de>
+Copyright: Copyright (C) 2015 Bastian Raschke <bastian.raschke@posteo.de>,
+ Philipp Meisberger <team@pm-codeworks.de>
 License: D-FSL
  This Program may be used by anyone in accordance with the terms of the German
- Free Software License
+ Free Software License.
  .
  The License may be obtained under <http://www.d-fsl.org>.

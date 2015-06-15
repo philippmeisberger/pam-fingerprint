@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-PAM Fingerprint
+PAM Fingerprint configuration program
 
-Copyright 2015 Philipp Meisberger, Bastian Raschke.
+Copyright 2015 Philipp Meisberger <team@pm-codeworks.de>,
+               Bastian Raschke <bastian.raschke@posteo.de>
 All rights reserved.
 """
 
@@ -12,6 +13,7 @@ import hashlib
 import time
 import argparse
 import os
+
 from pamfingerprint import __version__ as VERSION
 from pamfingerprint.Config import Config
 from pyfingerprint.pyfingerprint import PyFingerprint
