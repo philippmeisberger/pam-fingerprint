@@ -9,7 +9,7 @@ setup(
     author          = 'Philipp Meisberger',
     author_email    = 'team@pm-codeworks.de',
     url             = 'http://www.pm-codeworks.de/pamfingerprint.html',
-    license         = 'Simplified BSD 3 license',
+    license         = 'D-FSL',
     package_dir     = {'': 'files'},
     packages        = ['pamfingerprint'],
 )
