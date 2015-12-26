@@ -17,9 +17,19 @@ from pamfingerprint.Config import Config
 from pyfingerprint.pyfingerprint import PyFingerprint
 
 class UserUnknownException(Exception):
+    """
+    Dummy exception class for unknown user.
+
+    """
+
     pass
 
 class InvalidUserCredentials(Exception):
+    """
+    Dummy exception class for invalid user credentials.
+
+    """
+
     pass
 
 def showPAMTextMessage(pamh, message, errorMessage=False):
@@ -27,7 +37,10 @@ def showPAMTextMessage(pamh, message, errorMessage=False):
     Shows a PAM conversation text info.
 
     @param pamh
-    @param string message
+    The PAM handle.
+
+    @param str message
+    The message to print.
 
     @return bool
     """
@@ -51,8 +64,12 @@ def auth_log(message, priority=syslog.LOG_INFO):
     """
     Sends errors to default authentication log
 
-    @param string message
-    @param integer priority
+    @param str message
+    The message to write to syslog.
+
+    @param int priority
+    The priority of the syslog message.
+
     @return void
     """
 
@@ -68,7 +85,8 @@ def pam_sm_authenticate(pamh, flags, argv):
     @param pamh
     @param flags
     @param argv
-    @return integer
+
+    @return int
     """
 
     ## The authentication service should return [PAM_AUTH_ERROR] if the user has a null authentication token
@@ -193,11 +211,10 @@ def pam_sm_setcred(pamh, flags, argv):
     @param pamh
     @param flags
     @param argv
-    @return integer
+    @return int
     """
 
     return pamh.PAM_SUCCESS
-
 
 def pam_sm_acct_mgmt(pamh, flags, argv):
     """
@@ -206,11 +223,10 @@ def pam_sm_acct_mgmt(pamh, flags, argv):
     @param pamh
     @param flags
     @param argv
-    @return integer
+    @return int
     """
 
     return pamh.PAM_SUCCESS
-
 
 def pam_sm_open_session(pamh, flags, argv):
     """
@@ -219,11 +235,10 @@ def pam_sm_open_session(pamh, flags, argv):
     @param pamh
     @param flags
     @param argv
-    @return integer
+    @return int
     """
 
     return pamh.PAM_SUCCESS
-
 
 def pam_sm_close_session(pamh, flags, argv):
     """
@@ -232,11 +247,10 @@ def pam_sm_close_session(pamh, flags, argv):
     @param pamh
     @param flags
     @param argv
-    @return integer
+    @return int
     """
 
     return pamh.PAM_SUCCESS
-
 
 def pam_sm_chauthtok(pamh, flags, argv):
     """
@@ -245,7 +259,7 @@ def pam_sm_chauthtok(pamh, flags, argv):
     @param pamh
     @param flags
     @param argv
-    @return integer
+    @return int
     """
 
     return pamh.PAM_SUCCESS
