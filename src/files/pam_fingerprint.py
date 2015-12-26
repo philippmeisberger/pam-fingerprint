@@ -11,9 +11,11 @@ All rights reserved.
 
 import syslog
 import hashlib
+import os
+import ConfigParser
 
 from pamfingerprint import __version__ as VERSION
-from pamfingerprint.Config import Config
+from pamfingerprint import CONFIG_FILE
 from pyfingerprint.pyfingerprint import PyFingerprint
 
 class UserUnknownException(Exception):
@@ -105,17 +107,22 @@ def pam_sm_authenticate(pamh, flags, argv):
         if ( userName == None ):
             raise UserUnknownException('The user is not known!')
 
-        ## Tries to init config file
-        config = Config('/etc/pamfingerprint.conf')
+        # Checks if path/file is readable
+        if ( os.access(CONFIG_FILE, os.R_OK) == False ):
+            raise Exception('The configuration file "' + CONFIG_FILE + '" is not readable!')
 
+        configParser = ConfigParser.ConfigParser()
+        configParser.read(CONFIG_FILE)
+
+        ## Log the user
         auth_log('The user "' + userName + '" is asking for permission for service "' + str(pamh.service) + '".', syslog.LOG_DEBUG)
 
         ## Checks if the the user was added in configuration
-        if ( config.itemExists('Users', userName) == False ):
+        if ( configParser.has_option('Users', userName) == False ):
             raise Exception('The user was not added!')
 
         ## Tries to get user information (template position, fingerprint hash)
-        userData = config.readList('Users', userName)
+        userData = configParser.get('Users', userName).split(',')
 
         ## Validates user information
         if ( len(userData) != 2 ):
@@ -139,10 +146,10 @@ def pam_sm_authenticate(pamh, flags, argv):
     ## Initialize fingerprint sensor
     try:
         ## Gets sensor connection values
-        port = config.readString('PyFingerprint', 'port')
-        baudRate = config.readInteger('PyFingerprint', 'baudRate')
-        address = config.readHex('PyFingerprint', 'address')
-        password = config.readHex('PyFingerprint', 'password')
+        port = configParser.get('PyFingerprint', 'port')
+        baudRate = int(configParser.get('PyFingerprint', 'baudRate'), 10)
+        address = int(configParser.get('PyFingerprint', 'address'), 16)
+        password = int(configParser.get('PyFingerprint', 'password'), 16)
 
         ## Tries to init PyFingerprint
         fingerprint = PyFingerprint(port, baudRate, address, password)

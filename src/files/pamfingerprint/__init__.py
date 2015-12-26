@@ -4,11 +4,10 @@
 """
 PAM Fingerprint
 
-@author: Philipp Meisberger <team@pm-codeworks.de>
-@copyright: 2014 Bastian Raschke <bastian.raschke@posteo.de>
-@copyright: 2014 Philipp Meisberger <team@pm-codeworks.de>
-
+Copyright 2014 Philipp Meisberger <team@pm-codeworks.de>,
+               Bastian Raschke <bastian.raschke@posteo.de>
 All rights reserved.
 """
 
 __version__ = '1.3'
+CONFIG_FILE = '/etc/pamfingerprint.conf'

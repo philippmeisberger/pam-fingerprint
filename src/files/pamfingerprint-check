@@ -11,9 +11,11 @@ All rights reserved.
 
 import argparse
 import hashlib
+import os
+import ConfigParser
 
 from pamfingerprint import __version__ as VERSION
-from pamfingerprint.Config import Config
+from pamfingerprint import CONFIG_FILE
 from pyfingerprint.pyfingerprint import PyFingerprint
 
 
@@ -23,9 +25,12 @@ class PamFingerprintCheck(object):
 
     The PyFingerprint instance
     @var PyFingerprint __fingerprint
+
+    Config instance
+    @var Config __config
     """
     __fingerprint = None
-
+    __config = None
 
     def __init__(self):
         """
@@ -33,22 +38,27 @@ class PamFingerprintCheck(object):
 
         """
 
-        ## Tries to init config instance
+        ## Tries to read configuration
         try:
-            self.__config = Config('/etc/pamfingerprint.conf')
+            ## Checks if path/file is readable
+            if ( os.access(CONFIG_FILE, os.R_OK) == False ):
+                raise Exception('The configuration file "' + CONFIG_FILE + '" is not readable!')
+
+            self.__config = ConfigParser.ConfigParser()
+            self.__config.read(CONFIG_FILE)
 
         except Exception as e:
             print('[Exception] ' + str(e))
             exit(1)
 
-        ## Gets connection values
-        port = self.__config.readString('PyFingerprint', 'port')
-        baudRate = self.__config.readInteger('PyFingerprint', 'baudRate')
-        address = self.__config.readHex('PyFingerprint', 'address')
-        password = self.__config.readHex('PyFingerprint', 'password')
-
-        ## Tries to establish connection
         try:
+            ## Gets connection values
+            port = self.__config.get('PyFingerprint', 'port')
+            baudRate = int(self.__config.get('PyFingerprint', 'baudRate'), 10)
+            address = int(self.__config.get('PyFingerprint', 'address'), 16)
+            password = int(self.__config.get('PyFingerprint', 'password'), 16)
+
+            ## Tries to establish connection
             self.__fingerprint = PyFingerprint(port, baudRate, address, password)
 
             if ( self.__fingerprint.verifyPassword() == False ):
@@ -67,13 +77,13 @@ class PamFingerprintCheck(object):
         """
 
         ## Checks if the the user was already added
-        if ( self.__config.itemExists('Users', userName) == False ):
+        if ( self.__config.has_option('Users', userName) == False ):
             print('[Error] The user "' + userName + '" is not added!')
             return False
 
         ## Tries to get user information (template position, fingerprint hash)
         try:
-            userData = self.__config.readList('Users', userName)
+            userData = self.__config.get('Users', userName).split(',')
 
             ## Validates user information
             if ( len(userData) != 2 ):
