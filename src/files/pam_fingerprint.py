@@ -4,7 +4,7 @@
 """
 PAM Fingerprint implementation
 
-Copyright 2015 Philipp Meisberger <team@pm-codeworks.de>,
+Copyright 2014 Philipp Meisberger <team@pm-codeworks.de>,
                Bastian Raschke <bastian.raschke@posteo.de>
 All rights reserved.
 """
@@ -16,22 +16,35 @@ from pamfingerprint import __version__ as VERSION
 from pamfingerprint.Config import Config
 from pyfingerprint.pyfingerprint import PyFingerprint
 
+class UserUnknownException(Exception):
+    pass
 
-def showPAMTextMessage(pamh, message):
+class InvalidUserCredentials(Exception):
+    pass
+
+def showPAMTextMessage(pamh, message, errorMessage=False):
     """
     Shows a PAM conversation text info.
 
     @param pamh
     @param string message
 
-    @return void
+    @return bool
     """
 
-    if ( type(message) != str ):
-        raise ValueError('The given parameter is not a string!')
+    try:
+        if ( errorMessage == True ):
+            style = pamh.PAM_ERROR_MSG
+        else:
+            style = pamh.PAM_TEXT_INFO
 
-    msg = pamh.Message(pamh.PAM_TEXT_INFO, 'pamfingerprint ' + VERSION + ': '+ message)
-    pamh.conversation(msg)
+        msg = pamh.Message(style, 'pamfingerprint ' + VERSION + ': '+ str(message))
+        pamh.conversation(msg)
+        return True
+
+    except Exception as e:
+        auth_log(str(e), syslog.LOG_ERR)
+        return False
 
 
 def auth_log(message, priority=syslog.LOG_INFO):
@@ -58,8 +71,12 @@ def pam_sm_authenticate(pamh, flags, argv):
     @return integer
     """
 
-    ## Tries to get user which is asking for permission
+    ## The authentication service should return [PAM_AUTH_ERROR] if the user has a null authentication token
+    flags = pamh.PAM_DISALLOW_NULL_AUTHTOK
+
+    ## Initialize authentication progress
     try:
+        ## Tries to get user which is asking for permission
         userName = pamh.ruser
 
         ## Fallback
@@ -68,64 +85,64 @@ def pam_sm_authenticate(pamh, flags, argv):
 
         ## Be sure the user is set
         if ( userName == None ):
-            raise Exception('The user is not known!')
+            raise UserUnknownException('The user is not known!')
 
-    except Exception as e:
-        auth_log(str(e), syslog.LOG_CRIT)
-        return pamh.PAM_USER_UNKNOWN
-
-    ## Tries to init Config
-    try:
+        ## Tries to init config file
         config = Config('/etc/pamfingerprint.conf')
 
-    except Exception as e:
-        auth_log(str(e), syslog.LOG_CRIT)
-        return pamh.PAM_IGNORE
+        auth_log('The user "' + userName + '" is asking for permission for service "' + str(pamh.service) + '".', syslog.LOG_DEBUG)
 
-    auth_log('The user "' + userName + '" is asking for permission for service "' + str(pamh.service) + '".', syslog.LOG_DEBUG)
+        ## Checks if the the user was added in configuration
+        if ( config.itemExists('Users', userName) == False ):
+            raise Exception('The user was not added!')
 
-    ## Checks if the the user was added in configuration
-    if ( config.itemExists('Users', userName) == False ):
-        auth_log('The user was not added!', syslog.LOG_ERR)
-        return pamh.PAM_IGNORE
-
-    ## Tries to get user information (template position, fingerprint hash)
-    try:
+        ## Tries to get user information (template position, fingerprint hash)
         userData = config.readList('Users', userName)
 
         ## Validates user information
         if ( len(userData) != 2 ):
-            raise Exception('The user information of "' + userName + '" is invalid!')
+            raise InvalidUserCredentials('The user information of "' + userName + '" is invalid!')
 
         expectedPositionNumber = int(userData[0])
         expectedFingerprintHash = userData[1]
 
-    except Exception as e:
-        auth_log(str(e), syslog.LOG_CRIT)
+    except UserUnknownException as e:
+        auth_log(str(e), syslog.LOG_ERR)
+        return pamh.PAM_USER_UNKNOWN
+
+    except InvalidUserCredentials as e:
+        auth_log(str(e), syslog.LOG_ERR)
         return pamh.PAM_AUTH_ERR
 
-    ## Gets sensor connection values
-    port = config.readString('PyFingerprint', 'port')
-    baudRate = config.readInteger('PyFingerprint', 'baudRate')
-    address = config.readHex('PyFingerprint', 'address')
-    password = config.readHex('PyFingerprint', 'password')
+    except Exception as e:
+        auth_log(str(e), syslog.LOG_ERR)
+        return pamh.PAM_IGNORE
 
-    ## Tries to init PyFingerprint
+    ## Initialize fingerprint sensor
     try:
+        ## Gets sensor connection values
+        port = config.readString('PyFingerprint', 'port')
+        baudRate = config.readInteger('PyFingerprint', 'baudRate')
+        address = config.readHex('PyFingerprint', 'address')
+        password = config.readHex('PyFingerprint', 'password')
+
+        ## Tries to init PyFingerprint
         fingerprint = PyFingerprint(port, baudRate, address, password)
 
         if ( fingerprint.verifyPassword() == False ):
-            raise ValueError('The given fingerprint sensor password is wrong!')
+            raise Exception('The given fingerprint sensor password is wrong!')
 
     except Exception as e:
         auth_log('The fingerprint sensor could not be initialized: ' + str(e), syslog.LOG_ERR)
-        showPAMTextMessage(pamh, 'Sensor initialization failed!')
+        showPAMTextMessage(pamh, 'Sensor initialization failed!', True)
         return pamh.PAM_IGNORE
 
-    showPAMTextMessage(pamh, 'Waiting for finger...')
+    if ( showPAMTextMessage(pamh, 'Waiting for finger...') == False ):
+        return pamh.PAM_CONV_ERR
 
-    ## Tries to read fingerprint
+    ## Authentication progress
     try:
+        ## Tries to read fingerprint
         while ( fingerprint.readImage() == False ):
             pass
 
@@ -157,12 +174,12 @@ def pam_sm_authenticate(pamh, flags, argv):
             return pamh.PAM_SUCCESS
         else:
             auth_log('The found match is not assigned to user!', syslog.LOG_WARNING)
-            showPAMTextMessage(pamh, 'Access denied!')
+            showPAMTextMessage(pamh, 'Access denied!', True)
             return pamh.PAM_AUTH_ERR
 
     except Exception as e:
         auth_log('Fingerprint read failed: ' + str(e), syslog.LOG_CRIT)
-        showPAMTextMessage(pamh, 'Access denied!')
+        showPAMTextMessage(pamh, 'Access denied!', True)
         return pamh.PAM_AUTH_ERR
 
     ## Denies for default

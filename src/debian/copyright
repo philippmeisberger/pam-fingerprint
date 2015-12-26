@@ -1,7 +1,7 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: PAM Fingerprint
 Upstream-Contact: Philipp Meisberger <team@pm-codeworks.de>
-Source: http://apt.pm-codeworks.de/pool/main/libp/libpam-fingerprint/libpam-fingerprint_1.1.tar.gz
+Source: http://apt.pm-codeworks.de/pool/main/libp/libpam-fingerprint/libpam-fingerprint_1.2.tar.gz
 
 Files: *
 Copyright: Copyright (C) 2015 Bastian Raschke <bastian.raschke@posteo.de>,

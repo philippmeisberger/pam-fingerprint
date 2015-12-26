@@ -1,11 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from distutils.core import setup
+"""
+PAM Fingerprint
+
+Copyright 2014 Philipp Meisberger <team@pm-codeworks.de>,
+               Bastian Raschke <bastian.raschke@posteo.de>
+All rights reserved.
+"""
+
+from setuptools import setup, find_packages
+
+import sys
+sys.path.append('./files/')
+
+## Dynamically get the module version
+packageVersion = __import__('pamfingerprint').__version__
 
 setup(
     name            = 'PAM Fingerprint',
-    version         = '1.2',
+    version         = packageVersion,
     description     = 'Pluggable Authentication Module for biometric authentication.',
     author          = 'Philipp Meisberger',
     author_email    = 'team@pm-codeworks.de',
