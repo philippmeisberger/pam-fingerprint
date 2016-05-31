@@ -20,7 +20,7 @@ packageVersion = __import__('pamfingerprint').__version__
 setup(
     name            = 'PAM Fingerprint',
     version         = packageVersion,
-    description     = 'Pluggable Authentication Module for biometric authentication.',
+    description     = 'Linux Pluggable Authentication Module (PAM) for fingerprint authentication',
     author          = 'Philipp Meisberger',
     author_email    = 'team@pm-codeworks.de',
     url             = 'http://www.pm-codeworks.de/pamfingerprint.html',
