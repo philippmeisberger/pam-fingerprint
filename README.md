@@ -1,7 +1,7 @@
 PAM Fingerprint
 ===============
 
-PAM Fingerprint is a Linux Pluggable Authentication Module (PAM) for fingerprint authentication. The ZhianTec ZFM-20 fingerprint sensor (known as "Arduino fingerprint sensor") is required.
+PAM Fingerprint is a Linux Pluggable Authentication Module (PAM) for fingerprint authentication. It uses the ZhianTec ZFM-20 fingerprint sensor (known as "Arduino fingerprint sensor") in conjunction with the PyFingerprint library <https://github.com/bastianraschke/pyfingerprint>.
 
 Installation
 ------------
@@ -15,9 +15,9 @@ Add PM Codeworks key
     ~# wget -O - http://apt.pm-codeworks.de/pm-codeworks.de.gpg.key | apt-key add -
     ~# apt-get update
 
-Install the package
+Install the packages
 
-    ~# apt-get install libpam-fingerprint
+    ~# apt-get install python-fingerprint libpam-fingerprint
 
 Add group "dialout" for each user which should be able to use pamfingerprint
 
