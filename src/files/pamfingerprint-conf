@@ -146,6 +146,10 @@ class PamFingerprint(object):
 
                 self.__fingerprint.convertImage(0x02)
 
+                ## Same finger?
+                if ( self.__fingerprint.compareCharacteristics() == 0 ):
+                    raise Exception('Fingers are not the same!')
+
                 ## Creates new template
                 self.__fingerprint.createTemplate()
 
