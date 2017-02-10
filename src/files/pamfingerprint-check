@@ -146,10 +146,10 @@ class PamFingerprintCheck(object):
 
 if ( __name__ == '__main__' ):
 
-    parser = argparse.ArgumentParser(description='pamfingerprint simulation program:')
+    parser = argparse.ArgumentParser(description='PAM Fingerprint simulation program:')
 
     parser.add_argument('--check-user', metavar='NAME', help='Checks fingerprint for an existing user.')
-    parser.add_argument('--version', '-v', action='version', version='pamfingerprint ' + VERSION, help='Prints version and exits.')
+    parser.add_argument('--version', '-v', action='version', version='PAM Fingerprint ' + VERSION, help='Prints version and exits.')
 
     args = vars(parser.parse_args())
 

@@ -1,6 +1,12 @@
 ## Uses glob syntax, regex sucks ;)
 syntax: glob
 
-debian/libpam-fingerprint/*
+debian/libpam-fingerprint
 **.pyc
-**.out
+
+## Debian package files
+**.dsc
+**.xz
+**.deb
+**.build
+**.changes

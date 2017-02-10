@@ -86,7 +86,7 @@ class PamFingerprint(object):
 
     def addUser(self, userName):
         """
-        Enrolls new fingerprint template and adds user to pamfingerprint.
+        Enrolls new fingerprint template and adds user to PAM Fingerprint.
 
         @param string userName
         @return boolean
@@ -265,11 +265,11 @@ class PamFingerprint(object):
 
 if ( __name__ == '__main__' ):
 
-    parser = argparse.ArgumentParser(description='pamfingerprint configuration program:')
+    parser = argparse.ArgumentParser(description='PAM Fingerprint configuration program:')
 
     parser.add_argument('--add-user', metavar='NAME', help='Adds a new user.')
     parser.add_argument('--remove-user', metavar='NAME', help='Removes a user.')
-    parser.add_argument('--version', '-v', action='version', version='pamfingerprint '+ VERSION, help='Prints version and exits.')
+    parser.add_argument('--version', '-v', action='version', version='PAM Fingerprint '+ VERSION, help='Prints version and exits.')
 
     args = vars(parser.parse_args())
 

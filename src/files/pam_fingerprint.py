@@ -53,7 +53,7 @@ def showPAMTextMessage(pamh, message, errorMessage=False):
         else:
             style = pamh.PAM_TEXT_INFO
 
-        msg = pamh.Message(style, 'pamfingerprint ' + VERSION + ': '+ str(message))
+        msg = pamh.Message(style, 'PAM Fingerprint ' + VERSION + ': '+ str(message))
         pamh.conversation(msg)
         return True
 
@@ -76,7 +76,7 @@ def auth_log(message, priority=syslog.LOG_INFO):
     """
 
     syslog.openlog(facility=syslog.LOG_AUTH)
-    syslog.syslog(priority, 'pamfingerprint: ' + message)
+    syslog.syslog(priority, 'PAM Fingerprint: ' + message)
     syslog.closelog()
 
 
