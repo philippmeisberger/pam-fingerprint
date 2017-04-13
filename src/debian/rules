@@ -2,3 +2,7 @@
 
 %:
 	dh $@ --with python2,bash-completion
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf ./build/ ./files/*.egg-info/
