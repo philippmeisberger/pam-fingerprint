@@ -109,20 +109,6 @@ class PamFingerprint(object):
 
         ## Tries to create new template for user
         try:
-            freePositionNumber = -1
-
-            ## Gets a boolean list for templates 0-255 indicating the used status
-            templates = self.__fingerprint.getTemplateIndex(0)
-
-            ## Tries to find free position for storing template
-            for i in range(len(templates)):
-                if ( templates[i] == False ):
-                    freePositionNumber = i
-                    break
-
-            if ( freePositionNumber == -1 ):
-                raise Exception('Could not find a free position for storing template!')
-
             print('Waiting for finger...')
 
             while ( self.__fingerprint.readImage() == False ):
@@ -153,26 +139,24 @@ class PamFingerprint(object):
                 ## Creates new template
                 self.__fingerprint.createTemplate()
 
-                ## Stores new template on free position
-                self.__fingerprint.storeTemplate(freePositionNumber)
-                print('Stored new template on position #' + str(freePositionNumber) + '.')
+                ## Stores new template at free position
+                positionNumber = self.__fingerprint.storeTemplate()
+                print('Stored new template on position #' + str(positionNumber) + '.')
             else:
                 print('[Warning] The finger already exists at template position #' + str(positionNumber) + '!')
 
                 if ( self.__showConfirmationDialog('Bind this template to the user "' + userName + '" ?') == False ):
                     print('Adding user canceled.')
                     return False
-                else:
-                    freePositionNumber = positionNumber
 
             ## Gets characteristics and calculates hash
-            self.__fingerprint.loadTemplate(freePositionNumber, 0x01)
+            self.__fingerprint.loadTemplate(positionNumber, 0x01)
             characteristics = self.__fingerprint.downloadCharacteristics(0x01)
             fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
 
             ## The new user information list
             userData = (
-                str(freePositionNumber),
+                str(positionNumber),
                 fingerprintHash,
             )
 

@@ -4,23 +4,23 @@ Section: admin
 Priority: optional
 Standards-Version: 3.9.6
 Build-Depends: debhelper (>= 9),
+               dh-python,
                python (>= 2.7),
                python-setuptools,
                bash-completion
+XS-Python-Version: >= 2.7
+Vcs-Git: https://github.com/philippmeisberger/pam-fingerprint.git
 Homepage: http://www.pm-codeworks.de/pamfingerprint.html
 
 Package: libpam-fingerprint
 Provides: pamfingerprint
-Replaces: pamfingerprint
-Conflicts: pamfingerprint
-Depends: python (>= 2.7),
+Depends: ${python:Depends},
+         ${misc:Depends},
          python-argparse,
          libpam-python,
-         python-fingerprint (>= 1.2),
-         bash-completion,
-         ${python:Depends},
-         ${misc:Depends}
+         python-fingerprint (>= 1.5),
+         bash-completion
 Architecture: all
-Description: Pluggable Authentication Module for fingeprint authentication.
+Description: Pluggable Authentication Module for fingerprint authentication.
  The ZhianTec ZFM-20 fingerprint sensor (known as "Arduino fingerprint sensor")
  is required for this module.
