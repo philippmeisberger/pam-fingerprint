@@ -21,7 +21,7 @@ Install the packages
 
     ~# apt-get install python-fingerprint libpam-fingerprint
 
-Add group "dialout" for each user which should be able to use pamfingerprint
+Add group "dialout" for each user which should be able to use PAM Fingerprint
 
     ~# usermod -a -G dialout <username>
     ~# reboot
