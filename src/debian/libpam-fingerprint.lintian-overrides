@@ -1,0 +1,2 @@
+# A PAM module is a library which must not be executable!
+libpam-fingerprint: script-not-executable lib/security/pam_fingerprint.py
