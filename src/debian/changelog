@@ -1,11 +1,12 @@
-libpam-fingerprint (1.4) UNRELEASED; urgency=medium
+libpam-fingerprint (1.4) stable; urgency=medium
 
   * Minor release
   * Ensuring fingers are the same while adding new user
   * Using "PAM Fingerprint" instead of package name in all text outputs
   * PyFingerprint 1.5 is required
+  * Improved Debian packaging
 
- -- Philipp Meisberger <team@pm-codeworks.de>  Tue, 14 Feb 2017 22:36:06 +0100
+ -- Philipp Meisberger <team@pm-codeworks.de>  Tue, 09 May 2017 18:20:29 +0200
 
 libpam-fingerprint (1.3) stable; urgency=medium
 

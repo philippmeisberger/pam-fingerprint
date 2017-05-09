@@ -18,7 +18,7 @@ sys.path.append('./files/')
 packageVersion = __import__('pamfingerprint').__version__
 
 setup(
-    name            = 'PAM Fingerprint',
+    name            = 'libpam-fingerprint',
     version         = packageVersion,
     description     = 'Linux Pluggable Authentication Module (PAM) for fingerprint authentication',
     author          = 'Philipp Meisberger',
