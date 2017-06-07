@@ -8,6 +8,10 @@ Per default the password authentication is set as fallback in case no fingerprin
 Installation
 ------------
 
+There are two ways of installing PAM Fingerprint: Installation of the stable or latest version. The stable version is distributed through the PM Code Works APT repository and is fully tested but does not contain the latest changes.
+
+### Installation of the stable version
+
 Add PM Codeworks repository
 
     ~# wget http://apt.pm-codeworks.de/pm-codeworks.list -P /etc/apt/sources.d/
@@ -21,13 +25,34 @@ Install the packages
 
     ~# apt-get install python-fingerprint libpam-fingerprint
 
+### Installation of the latest version
+
+The latest version contains the latest changes that may not have been fully tested and should therefore not be used productively. It is recommended to install the stable version.
+
+Install required packages for building
+
+    ~# apt-get install git devscripts
+
+Clone this repository
+
+    ~$ git clone https://github.com/philippmeisberger/pam-fingerprint.git
+
+Build the package
+
+    ~$ cd ./pam-fingerprint/
+    ~$ dpkg-buildpackage -uc -us
+
+Install the package
+
+    ~# dpkg -i ../libpam-fingerprint*.deb
+
+Setup
+-----
+
 Add group "dialout" for each user which should be able to use PAM Fingerprint
 
     ~# usermod -a -G dialout <username>
     ~# reboot
-
-Setup
------
 
 Enable PAM Fingerprint for a user
 
