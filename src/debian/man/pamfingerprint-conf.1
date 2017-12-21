@@ -6,14 +6,15 @@ pamfingerprint-conf \- PAM Fingerprint configuration program
 .SH SYNOPSIS
 .nf
 .fam C
-\fBpamfingerprint-conf\fP [\fB--add-user\fP NAME | \fB--remove-user\fP NAME | \fB--version\fP | \fB--help\fP]
+\fBpamfingerprint-conf\fP [\fB--add-user\fP NAME | \fB--remove-user\fP NAME | \fB--check-user\fP NAME | \fB--version\fP | \fB--help\fP]
 .fam T
 .fi
 
 .SH DESCRIPTION
-\fBpamfingerprint-conf\fP allows (as root) to bind or unbind users to PAM Fingerprint.
+\fBpamfingerprint-conf\fP allows (as root) to add or remove users to PAM Fingerprint and to simulate fingerprint authentication process for already added users.
 
 .SH OPTIONS
+
 .TP
 .B
 \fB--add-user\fR NAME
@@ -26,7 +27,12 @@ Removes a user.
 
 .TP
 .B
-\fB--version\fR
+\fB--check-user\fR NAME
+Runs check for an existing user.
+
+.TP
+.B
+\fB--version\fR, \fB-v\fR
 Prints version and exits.
 
 .TP
@@ -34,9 +40,6 @@ Prints version and exits.
 \fB--help\fR, \fB-h\fR
 Show summary of options.
 .PP
-
-.SH "SEE ALSO"
-\fBpamfingerprint\fR(1), \fBpamfingerprint-check\fR(1)
 
 .SH FILES
 /etc/pamfingerprint.conf
