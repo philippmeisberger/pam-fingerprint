@@ -33,7 +33,7 @@ Install the packages
 
 ### Installation of the latest version
 
-The latest version contains the latest changes that may not have been fully tested and should therefore not be used productively. It is recommended to install the stable version.
+The latest version contains the latest changes that may not have been fully tested and should therefore not be used in production. It is recommended to install the stable version.
 
 Install required packages for building
 
@@ -51,6 +51,10 @@ Build the package
 Install the package
 
     ~# dpkg -i ../libpam-fingerprint*.deb
+
+Install missing dependencies
+
+    ~# apt-get install -f
 
 Setup
 -----
