@@ -8,5 +8,5 @@ debian/libpam-fingerprint
 **.dsc
 **.xz
 **.deb
-**.build
+**.build*
 **.changes
