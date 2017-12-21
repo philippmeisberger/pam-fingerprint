@@ -66,7 +66,7 @@ Enable PAM Fingerprint for a user
 
 Test if everything works well
 
-    ~# pamfingerprint-check --check-user <username>
+    ~# pamfingerprint-conf --check-user <username>
 
 Questions and suggestions
 -------------------------
