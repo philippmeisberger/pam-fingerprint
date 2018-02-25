@@ -45,7 +45,7 @@ Clone this repository
 
 Build the package
 
-    ~$ cd ./pam-fingerprint/
+    ~$ cd ./pam-fingerprint/src/
     ~$ dpkg-buildpackage -uc -us
 
 Install the package
