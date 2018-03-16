@@ -1,3 +1,11 @@
+libpam-fingerprint (1.5) UNRELEASED; urgency=medium
+
+  * Minor release
+  * Added --check-user option to pamfingerprint-conf
+  * Removed pamfingerprint-check
+
+ -- Philipp Meisberger <team@pm-codeworks.de>  Thu, 21 Dec 2017 18:28:23 +0100
+
 libpam-fingerprint (1.4) stable; urgency=medium
 
   * Minor release

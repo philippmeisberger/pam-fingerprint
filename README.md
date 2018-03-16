@@ -3,7 +3,7 @@ PAM Fingerprint
 
 PAM Fingerprint is a Linux Pluggable Authentication Module (PAM) for password-less fingerprint authentication. It uses the ZhianTec ZFM-20 fingerprint sensor (known as "Arduino fingerprint sensor") in conjunction with the PyFingerprint library <https://github.com/bastianraschke/pyfingerprint>.
 
-Per default the password authentication is set as fallback in case no fingerprint sensor is connected. Two-factor authentication is also possible. The module has to be configured by the `pamfingerprint-conf` program. To simulate an authentication process the `pamfingerprint-check` program can be used.
+Per default the password authentication is set as fallback in case no fingerprint sensor is connected. Two-factor authentication is also possible. The module has to be configured by the `pamfingerprint-conf` program.
 
 Installation
 ------------
@@ -70,7 +70,7 @@ Enable PAM Fingerprint for a user
 
 Test if everything works well
 
-    ~# pamfingerprint-check --check-user <username>
+    ~# pamfingerprint-conf --check-user <username>
 
 Questions and suggestions
 -------------------------
