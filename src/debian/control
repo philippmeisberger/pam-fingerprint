@@ -21,6 +21,7 @@ Depends: ${python:Depends},
          python-fingerprint (>= 1.5),
          bash-completion
 Architecture: all
-Description: Pluggable Authentication Module for fingerprint authentication.
- The ZhianTec ZFM-20 fingerprint sensor (known as "Arduino fingerprint sensor")
- is required for this module.
+Description: Pluggable Authentication Module for fingerprint authentication
+ This module provides biomtric fingerprint authentication. Supported sensors
+ are ZhianTec ZFM-20, ZFM-60, ZFM-70 and ZFM-100. Other models like R302, R303,
+ R305, R306, R307, R551 and FPM10A also work.
