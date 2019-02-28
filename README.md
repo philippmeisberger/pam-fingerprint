@@ -12,7 +12,7 @@ There are two ways of installing PAM Fingerprint: Installation of the stable or 
 
 ### Installation of the stable version
 
-Add PM Codeworks repository
+Add PM Code Works repository
 
 * Debian 8:
 
@@ -22,7 +22,7 @@ Add PM Codeworks repository
 
     `~# echo "deb http://apt.pm-codeworks.de stretch main" | tee /etc/apt/sources.list.d/pm-codeworks.list`
 
-Add PM Codeworks key
+Add PM Code Works key
 
     ~# wget -qO - http://apt.pm-codeworks.de/pm-codeworks.de.gpg | apt-key add -
     ~# apt-get update
@@ -37,7 +37,7 @@ The latest version contains the latest changes that may not have been fully test
 
 Install required packages for building
 
-    ~# apt-get install git devscripts
+    ~# apt-get install git devscripts equivs
 
 Clone this repository
 
@@ -46,6 +46,7 @@ Clone this repository
 Build the package
 
     ~$ cd ./pam-fingerprint/src/
+    ~$ sudo mk-build-deps -i debian/control
     ~$ dpkg-buildpackage -uc -us
 
 Install the package
