@@ -14,15 +14,15 @@ There are two ways of installing PAM Fingerprint: Installation of the stable or 
 
 Add PM Code Works repository
 
-* Debian 8:
-
-    `~# echo "deb http://apt.pm-codeworks.de jessie main" | tee /etc/apt/sources.list.d/pm-codeworks.list`
-
 * Debian 9:
 
     `~# echo "deb http://apt.pm-codeworks.de stretch main" | tee /etc/apt/sources.list.d/pm-codeworks.list`
 
-Add PM Code Works key
+* Debian 10:
+
+    `~# echo "deb http://apt.pm-codeworks.de buster main" | tee /etc/apt/sources.list.d/pm-codeworks.list`
+
+Add PM Code Works signing key
 
     ~# wget -qO - http://apt.pm-codeworks.de/pm-codeworks.de.gpg | apt-key add -
     ~# apt-get update
