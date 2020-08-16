@@ -26,4 +26,5 @@ setup(
     license         = 'D-FSL',
     package_dir     = {'': 'files'},
     packages        = ['pamfingerprint'],
+    install_requires= ['pyfingerprint'],
 )
