@@ -14,6 +14,9 @@ import hashlib
 import os
 import ConfigParser
 
+import sys
+sys.path.append('/usr/lib/python2.7/dist-packages')
+
 from pamfingerprint import __version__ as VERSION
 from pamfingerprint import CONFIG_FILE
 from pyfingerprint.pyfingerprint import PyFingerprint
