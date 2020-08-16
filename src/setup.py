@@ -22,7 +22,7 @@ setup(
     description     = 'Linux Pluggable Authentication Module (PAM) for fingerprint authentication',
     author          = 'Philipp Meisberger',
     author_email    = 'team@pm-codeworks.de',
-    url             = 'http://www.pm-codeworks.de/pamfingerprint.html',
+    url             = 'https://www.pm-codeworks.de/pamfingerprint.html',
     license         = 'D-FSL',
     package_dir     = {'': 'files'},
     packages        = ['pamfingerprint'],
