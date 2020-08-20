@@ -1,3 +1,9 @@
+libpam-fingerprint (1.5.1) UNRELEASED; urgency=high
+
+  * Fixed ImportError "No module named pamfingerprint"
+
+ -- Philipp Meisberger <team@pm-codeworks.de>  Thu, 20 Aug 2020 10:03:51 +0200
+
 libpam-fingerprint (1.5) stable; urgency=medium
 
   * Minor release
