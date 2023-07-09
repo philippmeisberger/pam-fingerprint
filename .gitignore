@@ -1,0 +1,14 @@
+src/debian/libpam-fingerprint
+.pybuild/
+*.egg-info
+*.pyc
+
+## Debian package files
+src/debian/.debhelper/
+*.debhelper
+*.substvars
+*.dsc
+*.xz
+*.deb
+*.build*
+*.changes
