@@ -9,7 +9,7 @@ Copyright 2014 Philipp Meisberger <team@pm-codeworks.de>,
 All rights reserved.
 """
 
-from setuptools import setup, find_packages
+from setuptools import setup
 from src.pamfingerprint import __version__
 
 setup(
@@ -21,7 +21,7 @@ setup(
     url='https://www.pm-codeworks.de/pamfingerprint.html',
     license='D-FSL',
     package_dir={'': 'src'},
-    packages=find_packages(),
+    packages=['pamfingerprint'],
     install_requires=['pyfingerprint'],
     classifiers=[
         'Intended Audience :: System Administrators',
