@@ -1,5 +1,6 @@
 src/debian/libpam-fingerprint
 .pybuild/
+.idea/
 *.egg-info
 *.pyc
 
