@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -9,23 +9,24 @@ Copyright 2014 Philipp Meisberger <team@pm-codeworks.de>,
 All rights reserved.
 """
 
-from setuptools import setup
-
-import sys
-
-sys.path.insert(0, './files/')
-
-import pamfingerprint
+from setuptools import setup, find_packages
+from src.pamfingerprint import __version__
 
 setup(
     name='libpam-fingerprint',
-    version=pamfingerprint.__version__,
+    version=__version__,
     description='Linux Pluggable Authentication Module (PAM) for fingerprint authentication',
     author='Philipp Meisberger',
     author_email='team@pm-codeworks.de',
     url='https://www.pm-codeworks.de/pamfingerprint.html',
     license='D-FSL',
-    package_dir={'': 'files'},
-    packages=['pamfingerprint'],
+    package_dir={'': 'src'},
+    packages=find_packages(),
     install_requires=['pyfingerprint'],
+    classifiers=[
+        'Intended Audience :: System Administrators',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Operating System :: Linux',
+    ]
 )
