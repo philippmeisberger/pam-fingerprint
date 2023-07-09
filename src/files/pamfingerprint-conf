@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -14,14 +14,14 @@ import time
 import argparse
 import os
 import pwd
-import ConfigParser
+from configparser import ConfigParser
 
 from pamfingerprint import __version__ as VERSION
 from pamfingerprint import CONFIG_FILE
 from pyfingerprint.pyfingerprint import PyFingerprint
 
 
-class PamFingerprint(object):
+class PamFingerprint:
     """
     Configuration program.
 
@@ -46,7 +46,7 @@ class PamFingerprint(object):
             if ( os.access(CONFIG_FILE, os.R_OK) == False ):
                 raise Exception('The configuration file "' + CONFIG_FILE + '" is not readable!')
 
-            self.__config = ConfigParser.ConfigParser()
+            self.__config = ConfigParser()
             self.__config.read(CONFIG_FILE)
 
         except Exception as e:
@@ -78,7 +78,7 @@ class PamFingerprint(object):
         @return boolean
         """
 
-        answer = raw_input(question + ' (Y/n)')
+        answer = input(question + ' (Y/n)')
 
         if ( answer not in ['y', 'Y', ''] ):
             return False
@@ -156,7 +156,7 @@ class PamFingerprint(object):
             ## Gets characteristics and calculates hash
             self.__fingerprint.loadTemplate(positionNumber, 0x01)
             characteristics = self.__fingerprint.downloadCharacteristics(0x01)
-            fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
+            fingerprintHash = hashlib.sha256(str(characteristics).encode('utf-8')).hexdigest()
 
             ## The new user information list
             userData = (
@@ -226,7 +226,7 @@ class PamFingerprint(object):
             characteristics = self.__fingerprint.downloadCharacteristics(0x01)
 
             ## Calculates hash of template
-            fingerprintHash = hashlib.sha256(str(characteristics)).hexdigest()
+            fingerprintHash = hashlib.sha256(str(characteristics).encode('utf-8')).hexdigest()
 
             ## Checks if template hash matches stored hash
             if ( fingerprintHash == expectedFingerprintHash ):
@@ -308,7 +308,7 @@ class PamFingerprint(object):
 
             ## Calculates hash of template
             print('Calculating hash...')
-            fingerprintHash = hashlib.sha256(str(characterics)).hexdigest()
+            fingerprintHash = hashlib.sha256(str(characterics).encode('utf-8')).hexdigest()
 
             print('Checking if calculated hash matches stored hash...')
 

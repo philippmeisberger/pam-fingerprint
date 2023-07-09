@@ -12,19 +12,20 @@ All rights reserved.
 from setuptools import setup
 
 import sys
+
 sys.path.insert(0, './files/')
 
 import pamfingerprint
 
 setup(
-    name            = 'libpam-fingerprint',
-    version         = pamfingerprint.__version__,
-    description     = 'Linux Pluggable Authentication Module (PAM) for fingerprint authentication',
-    author          = 'Philipp Meisberger',
-    author_email    = 'team@pm-codeworks.de',
-    url             = 'https://www.pm-codeworks.de/pamfingerprint.html',
-    license         = 'D-FSL',
-    package_dir     = {'': 'files'},
-    packages        = ['pamfingerprint'],
-    install_requires= ['pyfingerprint'],
+    name='libpam-fingerprint',
+    version=pamfingerprint.__version__,
+    description='Linux Pluggable Authentication Module (PAM) for fingerprint authentication',
+    author='Philipp Meisberger',
+    author_email='team@pm-codeworks.de',
+    url='https://www.pm-codeworks.de/pamfingerprint.html',
+    license='D-FSL',
+    package_dir={'': 'files'},
+    packages=['pamfingerprint'],
+    install_requires=['pyfingerprint'],
 )

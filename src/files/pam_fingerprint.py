@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -12,7 +12,7 @@ All rights reserved.
 import syslog
 import hashlib
 import os
-import ConfigParser
+from configparser import ConfigParser
 
 from pamfingerprint import __version__ as VERSION
 from pamfingerprint import CONFIG_FILE
@@ -111,7 +111,7 @@ def pam_sm_authenticate(pamh, flags, argv):
         if ( os.access(CONFIG_FILE, os.R_OK) == False ):
             raise Exception('The configuration file "' + CONFIG_FILE + '" is not readable!')
 
-        configParser = ConfigParser.ConfigParser()
+        configParser = ConfigParser()
         configParser.read(CONFIG_FILE)
 
         ## Log the user
@@ -190,7 +190,7 @@ def pam_sm_authenticate(pamh, flags, argv):
         characterics = fingerprint.downloadCharacteristics(0x01)
 
         ## Calculates hash of template
-        fingerprintHash = hashlib.sha256(str(characterics)).hexdigest()
+        fingerprintHash = hashlib.sha256(str(characterics).encode('utf-8')).hexdigest()
 
         ## Checks if the calculated hash is equal to expected hash from user
         if ( fingerprintHash == expectedFingerprintHash ):
