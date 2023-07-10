@@ -19,7 +19,7 @@ setup(
     author='Philipp Meisberger',
     author_email='team@pm-codeworks.de',
     url='https://www.pm-codeworks.de/pamfingerprint.html',
-    license='D-FSL',
+    license='AGPL',
     package_dir={'': 'src'},
     packages=['pamfingerprint'],
     install_requires=['pyfingerprint'],
