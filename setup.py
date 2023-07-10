@@ -27,6 +27,6 @@ setup(
         'Intended Audience :: System Administrators',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Operating System :: Linux',
+        'Operating System :: POSIX :: Linux',
     ]
 )
