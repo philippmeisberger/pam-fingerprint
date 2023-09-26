@@ -1,0 +1,4 @@
+debian/pam-auth-update/fingerprint usr/share/pam-configs/
+src/pam_fingerprint.py lib/security/
+src/pamfingerprint-conf usr/bin/
+src/pamfingerprint.conf etc/
