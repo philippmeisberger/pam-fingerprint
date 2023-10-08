@@ -14,22 +14,18 @@ There are two ways of installing PAM Fingerprint: Installation of the stable or 
 
 Add PM Code Works repository
 
-* Debian 9:
+Debian 12:
 
-    `~# echo "deb http://apt.pm-codeworks.de stretch main" | tee /etc/apt/sources.list.d/pm-codeworks.list`
-
-* Debian 10:
-
-    `~# echo "deb http://apt.pm-codeworks.de buster main" | tee /etc/apt/sources.list.d/pm-codeworks.list`
+    ~# echo "deb https://apt.pm-codeworks.de bookworm main" | tee /etc/apt/sources.list.d/pm-codeworks.list
 
 Add PM Code Works signing key
 
-    ~# wget -qO - http://apt.pm-codeworks.de/pm-codeworks.de.gpg | apt-key add -
-    ~# apt-get update
+    ~# wget -qO - https://apt.pm-codeworks.de/pm-codeworks.de.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/pm-codeworks.de.gpg
+    ~# apt update
 
 Install the packages
 
-    ~# apt-get install python-fingerprint libpam-fingerprint
+    ~# apt install python-fingerprint libpam-fingerprint
 
 ### Installation of the latest version
 
@@ -37,7 +33,7 @@ The latest version contains the latest changes that may not have been fully test
 
 Install required packages for building
 
-    ~# apt-get install git devscripts equivs
+    ~# apt install git devscripts equivs
 
 Clone this repository
 
@@ -55,7 +51,7 @@ Install the package
 
 Install missing dependencies
 
-    ~# apt-get install -f
+    ~# apt install -f
 
 Setup
 -----
