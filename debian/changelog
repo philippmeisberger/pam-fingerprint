@@ -1,9 +1,10 @@
-libpam-fingerprint (1.6) UNRELEASED; urgency=medium
+libpam-fingerprint (1.6) stable; urgency=medium
 
   * Minor release
   * migrated to python3
+  * re-licensed with AGPL
 
- -- Philipp Meisberger <team@pm-codeworks.de>  Sun, 02 Jul 2023 21:25:20 +0200
+ -- Philipp Meisberger <team@pm-codeworks.de>  Fri, 13 Oct 2023 20:37:48 +0200
 
 libpam-fingerprint (1.5) stable; urgency=medium
 
